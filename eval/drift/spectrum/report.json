@@ -1,0 +1,378 @@
+{
+  "measured": {
+    "pages": 3,
+    "elements": 57,
+    "textElements": 15,
+    "urls": [
+      "https://spectrum.adobe.com/",
+      "https://spectrum.adobe.com/page/button/",
+      "https://spectrum.adobe.com/page/color-system/"
+    ],
+    "viewports": [
+      1280
+    ],
+    "measuredAt": "2026-10-08T10:45:09.932Z"
+  },
+  "system": {
+    "colour": {
+      "tokens": [
+        {
+          "value": "#F7F7F7",
+          "weight": 0.99,
+          "members": 1,
+          "share": 0.3946,
+          "roles": [
+            "ground"
+          ]
+        },
+        {
+          "value": "#717171",
+          "weight": 0.82,
+          "members": 1,
+          "share": 0.3297,
+          "roles": [
+            "text"
+          ]
+        },
+        {
+          "value": "#131313",
+          "weight": 0.17,
+          "members": 1,
+          "share": 0.068,
+          "roles": [
+            "ground",
+            "border"
+          ]
+        },
+        {
+          "value": "#3B63FB",
+          "weight": 0.17,
+          "members": 1,
+          "share": 0.067,
+          "roles": [
+            "ground",
+            "border"
+          ]
+        },
+        {
+          "value": "#DBE8FF",
+          "weight": 0.17,
+          "members": 1,
+          "share": 0.0667,
+          "roles": [
+            "border"
+          ]
+        },
+        {
+          "value": "#274DEA",
+          "weight": 0.08,
+          "members": 1,
+          "share": 0.0311,
+          "roles": [
+            "text"
+          ]
+        },
+        {
+          "value": "#292929",
+          "weight": 0.04,
+          "members": 1,
+          "share": 0.0173,
+          "roles": [
+            "text"
+          ]
+        },
+        {
+          "value": "#000000",
+          "weight": 0.03,
+          "members": 1,
+          "share": 0.0116,
+          "roles": [
+            "text"
+          ]
+        },
+        {
+          "value": "#FFFFFF",
+          "weight": 0.03,
+          "members": 1,
+          "share": 0.0104,
+          "roles": [
+            "text"
+          ]
+        }
+      ],
+      "coverage": 0.9964,
+      "distinct": 10,
+      "sprawl": 1.11,
+      "nearMisses": [],
+      "tail": [
+        {
+          "value": "#E5ECF8",
+          "weight": 0.01
+        }
+      ],
+      "drift": 6.18
+    },
+    "spacing": {
+      "step": 2,
+      "coverage": 0.9365,
+      "onScale": true,
+      "residual": 0.083,
+      "offScale": [
+        {
+          "value": 102.656,
+          "weight": 4,
+          "off": 0.66
+        }
+      ],
+      "considered": [
+        {
+          "step": 2,
+          "coverage": 0.9365
+        },
+        {
+          "step": 3,
+          "coverage": 0.4762
+        },
+        {
+          "step": 4,
+          "coverage": 0.8413
+        },
+        {
+          "step": 5,
+          "coverage": 0.0635
+        },
+        {
+          "step": 6,
+          "coverage": 0.4762
+        },
+        {
+          "step": 7,
+          "coverage": 0.0317
+        },
+        {
+          "step": 8,
+          "coverage": 0.6825
+        },
+        {
+          "step": 9,
+          "coverage": 0
+        },
+        {
+          "step": 10,
+          "coverage": 0.0635
+        },
+        {
+          "step": 11,
+          "coverage": 0.0952
+        },
+        {
+          "step": 12,
+          "coverage": 0.4127
+        },
+        {
+          "step": 13,
+          "coverage": 0
+        },
+        {
+          "step": 14,
+          "coverage": 0.0317
+        },
+        {
+          "step": 15,
+          "coverage": 0
+        },
+        {
+          "step": 16,
+          "coverage": 0.1587
+        },
+        {
+          "step": 17,
+          "coverage": 0
+        },
+        {
+          "step": 18,
+          "coverage": 0
+        },
+        {
+          "step": 19,
+          "coverage": 0
+        },
+        {
+          "step": 20,
+          "coverage": 0.0317
+        },
+        {
+          "step": 21,
+          "coverage": 0
+        },
+        {
+          "step": 22,
+          "coverage": 0.0952
+        },
+        {
+          "step": 23,
+          "coverage": 0
+        },
+        {
+          "step": 24,
+          "coverage": 0.254
+        }
+      ]
+    },
+    "type": {
+      "values": [
+        {
+          "value": 14,
+          "weight": 81,
+          "share": 0.0636,
+          "members": 1
+        },
+        {
+          "value": 16,
+          "weight": 1078,
+          "share": 0.8462,
+          "members": 1
+        },
+        {
+          "value": 18,
+          "weight": 78,
+          "share": 0.0612,
+          "members": 1
+        },
+        {
+          "value": 40,
+          "weight": 18,
+          "share": 0.0141,
+          "members": 1
+        },
+        {
+          "value": 64,
+          "weight": 19,
+          "share": 0.0149,
+          "members": 1
+        }
+      ],
+      "distinct": 5,
+      "incidental": [],
+      "ratio": {
+        "ratio": 1.371,
+        "spread": 1.097,
+        "steps": 5
+      }
+    },
+    "families": {
+      "values": [
+        {
+          "value": "adobe-clean",
+          "weight": 1274,
+          "share": 100
+        }
+      ],
+      "distinct": 1
+    },
+    "leading": {
+      "values": [
+        {
+          "value": 1,
+          "weight": 19,
+          "share": 0.0149,
+          "members": 1
+        },
+        {
+          "value": 1.2,
+          "weight": 73,
+          "share": 0.0573,
+          "members": 1
+        },
+        {
+          "value": 1.22,
+          "weight": 23,
+          "share": 0.0181,
+          "members": 1
+        },
+        {
+          "value": 1.29,
+          "weight": 10,
+          "share": 0.0078,
+          "members": 1
+        },
+        {
+          "value": 1.5,
+          "weight": 1149,
+          "share": 0.9019,
+          "members": 1
+        }
+      ],
+      "distinct": 5,
+      "incidental": [
+        {
+          "value": 1.29,
+          "weight": 10,
+          "share": 0.0078,
+          "members": 1
+        }
+      ]
+    },
+    "radius": {
+      "absent": false,
+      "scale": [
+        {
+          "value": 16,
+          "weight": 4,
+          "share": 0.3333,
+          "members": 1
+        },
+        {
+          "value": 24,
+          "weight": 4,
+          "share": 0.3333,
+          "members": 1
+        },
+        {
+          "value": 100,
+          "weight": 4,
+          "share": 0.3333,
+          "members": 1
+        }
+      ],
+      "distinct": 3
+    },
+    "borders": {
+      "values": [
+        {
+          "value": 1,
+          "weight": 4,
+          "share": 0.3333,
+          "members": 1
+        },
+        {
+          "value": 2,
+          "weight": 8,
+          "share": 0.6667,
+          "members": 1
+        }
+      ],
+      "distinct": 2,
+      "incidental": []
+    },
+    "shadow": {
+      "values": [],
+      "distinct": 0
+    }
+  },
+  "numbers": {
+    "size": 16,
+    "coverage": 99.6,
+    "spacingCoverage": 93.7,
+    "sprawl": 1.8,
+    "wasteValues": 0,
+    "wasteShare": 0
+  },
+  "findings": [
+    "10 distinct colours render across the pages surveyed. 9 of them account for 99.6% of the colour on the page.",
+    "Spacing follows a 2px step, which explains 93.7% of the margins, padding and gaps measured.",
+    "1 spacing values sit off that step, the most frequent being 102.656px, which is 0.66px from the nearest multiple.",
+    "5 distinct font sizes are in use across 5 steps. The sizes sit on roughly a 1.371 ratio.",
+    "3 corner radii are in use, clustering into 3 steps."
+  ]
+}

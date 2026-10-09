@@ -1,0 +1,41 @@
+{
+  "$description": "Public design systems whose own sites `af drift` measures. The question for each is the same: how far does the flagship's site drift from the flagship's system. A key is a directory under eval/drift/; the pages are the system's home and the two pages most sites of this kind have, a component page and a colour or foundations page. A page that does not resolve is recorded as such by eval/drift-batch.mjs, not skipped silently. URLs were written without network access on 2026-10-08 and have not been verified; the batch runner records which of them answered.",
+  "targets": {
+    "govuk": {
+      "name": "GOV.UK Design System",
+      "pages": ["https://design-system.service.gov.uk/", "https://design-system.service.gov.uk/components/button/", "https://design-system.service.gov.uk/styles/colour/"]
+    },
+    "carbon": {
+      "name": "Carbon (IBM)",
+      "pages": ["https://carbondesignsystem.com/", "https://carbondesignsystem.com/components/button/usage/", "https://carbondesignsystem.com/elements/color/overview/"]
+    },
+    "material": {
+      "name": "Material 3 (Google)",
+      "pages": ["https://m3.material.io/", "https://m3.material.io/components/buttons/overview", "https://m3.material.io/styles/color/overview"]
+    },
+    "primer": {
+      "name": "Primer (GitHub)",
+      "pages": ["https://primer.style/", "https://primer.style/product/components/button/", "https://primer.style/product/getting-started/foundations/color/"]
+    },
+    "polaris": {
+      "name": "Polaris (Shopify)",
+      "pages": ["https://polaris.shopify.com/", "https://polaris.shopify.com/components/actions/button", "https://polaris.shopify.com/design/colors"]
+    },
+    "uswds": {
+      "name": "USWDS",
+      "pages": ["https://designsystem.digital.gov/", "https://designsystem.digital.gov/components/button/", "https://designsystem.digital.gov/design-tokens/color/overview/"]
+    },
+    "atlassian": {
+      "name": "Atlassian Design System",
+      "pages": ["https://atlassian.design/", "https://atlassian.design/components/button/examples", "https://atlassian.design/foundations/color-new"]
+    },
+    "spectrum": {
+      "name": "Spectrum (Adobe)",
+      "pages": ["https://spectrum.adobe.com/", "https://spectrum.adobe.com/page/button/", "https://spectrum.adobe.com/page/color-system/"]
+    },
+    "fluent": {
+      "name": "Fluent 2 (Microsoft)",
+      "pages": ["https://fluent2.microsoft.design/", "https://fluent2.microsoft.design/components/web/react/core/button/usage", "https://fluent2.microsoft.design/color"]
+    }
+  }
+}

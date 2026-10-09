@@ -1,0 +1,13 @@
+Applied Form engine
+Copyright 2026 Applied Form Ltd
+
+This product is licensed under the Apache License, Version 2.0 (see LICENSE).
+
+The name "Applied Form", the Applied Form wordmark and the Applied Form mark are trademarks and
+are not licensed under the Apache License. The token file in tokens/ is the Reference system, a
+neutral palette over the engine's structure, written for testing the engine; it is not the
+Applied Form design system, which is licensed separately.
+
+The fonts in fonts/ (Fraunces, Libre Franklin, IBM Plex Mono) are distributed under the SIL Open
+Font License 1.1. Each family's copyright notice and the licence text are in fonts/OFL-*.txt;
+see fonts/README.md.

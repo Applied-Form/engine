@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en" data-register="ii">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Clean · a Register II page built from the tokens alone</title>
+<link rel="stylesheet" href="../../dist/tokens.css">
+<style>
+  /* The smallest page every rule passes: tokens.css and nothing that is not a token. It is the
+     engine's own clean case, so a test of "a page the gate accepts" does not have to borrow a
+     reference page that belongs to one system's identity. */
+  body { margin: 0; background: var(--af-color-white); color: var(--af-color-text-ii); font: var(--af-type-body-weight) var(--af-type-body-size)/var(--af-type-body-leading) var(--af-font-text); }
+  main { max-width: 66ch; margin: 0 auto; padding: var(--af-space-04) var(--af-space-03); }
+  h1 { font: var(--af-type-heading-02-weight) var(--af-type-heading-02-size)/var(--af-type-heading-02-leading) var(--af-font-text); margin: 0 0 var(--af-space-02); }
+  p { margin: 0 0 var(--af-space-02); }
+</style>
+</head>
+<body>
+<main id="main">
+  <h1>A clean page</h1>
+  <p>Every value on this page comes from the token file. It has a register, one voice, a measure inside the limit, and nothing for a rule to object to.</p>
+  <p>It is a fixture, not a design.</p>
+</main>
+</body>
+</html>

@@ -1,0 +1,60 @@
+{
+  "name": "@appliedform/engine",
+  "version": "3.1.0",
+  "description": "A design-system conformance gate measured in a real browser: DTCG tokens in, every rendered page checked at every width, with drift surveys, an MCP server and an evaluation harness anyone can rerun.",
+  "type": "module",
+  "mcpName": "io.github.applied-form/engine",
+  "license": "Apache-2.0",
+  "author": "Applied Form Ltd",
+  "engines": {
+    "node": ">=20"
+  },
+  "bin": {
+    "af": "bin/af.mjs",
+    "af-mcp": "scripts/mcp.mjs",
+    "engine": "scripts/mcp.mjs"
+  },
+  "files": [
+    "bin",
+    "src",
+    "scripts",
+    "tokens",
+    "fonts",
+    "dist",
+    "docs",
+    "af.config.example.json",
+    "server.json",
+    "NOTICE"
+  ],
+  "scripts": {
+    "build": "node scripts/build-css.mjs && node scripts/build-components.mjs && node scripts/build-stylelint.mjs",
+    "test": "node --test test/*.test.mjs",
+    "check": "npm run build && npm test && node scripts/lint-page.mjs test/fixtures/clean.html",
+    "mcp": "node scripts/mcp.mjs",
+    "drift:batch": "node eval/drift-batch.mjs",
+    "eval": "node eval/run.mjs",
+    "eval:analyse": "node eval/analyse.mjs",
+    "eval:judge": "node eval/judge-run.mjs",
+    "eval:compare": "node eval/compare.mjs test/fixtures/violations.html test/fixtures/attacks.html test/fixtures/clean.html",
+    "prepack": "node -e \"const e={...process.env};delete e.AF_BRAND;require('child_process').execSync('npm run build',{stdio:'inherit',env:e})\""
+  },
+  "dependencies": {
+    "playwright": "^1.56.1"
+  },
+  "devDependencies": {
+    "@anthropic-ai/foundry-sdk": "^0.5.4",
+    "@anthropic-ai/sdk": "^0.123.0",
+    "axe-core": "^4.10.0",
+    "stylelint": "^17.16.0",
+    "stylelint-declaration-strict-value": "^1.12.1"
+  },
+  "keywords": [
+    "design-system",
+    "design-tokens",
+    "dtcg",
+    "accessibility",
+    "lint",
+    "playwright",
+    "mcp"
+  ]
+}

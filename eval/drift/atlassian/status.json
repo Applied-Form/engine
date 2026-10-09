@@ -1,0 +1,15 @@
+{
+  "key": "atlassian",
+  "name": "Atlassian Design System",
+  "pages": [
+    "https://atlassian.design/",
+    "https://atlassian.design/components/button/examples",
+    "https://atlassian.design/foundations/color-new"
+  ],
+  "started": "2026-10-08T10:45:02.191Z",
+  "finished": "2026-10-08T10:45:08.458Z",
+  "ok": true,
+  "exit": 0,
+  "stdout": "wrote eval/drift/atlassian/survey.json\nwrote eval/drift/atlassian/report.json\n\nSurveyed 3 page-viewport pairs, 5593 rendered elements, measured 2026-10-08.\n\n  system size      29 values describe the site\n  colour coverage  90.2% of the colour on the page\n  spacing step     2px, explaining 99.4%\n  sprawl           3.7x more distinct values than tokens\n  waste            2 indistinguishable colours, 2.4% of the page\n\n· 72 distinct colours render across the pages surveyed. 12 of them account for 90.2% of the colour on the page.\n· 2 colours sit within a just-noticeable difference of a colour already in use and cannot be told apart by eye — together 2.4% of the colour on the page. The heaviest is #D7D8D7, which is 2.13 from #DDDEDD.\n· Spacing follows a 2px step, which explains 99.4% of the margins, padding and gaps measured.\n· 1 spacing values sit off that step, the most frequent being 1px, which is 1px from the nearest multiple.\n· 14 distinct font sizes are in use across 13 steps. The sizes sit on roughly a 1.155 ratio.\n· 8 of those sizes carry under 1% of the text each, which is the signature of a one-off rather than a step.\n· 12 corner radii are in use, clustering into 12 steps.\n· 4 distinct shadows are in use. An elevation scale usually has two or three.\n\n",
+  "stderr": ""
+}

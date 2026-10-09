@@ -1,0 +1,9 @@
+{
+  "_": "Copy to af.config.json in a consuming repo. Every rule is `error` unless named here. `af rules` lists them.",
+  "rules": {
+    "measure": "warn",
+    "spacing": "warn",
+    "label-apca": "off"
+  },
+  "baseline": "af-baseline.json"
+}

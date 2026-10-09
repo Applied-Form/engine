@@ -1,0 +1,123 @@
+{
+  "$description": "Meridian: a brand overlay derived by af brand. Colour only; type, mark, spacing, grid and every rule come from the base file. The two light status tints and the two literal steps of the sequential chart scale are derived from Meridian's own palette (tints mixed toward white until they clear 4.6:1 on its espresso; scale steps the midpoints of its sand, clay and terra deep), so no value in the study is Applied Form's.",
+  "$extensions": {
+    "form.applied": {
+      "brand": {
+        "name": "Meridian"
+      }
+    }
+  },
+  "color": {
+    "paper": {
+      "$value": "#F2F6F3"
+    },
+    "sand": {
+      "$value": "#E3ECE5"
+    },
+    "tint": {
+      "$value": "#CAE1D0"
+    },
+    "clay": {
+      "$value": "#4BB47C"
+    },
+    "clay-light": {
+      "$value": "#ACD7C0"
+    },
+    "clay-deep": {
+      "$value": "#327652"
+    },
+    "terracotta": {
+      "$value": "#257E4F"
+    },
+    "terra-deep": {
+      "$value": "#15653A"
+    },
+    "terracotta-light": {
+      "$value": "#8BD3AC"
+    },
+    "teal": {
+      "$value": "#A250A5"
+    },
+    "teal-deep": {
+      "$value": "#9E45A1"
+    },
+    "teal-light": {
+      "$value": "#D9BBDA"
+    },
+    "espresso": {
+      "$value": "#2B5A41"
+    },
+    "ink": {
+      "$value": "#222B26"
+    },
+    "muted": {
+      "$value": "#566E61"
+    },
+    "layer-ii": {
+      "$value": "#F3F6F4"
+    },
+    "text-ii": {
+      "$value": "#161D19"
+    },
+    "positive": {
+      "$value": "#497969"
+    },
+    "caution": {
+      "$value": "#C0891B"
+    },
+    "caution-deep": {
+      "$value": "#886113"
+    },
+    "critical": {
+      "$value": "#B8392E"
+    },
+    "positive-light": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.7216,
+          0.7961,
+          0.7725
+        ],
+        "hex": "#B8CBC5"
+      }
+    },
+    "critical-light": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.9059,
+          0.7373,
+          0.7216
+        ],
+        "hex": "#E7BCB8"
+      }
+    }
+  },
+  "chart": {
+    "scale-sequential": {
+      "2": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.5922,
+            0.8157,
+            0.6941
+          ],
+          "hex": "#97D0B1"
+        }
+      },
+      "4": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.1882,
+            0.5529,
+            0.3569
+          ],
+          "hex": "#308D5B"
+        }
+      }
+    }
+  }
+}

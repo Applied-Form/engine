@@ -1,0 +1,15 @@
+{
+  "key": "polaris",
+  "name": "Polaris (Shopify)",
+  "pages": [
+    "https://polaris.shopify.com/",
+    "https://polaris.shopify.com/components/actions/button",
+    "https://polaris.shopify.com/design/colors"
+  ],
+  "started": "2026-10-08T10:44:55.020Z",
+  "finished": "2026-10-08T10:44:58.163Z",
+  "ok": true,
+  "exit": 0,
+  "stdout": "wrote eval/drift/polaris/survey.json\nwrote eval/drift/polaris/report.json\n\nSurveyed 3 page-viewport pairs, 750 rendered elements, measured 2026-10-08.\n\n  system size      16 values describe the site\n  colour coverage  100% of the colour on the page\n  spacing step     2px, explaining 96.6%\n  sprawl           1.9x more distinct values than tokens\n  waste            1 indistinguishable colours, 5.6% of the page\n\n· 10 distinct colours render across the pages surveyed. 8 of them account for 100% of the colour on the page.\n· 1 colours sit within a just-noticeable difference of a colour already in use and cannot be told apart by eye — together 5.6% of the colour on the page. The heaviest is #FAFBFB, which is 1.5 from #FFFFFF.\n· Spacing follows a 2px step, which explains 96.6% of the margins, padding and gaps measured.\n· 2 spacing values sit off that step, the most frequent being 3px, which is 1px from the nearest multiple.\n· 5 distinct font sizes are in use across 5 steps. The sizes sit on roughly a 1.25 ratio.\n· 1 of those sizes carry under 1% of the text each, which is the signature of a one-off rather than a step.\n· 3 corner radii are in use, clustering into 3 steps.\n· 3 distinct shadows are in use. An elevation scale usually has two or three.\n\n",
+  "stderr": ""
+}

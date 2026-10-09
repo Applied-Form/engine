@@ -1,0 +1,15 @@
+{
+  "key": "uswds",
+  "name": "USWDS",
+  "pages": [
+    "https://designsystem.digital.gov/",
+    "https://designsystem.digital.gov/components/button/",
+    "https://designsystem.digital.gov/design-tokens/color/overview/"
+  ],
+  "started": "2026-10-08T10:44:58.164Z",
+  "finished": "2026-10-08T10:45:02.190Z",
+  "ok": true,
+  "exit": 0,
+  "stdout": "wrote eval/drift/uswds/survey.json\nwrote eval/drift/uswds/report.json\n\nSurveyed 3 page-viewport pairs, 1556 rendered elements, measured 2026-10-08.\n\n  system size      24 values describe the site\n  colour coverage  97.7% of the colour on the page\n  spacing step     2px, explaining 99.6%\n  sprawl           3.1x more distinct values than tokens\n  waste            6 indistinguishable colours, 9.6% of the page\n\n· 42 distinct colours render across the pages surveyed. 8 of them account for 97.7% of the colour on the page.\n· 6 colours sit within a just-noticeable difference of a colour already in use and cannot be told apart by eye — together 9.6% of the colour on the page. The heaviest is #FFFFFF, which is 1.04 from #FCFCFC.\n· Spacing follows a 2px step, which explains 99.6% of the margins, padding and gaps measured.\n· 4 spacing values sit off that step, the most frequent being 29.3756px, which is 0.62px from the nearest multiple.\n· 13 distinct font sizes are in use across 12 steps. The sizes sit on roughly a 1.086 ratio.\n· 5 of those sizes carry under 1% of the text each, which is the signature of a one-off rather than a step.\n· 4 corner radii are in use, clustering into 4 steps.\n· 11 distinct shadows are in use. An elevation scale usually has two or three.\n\n",
+  "stderr": ""
+}

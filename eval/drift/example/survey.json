@@ -1,0 +1,463 @@
+{
+  "measured": {
+    "urls": [
+      "https://example.com/"
+    ],
+    "viewports": [
+      1280
+    ],
+    "measuredAt": "2026-10-08T11:10:34.880Z",
+    "pages": 1
+  },
+  "merged": {
+    "elements": 13,
+    "textElements": 7,
+    "textColor": [
+      {
+        "value": "#000000",
+        "weight": 156
+      },
+      {
+        "value": "#000000",
+        "weight": 131
+      },
+      {
+        "value": "#000000",
+        "weight": 40
+      },
+      {
+        "value": "#000000",
+        "weight": 196
+      },
+      {
+        "value": "#000000",
+        "weight": 206
+      },
+      {
+        "value": "#000000",
+        "weight": 167
+      },
+      {
+        "value": "#0000EE",
+        "weight": 10
+      }
+    ],
+    "ground": [],
+    "borderColor": [],
+    "spacing": [
+      {
+        "value": 400,
+        "weight": 1
+      },
+      {
+        "value": 400,
+        "weight": 1
+      },
+      {
+        "value": 225,
+        "weight": 1
+      },
+      {
+        "value": 32,
+        "weight": 1
+      },
+      {
+        "value": 32,
+        "weight": 1
+      },
+      {
+        "value": 32,
+        "weight": 1
+      },
+      {
+        "value": 186,
+        "weight": 1
+      },
+      {
+        "value": 186,
+        "weight": 1
+      },
+      {
+        "value": 16,
+        "weight": 1
+      },
+      {
+        "value": 16,
+        "weight": 1
+      },
+      {
+        "value": 14,
+        "weight": 1
+      },
+      {
+        "value": 14,
+        "weight": 1
+      },
+      {
+        "value": 14,
+        "weight": 1
+      },
+      {
+        "value": 14,
+        "weight": 1
+      },
+      {
+        "value": 14,
+        "weight": 1
+      },
+      {
+        "value": 14,
+        "weight": 1
+      },
+      {
+        "value": 14,
+        "weight": 1
+      },
+      {
+        "value": 14,
+        "weight": 1
+      },
+      {
+        "value": 14,
+        "weight": 1
+      },
+      {
+        "value": 14,
+        "weight": 1
+      }
+    ],
+    "fontSize": [
+      {
+        "value": 16,
+        "weight": 156
+      },
+      {
+        "value": 14,
+        "weight": 131
+      },
+      {
+        "value": 14,
+        "weight": 40
+      },
+      {
+        "value": 14,
+        "weight": 196
+      },
+      {
+        "value": 14,
+        "weight": 206
+      },
+      {
+        "value": 14,
+        "weight": 167
+      },
+      {
+        "value": 16,
+        "weight": 10
+      }
+    ],
+    "fontFamily": [
+      {
+        "value": "system-ui",
+        "weight": 156
+      },
+      {
+        "value": "system-ui",
+        "weight": 131
+      },
+      {
+        "value": "system-ui",
+        "weight": 40
+      },
+      {
+        "value": "system-ui",
+        "weight": 196
+      },
+      {
+        "value": "system-ui",
+        "weight": 206
+      },
+      {
+        "value": "system-ui",
+        "weight": 167
+      },
+      {
+        "value": "system-ui",
+        "weight": 10
+      }
+    ],
+    "fontWeight": [
+      {
+        "value": 400,
+        "weight": 156
+      },
+      {
+        "value": 400,
+        "weight": 131
+      },
+      {
+        "value": 400,
+        "weight": 40
+      },
+      {
+        "value": 400,
+        "weight": 196
+      },
+      {
+        "value": 400,
+        "weight": 206
+      },
+      {
+        "value": 400,
+        "weight": 167
+      },
+      {
+        "value": 400,
+        "weight": 10
+      }
+    ],
+    "lineHeight": [
+      {
+        "value": 1.6,
+        "weight": 156
+      },
+      {
+        "value": 1.6,
+        "weight": 131
+      },
+      {
+        "value": 1.6,
+        "weight": 40
+      },
+      {
+        "value": 1.6,
+        "weight": 196
+      },
+      {
+        "value": 1.6,
+        "weight": 206
+      },
+      {
+        "value": 1.6,
+        "weight": 167
+      },
+      {
+        "value": 1.6,
+        "weight": 10
+      }
+    ],
+    "radius": [
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      }
+    ],
+    "borderWidth": [],
+    "shadow": [],
+    "pages": 1
+  }
+}

@@ -1,0 +1,712 @@
+{
+  "measured": {
+    "pages": 3,
+    "elements": 2664,
+    "textElements": 917,
+    "urls": [
+      "https://primer.style/",
+      "https://primer.style/product/components/button/",
+      "https://primer.style/product/getting-started/foundations/color/"
+    ],
+    "viewports": [
+      1280
+    ],
+    "measuredAt": "2026-10-08T10:44:54.972Z"
+  },
+  "system": {
+    "colour": {
+      "tokens": [
+        {
+          "value": "#FFFFFF",
+          "weight": 0.73,
+          "members": 1,
+          "share": 0.2924,
+          "roles": [
+            "text",
+            "ground"
+          ]
+        },
+        {
+          "value": "#1F2328",
+          "weight": 0.49,
+          "members": 1,
+          "share": 0.194,
+          "roles": [
+            "text"
+          ]
+        },
+        {
+          "value": "#D1D9E0",
+          "weight": 0.46,
+          "members": 1,
+          "share": 0.1833,
+          "roles": [
+            "text",
+            "border"
+          ]
+        },
+        {
+          "value": "#F6F8FA",
+          "weight": 0.27,
+          "members": 2,
+          "share": 0.1081,
+          "roles": [
+            "ground"
+          ]
+        },
+        {
+          "value": "#393A34",
+          "weight": 0.17,
+          "members": 1,
+          "share": 0.0698,
+          "roles": [
+            "text"
+          ]
+        },
+        {
+          "value": "#58635B",
+          "weight": 0.06,
+          "members": 1,
+          "share": 0.0257,
+          "roles": [
+            "text"
+          ]
+        },
+        {
+          "value": "#25292E",
+          "weight": 0.06,
+          "members": 1,
+          "share": 0.0236,
+          "roles": [
+            "text"
+          ]
+        },
+        {
+          "value": "#000000",
+          "weight": 0.05,
+          "members": 1,
+          "share": 0.0211,
+          "roles": [
+            "text"
+          ]
+        },
+        {
+          "value": "#00009F",
+          "weight": 0.04,
+          "members": 1,
+          "share": 0.0157,
+          "roles": [
+            "text"
+          ]
+        },
+        {
+          "value": "#00A4DB",
+          "weight": 0.03,
+          "members": 1,
+          "share": 0.0131,
+          "roles": [
+            "text"
+          ]
+        },
+        {
+          "value": "#59636E",
+          "weight": 0.03,
+          "members": 1,
+          "share": 0.0111,
+          "roles": [
+            "text"
+          ]
+        },
+        {
+          "value": "#0055D5",
+          "weight": 0.02,
+          "members": 1,
+          "share": 0.0089,
+          "roles": [
+            "text"
+          ]
+        }
+      ],
+      "coverage": 0.9667,
+      "distinct": 30,
+      "sprawl": 2.5,
+      "nearMisses": [
+        {
+          "value": "#EFF2F5",
+          "weight": 0.00001772084256298797,
+          "nearestToken": "#F6F8FA",
+          "distance": 2.22
+        }
+      ],
+      "tail": [
+        {
+          "value": "#0969DA",
+          "weight": 0.02
+        },
+        {
+          "value": "#E3116C",
+          "weight": 0.01
+        },
+        {
+          "value": "#DFE4E9",
+          "weight": 0.01
+        },
+        {
+          "value": "#1F793A",
+          "weight": 0.01
+        },
+        {
+          "value": "#CF222E",
+          "weight": 0.01
+        },
+        {
+          "value": "#E6EAEF",
+          "weight": 0
+        },
+        {
+          "value": "#DAE1E6",
+          "weight": 0
+        },
+        {
+          "value": "#B2BAB6",
+          "weight": 0
+        },
+        {
+          "value": "#D1242F",
+          "weight": 0
+        },
+        {
+          "value": "#36ACAA",
+          "weight": 0
+        },
+        {
+          "value": "#1A7F37",
+          "weight": 0
+        },
+        {
+          "value": "#F2F5F3",
+          "weight": 0
+        },
+        {
+          "value": "#ECEEF0",
+          "weight": 0
+        },
+        {
+          "value": "#1F883D",
+          "weight": 0
+        },
+        {
+          "value": "#DAFBE1",
+          "weight": 0
+        },
+        {
+          "value": "#197634",
+          "weight": 0
+        },
+        {
+          "value": "#0377FF",
+          "weight": 0
+        }
+      ],
+      "drift": 31.17
+    },
+    "spacing": {
+      "step": 4,
+      "coverage": 0.906,
+      "onScale": true,
+      "residual": 0.162,
+      "offScale": [
+        {
+          "value": 10,
+          "weight": 104,
+          "off": 2
+        },
+        {
+          "value": 2.72,
+          "weight": 64,
+          "off": 1.28
+        },
+        {
+          "value": 6,
+          "weight": 35,
+          "off": 2
+        },
+        {
+          "value": 7,
+          "weight": 8,
+          "off": 1
+        },
+        {
+          "value": 2,
+          "weight": 6,
+          "off": 2
+        },
+        {
+          "value": 3.33691,
+          "weight": 4,
+          "off": 0.66
+        },
+        {
+          "value": 98.75,
+          "weight": 2,
+          "off": 1.25
+        },
+        {
+          "value": 1,
+          "weight": 2,
+          "off": 1
+        },
+        {
+          "value": 90,
+          "weight": 2,
+          "off": 2
+        },
+        {
+          "value": 47,
+          "weight": 1,
+          "off": 1
+        }
+      ],
+      "considered": [
+        {
+          "step": 2,
+          "coverage": 0.9666
+        },
+        {
+          "step": 3,
+          "coverage": 0.1698
+        },
+        {
+          "step": 4,
+          "coverage": 0.906
+        },
+        {
+          "step": 5,
+          "coverage": 0.0445
+        },
+        {
+          "step": 6,
+          "coverage": 0.141
+        },
+        {
+          "step": 7,
+          "coverage": 0.0206
+        },
+        {
+          "step": 8,
+          "coverage": 0.7481
+        },
+        {
+          "step": 9,
+          "coverage": 0.0025
+        },
+        {
+          "step": 10,
+          "coverage": 0.0445
+        },
+        {
+          "step": 11,
+          "coverage": 0.0008
+        },
+        {
+          "step": 12,
+          "coverage": 0.1257
+        },
+        {
+          "step": 13,
+          "coverage": 0
+        },
+        {
+          "step": 14,
+          "coverage": 0.0173
+        },
+        {
+          "step": 15,
+          "coverage": 0.0008
+        },
+        {
+          "step": 16,
+          "coverage": 0.1059
+        },
+        {
+          "step": 17,
+          "coverage": 0
+        },
+        {
+          "step": 18,
+          "coverage": 0.0016
+        },
+        {
+          "step": 19,
+          "coverage": 0
+        },
+        {
+          "step": 20,
+          "coverage": 0.0008
+        },
+        {
+          "step": 21,
+          "coverage": 0
+        },
+        {
+          "step": 22,
+          "coverage": 0
+        },
+        {
+          "step": 23,
+          "coverage": 0
+        },
+        {
+          "step": 24,
+          "coverage": 0.0462
+        }
+      ]
+    },
+    "type": {
+      "values": [
+        {
+          "value": 12,
+          "weight": 600,
+          "share": 0.0505,
+          "members": 1
+        },
+        {
+          "value": 13,
+          "weight": 3276,
+          "share": 0.2755,
+          "members": 1
+        },
+        {
+          "value": 13.6,
+          "weight": 853,
+          "share": 0.0717,
+          "members": 2
+        },
+        {
+          "value": 16,
+          "weight": 6317,
+          "share": 0.5313,
+          "members": 1
+        },
+        {
+          "value": 18,
+          "weight": 53,
+          "share": 0.0045,
+          "members": 1
+        },
+        {
+          "value": 20,
+          "weight": 20,
+          "share": 0.0017,
+          "members": 1
+        },
+        {
+          "value": 22,
+          "weight": 347,
+          "share": 0.0292,
+          "members": 1
+        },
+        {
+          "value": 24,
+          "weight": 46,
+          "share": 0.0039,
+          "members": 1
+        },
+        {
+          "value": 28,
+          "weight": 87,
+          "share": 0.0073,
+          "members": 1
+        },
+        {
+          "value": 34,
+          "weight": 272,
+          "share": 0.0229,
+          "members": 1
+        },
+        {
+          "value": 40,
+          "weight": 6,
+          "share": 0.0005,
+          "members": 1
+        },
+        {
+          "value": 56,
+          "weight": 12,
+          "share": 0.001,
+          "members": 1
+        }
+      ],
+      "distinct": 13,
+      "incidental": [
+        {
+          "value": 18,
+          "weight": 53,
+          "share": 0.0045,
+          "members": 1
+        },
+        {
+          "value": 20,
+          "weight": 20,
+          "share": 0.0017,
+          "members": 1
+        },
+        {
+          "value": 24,
+          "weight": 46,
+          "share": 0.0039,
+          "members": 1
+        },
+        {
+          "value": 28,
+          "weight": 87,
+          "share": 0.0073,
+          "members": 1
+        },
+        {
+          "value": 40,
+          "weight": 6,
+          "share": 0.0005,
+          "members": 1
+        },
+        {
+          "value": 56,
+          "weight": 12,
+          "share": 0.001,
+          "members": 1
+        }
+      ],
+      "ratio": {
+        "ratio": 1.125,
+        "spread": 0.354,
+        "steps": 12
+      }
+    },
+    "families": {
+      "values": [
+        {
+          "value": "Mona Sans VF",
+          "weight": 4446,
+          "share": 37.4
+        },
+        {
+          "value": "Mona Sans",
+          "weight": 3739,
+          "share": 31.4
+        },
+        {
+          "value": "ui-monospace",
+          "weight": 3276,
+          "share": 27.6
+        },
+        {
+          "value": "monospace",
+          "weight": 428,
+          "share": 3.6
+        }
+      ],
+      "distinct": 4
+    },
+    "leading": {
+      "values": [
+        {
+          "value": 0.83,
+          "weight": 24,
+          "share": 0.002,
+          "members": 1
+        },
+        {
+          "value": 1,
+          "weight": 38,
+          "share": 0.0032,
+          "members": 1
+        },
+        {
+          "value": 1.1,
+          "weight": 12,
+          "share": 0.001,
+          "members": 1
+        },
+        {
+          "value": 1.2,
+          "weight": 6,
+          "share": 0.0005,
+          "members": 1
+        },
+        {
+          "value": 1.25,
+          "weight": 1677,
+          "share": 0.1414,
+          "members": 1
+        },
+        {
+          "value": 1.3,
+          "weight": 473,
+          "share": 0.0399,
+          "members": 2
+        },
+        {
+          "value": 1.35,
+          "weight": 87,
+          "share": 0.0073,
+          "members": 1
+        },
+        {
+          "value": 1.4,
+          "weight": 347,
+          "share": 0.0293,
+          "members": 1
+        },
+        {
+          "value": 1.5,
+          "weight": 6579,
+          "share": 0.5547,
+          "members": 1
+        },
+        {
+          "value": 1.63,
+          "weight": 538,
+          "share": 0.0454,
+          "members": 1
+        },
+        {
+          "value": 1.67,
+          "weight": 2080,
+          "share": 0.1754,
+          "members": 1
+        }
+      ],
+      "distinct": 12,
+      "incidental": [
+        {
+          "value": 0.83,
+          "weight": 24,
+          "share": 0.002,
+          "members": 1
+        },
+        {
+          "value": 1,
+          "weight": 38,
+          "share": 0.0032,
+          "members": 1
+        },
+        {
+          "value": 1.1,
+          "weight": 12,
+          "share": 0.001,
+          "members": 1
+        },
+        {
+          "value": 1.2,
+          "weight": 6,
+          "share": 0.0005,
+          "members": 1
+        },
+        {
+          "value": 1.35,
+          "weight": 87,
+          "share": 0.0073,
+          "members": 1
+        }
+      ]
+    },
+    "radius": {
+      "absent": false,
+      "scale": [
+        {
+          "value": 6,
+          "weight": 1632,
+          "share": 0.8344,
+          "members": 1
+        },
+        {
+          "value": 8,
+          "weight": 192,
+          "share": 0.0982,
+          "members": 1
+        },
+        {
+          "value": 12,
+          "weight": 88,
+          "share": 0.045,
+          "members": 1
+        },
+        {
+          "value": 24,
+          "weight": 24,
+          "share": 0.0123,
+          "members": 1
+        },
+        {
+          "value": 999,
+          "weight": 8,
+          "share": 0.0041,
+          "members": 1
+        },
+        {
+          "value": 9999.01,
+          "weight": 12,
+          "share": 0.0061,
+          "members": 1
+        }
+      ],
+      "distinct": 6
+    },
+    "borders": {
+      "values": [
+        {
+          "value": 1,
+          "weight": 590,
+          "share": 1,
+          "members": 1
+        }
+      ],
+      "distinct": 1,
+      "incidental": []
+    },
+    "shadow": {
+      "values": [
+        {
+          "value": "rgba(31, 35, 40, 0.04) 0px 1px 0px 0px",
+          "weight": 63,
+          "share": 94
+        },
+        {
+          "value": "rgba(31, 35, 40, 0.04) 0px 1px 1px 0px, rgba(31, 35, 40, 0.03) 0px 1px 2px 0px",
+          "weight": 2,
+          "share": 3
+        },
+        {
+          "value": "rgba(31, 35, 40, 0.04) 0px 1px 0px 0px inset",
+          "weight": 1,
+          "share": 1.5
+        },
+        {
+          "value": "rgba(209, 217, 224, 0.7) 0px -1px 0px 0px inset",
+          "weight": 1,
+          "share": 1.5
+        }
+      ],
+      "distinct": 4
+    }
+  },
+  "numbers": {
+    "size": 29,
+    "coverage": 96.7,
+    "spacingCoverage": 90.6,
+    "sprawl": 2.4,
+    "wasteValues": 1,
+    "wasteShare": 0
+  },
+  "findings": [
+    "30 distinct colours render across the pages surveyed. 12 of them account for 96.7% of the colour on the page.",
+    "1 colours sit within a just-noticeable difference of a colour already in use and cannot be told apart by eye — together 0% of the colour on the page. The heaviest is #EFF2F5, which is 2.22 from #F6F8FA.",
+    "Spacing follows a 4px step, which explains 90.6% of the margins, padding and gaps measured.",
+    "10 spacing values sit off that step, the most frequent being 10px, which is 2px from the nearest multiple.",
+    "13 distinct font sizes are in use across 12 steps. The sizes sit on roughly a 1.125 ratio.",
+    "6 of those sizes carry under 1% of the text each, which is the signature of a one-off rather than a step.",
+    "4 font families render on the page, where a system normally has two or three.",
+    "6 corner radii are in use, clustering into 6 steps.",
+    "4 distinct shadows are in use. An elevation scale usually has two or three."
+  ]
+}

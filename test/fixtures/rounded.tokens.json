@@ -1,0 +1,42 @@
+{
+  "$description": "A system that permits rounded corners and two elevations, which the base refuses, and keeps the gradient prohibition. No colour: the overlay states parameters and nothing else, which is the proof that the rules are parameters and not one system's taste (decision 0016). The values are invented for the test and belong to no shipped system.",
+  "$extensions": {
+    "form.applied": {
+      "brand": {
+        "name": "Rounded"
+      },
+      "absent": {
+        "$description": "Gradients stay prohibited; radius and shadow are permitted, each on a declared scale.",
+        "$value": [
+          "gradient-fill"
+        ]
+      }
+    }
+  },
+  "radius": {
+    "$type": "dimension",
+    "$description": "The permitted corner radii. Every radius in the system is one of these, and the linter checks it (rule radius-off-scale).",
+    "sm": {
+      "$value": {
+        "value": 4,
+        "unit": "px"
+      }
+    },
+    "md": {
+      "$value": {
+        "value": 12,
+        "unit": "px"
+      }
+    }
+  },
+  "elevation": {
+    "$type": "shadow",
+    "$description": "The permitted elevations, written with an explicit offset, blur and spread so the geometry a browser reports back matches the step it came from.",
+    "raised": {
+      "$value": "0px 2px 4px 0px rgba(0, 0, 0, 0.12)"
+    },
+    "lifted": {
+      "$value": "0px 8px 16px 0px rgba(0, 0, 0, 0.16)"
+    }
+  }
+}

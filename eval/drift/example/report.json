@@ -1,0 +1,225 @@
+{
+  "measured": {
+    "pages": 1,
+    "elements": 13,
+    "textElements": 7,
+    "urls": [
+      "https://example.com/"
+    ],
+    "viewports": [
+      1280
+    ],
+    "measuredAt": "2026-10-08T11:10:34.880Z"
+  },
+  "system": {
+    "colour": {
+      "tokens": [
+        {
+          "value": "#000000",
+          "weight": 0.99,
+          "members": 1,
+          "share": 0.989,
+          "roles": [
+            "text"
+          ]
+        },
+        {
+          "value": "#0000EE",
+          "weight": 0.01,
+          "members": 1,
+          "share": 0.011,
+          "roles": [
+            "text"
+          ]
+        }
+      ],
+      "coverage": 1,
+      "distinct": 2,
+      "sprawl": 1,
+      "nearMisses": [],
+      "tail": [],
+      "drift": null
+    },
+    "spacing": {
+      "step": 2,
+      "coverage": 0.95,
+      "onScale": true,
+      "residual": 0.05,
+      "offScale": [
+        {
+          "value": 225,
+          "weight": 1,
+          "off": 1
+        }
+      ],
+      "considered": [
+        {
+          "step": 2,
+          "coverage": 0.95
+        },
+        {
+          "step": 3,
+          "coverage": 0.15
+        },
+        {
+          "step": 4,
+          "coverage": 0.35
+        },
+        {
+          "step": 5,
+          "coverage": 0.15
+        },
+        {
+          "step": 6,
+          "coverage": 0.1
+        },
+        {
+          "step": 7,
+          "coverage": 0.5
+        },
+        {
+          "step": 8,
+          "coverage": 0.35
+        },
+        {
+          "step": 9,
+          "coverage": 0.05
+        },
+        {
+          "step": 10,
+          "coverage": 0.1
+        },
+        {
+          "step": 11,
+          "coverage": 0
+        },
+        {
+          "step": 12,
+          "coverage": 0
+        },
+        {
+          "step": 13,
+          "coverage": 0
+        },
+        {
+          "step": 14,
+          "coverage": 0.5
+        },
+        {
+          "step": 15,
+          "coverage": 0.05
+        },
+        {
+          "step": 16,
+          "coverage": 0.35
+        },
+        {
+          "step": 17,
+          "coverage": 0
+        },
+        {
+          "step": 18,
+          "coverage": 0
+        },
+        {
+          "step": 19,
+          "coverage": 0
+        },
+        {
+          "step": 20,
+          "coverage": 0.1
+        },
+        {
+          "step": 21,
+          "coverage": 0
+        },
+        {
+          "step": 22,
+          "coverage": 0
+        },
+        {
+          "step": 23,
+          "coverage": 0
+        },
+        {
+          "step": 24,
+          "coverage": 0
+        }
+      ]
+    },
+    "type": {
+      "values": [
+        {
+          "value": 14,
+          "weight": 740,
+          "share": 0.8168,
+          "members": 1
+        },
+        {
+          "value": 16,
+          "weight": 166,
+          "share": 0.1832,
+          "members": 1
+        }
+      ],
+      "distinct": 2,
+      "incidental": [],
+      "ratio": {
+        "ratio": null,
+        "spread": null,
+        "steps": 2
+      }
+    },
+    "families": {
+      "values": [
+        {
+          "value": "system-ui",
+          "weight": 906,
+          "share": 100
+        }
+      ],
+      "distinct": 1
+    },
+    "leading": {
+      "values": [
+        {
+          "value": 1.6,
+          "weight": 906,
+          "share": 1,
+          "members": 1
+        }
+      ],
+      "distinct": 1,
+      "incidental": []
+    },
+    "radius": {
+      "absent": true,
+      "scale": [],
+      "distinct": 0
+    },
+    "borders": {
+      "values": [],
+      "distinct": 0,
+      "incidental": []
+    },
+    "shadow": {
+      "values": [],
+      "distinct": 0
+    }
+  },
+  "numbers": {
+    "size": 6,
+    "coverage": 100,
+    "spacingCoverage": 95,
+    "sprawl": 1.8,
+    "wasteValues": 0,
+    "wasteShare": 0
+  },
+  "findings": [
+    "2 distinct colours render across the pages surveyed. 2 of them account for 100% of the colour on the page.",
+    "Spacing follows a 2px step, which explains 95% of the margins, padding and gaps measured.",
+    "1 spacing values sit off that step, the most frequent being 225px, which is 1px from the nearest multiple.",
+    "2 distinct font sizes are in use across 2 steps.",
+    "None of the 13 rendered elements has a corner radius. That is a decision, and a system built from this site should record it as one rather than leave it unstated."
+  ]
+}

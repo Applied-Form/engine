@@ -1,0 +1,412 @@
+{
+  "measured": {
+    "pages": 3,
+    "elements": 750,
+    "textElements": 201,
+    "urls": [
+      "https://polaris.shopify.com/",
+      "https://polaris.shopify.com/components/actions/button",
+      "https://polaris.shopify.com/design/colors"
+    ],
+    "viewports": [
+      1280
+    ],
+    "measuredAt": "2026-10-08T10:44:58.140Z"
+  },
+  "system": {
+    "colour": {
+      "tokens": [
+        {
+          "value": "#FFFFFF",
+          "weight": 0.98,
+          "members": 2,
+          "share": 0.3938,
+          "roles": [
+            "ground"
+          ]
+        },
+        {
+          "value": "#44474A",
+          "weight": 0.78,
+          "members": 1,
+          "share": 0.313,
+          "roles": [
+            "text"
+          ]
+        },
+        {
+          "value": "#D2D5D8",
+          "weight": 0.31,
+          "members": 1,
+          "share": 0.1246,
+          "roles": [
+            "text",
+            "border"
+          ]
+        },
+        {
+          "value": "#475F91",
+          "weight": 0.17,
+          "members": 1,
+          "share": 0.0676,
+          "roles": [
+            "text",
+            "border"
+          ]
+        },
+        {
+          "value": "#202223",
+          "weight": 0.1,
+          "members": 1,
+          "share": 0.0394,
+          "roles": [
+            "text"
+          ]
+        },
+        {
+          "value": "#96C6DD",
+          "weight": 0.09,
+          "members": 1,
+          "share": 0.0356,
+          "roles": [
+            "border"
+          ]
+        },
+        {
+          "value": "#6D7175",
+          "weight": 0.05,
+          "members": 1,
+          "share": 0.0199,
+          "roles": [
+            "text"
+          ]
+        },
+        {
+          "value": "#F6F6F7",
+          "weight": 0.01,
+          "members": 1,
+          "share": 0.0057,
+          "roles": [
+            "ground"
+          ]
+        }
+      ],
+      "coverage": 0.9995,
+      "distinct": 10,
+      "sprawl": 1.25,
+      "nearMisses": [
+        {
+          "value": "#FAFBFB",
+          "weight": 0.13914970163092732,
+          "nearestToken": "#FFFFFF",
+          "distance": 1.5
+        }
+      ],
+      "tail": [
+        {
+          "value": "#EEF3F7",
+          "weight": 0
+        }
+      ],
+      "drift": 2.66
+    },
+    "spacing": {
+      "step": 2,
+      "coverage": 0.9658,
+      "onScale": true,
+      "residual": 0.034,
+      "offScale": [
+        {
+          "value": 3,
+          "weight": 15,
+          "off": 1
+        },
+        {
+          "value": 5,
+          "weight": 9,
+          "off": 1
+        }
+      ],
+      "considered": [
+        {
+          "step": 2,
+          "coverage": 0.9658
+        },
+        {
+          "step": 3,
+          "coverage": 0.3162
+        },
+        {
+          "step": 4,
+          "coverage": 0.7991
+        },
+        {
+          "step": 5,
+          "coverage": 0.0812
+        },
+        {
+          "step": 6,
+          "coverage": 0.2949
+        },
+        {
+          "step": 7,
+          "coverage": 0
+        },
+        {
+          "step": 8,
+          "coverage": 0.4444
+        },
+        {
+          "step": 9,
+          "coverage": 0
+        },
+        {
+          "step": 10,
+          "coverage": 0.0684
+        },
+        {
+          "step": 11,
+          "coverage": 0
+        },
+        {
+          "step": 12,
+          "coverage": 0.2265
+        },
+        {
+          "step": 13,
+          "coverage": 0
+        },
+        {
+          "step": 14,
+          "coverage": 0
+        },
+        {
+          "step": 15,
+          "coverage": 0.0256
+        },
+        {
+          "step": 16,
+          "coverage": 0.1709
+        },
+        {
+          "step": 17,
+          "coverage": 0
+        },
+        {
+          "step": 18,
+          "coverage": 0
+        },
+        {
+          "step": 19,
+          "coverage": 0
+        },
+        {
+          "step": 20,
+          "coverage": 0.0684
+        },
+        {
+          "step": 21,
+          "coverage": 0
+        },
+        {
+          "step": 22,
+          "coverage": 0
+        },
+        {
+          "step": 23,
+          "coverage": 0
+        },
+        {
+          "step": 24,
+          "coverage": 0.0171
+        }
+      ]
+    },
+    "type": {
+      "values": [
+        {
+          "value": 12,
+          "weight": 105,
+          "share": 0.0153,
+          "members": 1
+        },
+        {
+          "value": 14,
+          "weight": 3438,
+          "share": 0.4998,
+          "members": 1
+        },
+        {
+          "value": 16,
+          "weight": 3006,
+          "share": 0.437,
+          "members": 1
+        },
+        {
+          "value": 24,
+          "weight": 276,
+          "share": 0.0401,
+          "members": 1
+        },
+        {
+          "value": 32,
+          "weight": 54,
+          "share": 0.0078,
+          "members": 1
+        }
+      ],
+      "distinct": 5,
+      "incidental": [
+        {
+          "value": 32,
+          "weight": 54,
+          "share": 0.0078,
+          "members": 1
+        }
+      ],
+      "ratio": {
+        "ratio": 1.25,
+        "spread": 0.357,
+        "steps": 5
+      }
+    },
+    "families": {
+      "values": [
+        {
+          "value": "Inter",
+          "weight": 6876,
+          "share": 100
+        },
+        {
+          "value": "JetBrains Mono",
+          "weight": 3,
+          "share": 0
+        }
+      ],
+      "distinct": 2
+    },
+    "leading": {
+      "values": [
+        {
+          "value": 1.17,
+          "weight": 276,
+          "share": 0.0401,
+          "members": 1
+        },
+        {
+          "value": 1.25,
+          "weight": 438,
+          "share": 0.0637,
+          "members": 1
+        },
+        {
+          "value": 1.33,
+          "weight": 105,
+          "share": 0.0153,
+          "members": 1
+        },
+        {
+          "value": 1.43,
+          "weight": 3438,
+          "share": 0.4998,
+          "members": 1
+        },
+        {
+          "value": 1.5,
+          "weight": 2562,
+          "share": 0.3724,
+          "members": 1
+        },
+        {
+          "value": 2.5,
+          "weight": 60,
+          "share": 0.0087,
+          "members": 1
+        }
+      ],
+      "distinct": 6,
+      "incidental": [
+        {
+          "value": 2.5,
+          "weight": 60,
+          "share": 0.0087,
+          "members": 1
+        }
+      ]
+    },
+    "radius": {
+      "absent": false,
+      "scale": [
+        {
+          "value": 3,
+          "weight": 12,
+          "share": 0.0667,
+          "members": 1
+        },
+        {
+          "value": 4,
+          "weight": 12,
+          "share": 0.0667,
+          "members": 1
+        },
+        {
+          "value": 8,
+          "weight": 156,
+          "share": 0.8667,
+          "members": 1
+        }
+      ],
+      "distinct": 3
+    },
+    "borders": {
+      "values": [
+        {
+          "value": 1,
+          "weight": 135,
+          "share": 1,
+          "members": 1
+        }
+      ],
+      "distinct": 1,
+      "incidental": []
+    },
+    "shadow": {
+      "values": [
+        {
+          "value": "rgba(0, 0, 0, 0.1) 0px 2px 0px 0px",
+          "weight": 18,
+          "share": 66.7
+        },
+        {
+          "value": "rgba(0, 0, 0, 0.2) 0px -2px 0px 0px inset, rgba(255, 255, 255, 0.75) 0px 2px 0px 0px inset",
+          "weight": 6,
+          "share": 22.2
+        },
+        {
+          "value": "rgb(150, 198, 221) 0px 0px 0px 1px inset, rgba(0, 0, 0, 0.1) 0px 1px 0px 0px",
+          "weight": 3,
+          "share": 11.1
+        }
+      ],
+      "distinct": 3
+    }
+  },
+  "numbers": {
+    "size": 16,
+    "coverage": 100,
+    "spacingCoverage": 96.6,
+    "sprawl": 1.9,
+    "wasteValues": 1,
+    "wasteShare": 5.6
+  },
+  "findings": [
+    "10 distinct colours render across the pages surveyed. 8 of them account for 100% of the colour on the page.",
+    "1 colours sit within a just-noticeable difference of a colour already in use and cannot be told apart by eye — together 5.6% of the colour on the page. The heaviest is #FAFBFB, which is 1.5 from #FFFFFF.",
+    "Spacing follows a 2px step, which explains 96.6% of the margins, padding and gaps measured.",
+    "2 spacing values sit off that step, the most frequent being 3px, which is 1px from the nearest multiple.",
+    "5 distinct font sizes are in use across 5 steps. The sizes sit on roughly a 1.25 ratio.",
+    "1 of those sizes carry under 1% of the text each, which is the signature of a one-off rather than a step.",
+    "3 corner radii are in use, clustering into 3 steps.",
+    "3 distinct shadows are in use. An elevation scale usually has two or three."
+  ]
+}

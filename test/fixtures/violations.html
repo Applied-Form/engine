@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en" data-register="ii">
+<head>
+<meta charset="utf-8">
+<title>Extractor fixture: deliberate violations</title>
+<link rel="stylesheet" href="../../dist/tokens.css">
+<link rel="stylesheet" href="../../dist/components.css">
+<style>
+  .pseudo::before { content: "Generated 9px label"; font-size: 9px; font-family: "Libre Franklin"; }
+  .gradient { background-image: linear-gradient(90deg, var(--af-color-teal), var(--af-color-terracotta)); min-height: 64px; width: 100%; }
+  .nounder a { text-decoration: underline; }
+  .nounder a span { display: inline-block; text-decoration: none; }
+  .small { font-size: 14px; }
+  .offgrid { margin-left: 7px; }
+  .z7 { position: relative; z-index: 7; }
+  .tilt { rotate: 12deg; display: inline-block; }
+  .placed { position: absolute; left: 7px; top: 12px; }
+  .bleedy { margin-inline: -23px; }
+  .panel { width: 640px; height: 400px; background: #F6F6F4; }
+  .slow { transition: color 300ms; }
+  .tiny-btn { width: 16px; height: 16px; padding: 0; border: 0; }
+  .card { box-shadow: 0 4px 8px rgba(0,0,0,0.3); width: 200px; height: 100px; }
+  .rounded-box { border-radius: 12px; width: 100px; height: 60px; }
+  .gradient-heading { background-image: linear-gradient(90deg, #587584, #AC5362); -webkit-background-clip: text; background-clip: text; color: transparent; width: max-content; }
+</style>
+</head>
+<body>
+<div class="gradient" aria-hidden="true"></div>
+<main class="af-page" id="main">
+  <p class="pseudo">Paragraph carrying generated content before it.</p>
+  <p class="nounder">A link whose <a href="#main"><span>underline is removed</span></a> by a descendant.</p>
+  <div class="small">Fourteen pixel Franklin in a div, which is running text however it is tagged.</div>
+  <div id="host"></div>
+  <figure><svg data-chart data-figure="plot" viewBox="0 0 200 100" width="200" height="100"><rect data-series x="10" y="10" width="40" height="80" style="fill: var(--af-series-light-2)"/><rect data-series x="60" y="30" width="40" height="60" style="fill: var(--af-series-light-1)"/></svg><ul class="legend"><li>Series one</li></ul></figure>
+  <button class="tiny-btn" aria-label="close">×</button>
+  <img class="photo" src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACwAAAAAAQABAAACAUwAOw==" width="120" height="80">
+  <div class="card">A shadowed card.</div>
+  <div class="rounded-box">A rounded box.</div>
+  <h1 class="gradient-heading">Gradient Heading</h1>
+  <section data-spread="datum" data-grid class="af-grid" style="padding:0; position: relative">
+    <div class="offgrid af-c8"><p>Seven pixels off the first column line.</p></div>
+    <div class="af-c8 z7"><p class="tilt slow">A tilted paragraph on layer seven.</p></div>
+    <div class="placed"><p>Placed seven by twelve.</p></div>
+    <div class="af-c16 bleedy"><p>Bleeding twenty-three pixels.</p></div>
+    <div class="af-c16 panel" data-aspect="16:9"></div>
+  </section>
+</main>
+<script>
+  const host = document.getElementById('host').attachShadow({ mode: 'open' });
+  host.innerHTML = '<p style="font-family: Fraunces, serif; font-size: 22px">Fraunces hidden in a shadow root.</p>';
+</script>
+</body>
+</html>

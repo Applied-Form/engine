@@ -1,0 +1,15 @@
+{
+  "key": "govuk",
+  "name": "GOV.UK Design System",
+  "pages": [
+    "https://design-system.service.gov.uk/",
+    "https://design-system.service.gov.uk/components/button/",
+    "https://design-system.service.gov.uk/styles/colour/"
+  ],
+  "started": "2026-10-08T10:44:27.527Z",
+  "finished": "2026-10-08T10:44:29.628Z",
+  "ok": true,
+  "exit": 0,
+  "stdout": "wrote eval/drift/govuk/survey.json\nwrote eval/drift/govuk/report.json\n\nSurveyed 3 page-viewport pairs, 1531 rendered elements, measured 2026-10-08.\n\n  system size      18 values describe the site\n  colour coverage  99.4% of the colour on the page\n  spacing step     5px, explaining 42%\n  sprawl           5.7x more distinct values than tokens\n  waste            2 indistinguishable colours, 0% of the page\n\n· 70 distinct colours render across the pages surveyed. 8 of them account for 99.4% of the colour on the page.\n· 2 colours sit within a just-noticeable difference of a colour already in use and cannot be told apart by eye — together 0% of the colour on the page. The heaviest is #F3F9F9, which is 1.7 from #F4F8FB.\n· Spacing follows no consistent step. The closest candidate is 5px and it explains only 42%.\n· 11 spacing values sit off that step, the most frequent being 1px, which is 1px from the nearest multiple.\n· 7 distinct font sizes are in use across 7 steps. The sizes sit on roughly a 1.188 ratio.\n· 3 of those sizes carry under 1% of the text each, which is the signature of a one-off rather than a step.\n· 1 corner radii are in use, clustering into 1 steps.\n· 2 distinct shadows are in use. An elevation scale usually has two or three.\n\n",
+  "stderr": ""
+}

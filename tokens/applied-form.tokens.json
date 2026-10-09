@@ -1,0 +1,1904 @@
+{
+  "$description": "Reference: the neutral system the open engine is tested against. Colour derived by `af brand --hue 200 --paper #F6F6F4 --saturation 0.2`; positive-light and critical-light are the overlay's positive and critical mixed toward white until they clear 4.6:1 on its espresso, where the base pair sits at 4.5:1; structure, rules and the three OFL voices come from the base file. It exists so the engine can be published without publishing Applied Form's own palette, and it is not a design anyone should ship. The mark's shape parameters are replaced, because Applied Form's identify the brand; its size and placement limits are rules and stay. The two literal steps of the sequential chart scale are the midpoints of its own sand, clay and terra deep.",
+  "$extensions": {
+    "form.applied": {
+      "version": "3.1.0",
+      "aspectRatios": [
+        "1:1",
+        "2:1",
+        "2:3",
+        "3:2",
+        "4:3",
+        "16:9"
+      ],
+      "absent": {
+        "$description": "Effects Applied Form deliberately does not use. The absence rules in src/lib/rules/absence.mjs flag any element that reaches for one outside its named exemptions.",
+        "$value": [
+          "shadow",
+          "gradient-fill",
+          "radius"
+        ]
+      },
+      "fallbacks": {
+        "$description": "When a colour fails a contrast floor on a ground, try these in order.",
+        "terracotta": [
+          "{color.terra-deep}",
+          "{color.terracotta-light}"
+        ],
+        "teal": [
+          "{color.teal-deep}",
+          "{color.teal-light}"
+        ],
+        "clay": [
+          "{color.clay-light}",
+          "{color.clay-deep}"
+        ],
+        "caution": [
+          "{color.caution-deep}",
+          "{color.caution}"
+        ],
+        "positive": [
+          "{color.positive-light}"
+        ],
+        "critical": [
+          "{color.critical-light}"
+        ]
+      },
+      "spreads": {
+        "$description": "Register I spread archetypes: the moves. Each is a fixed 16:9 canvas obeying every core floor. data-spread on the section names the move; the linter checks its constraints.",
+        "colossus": {
+          "ground": "{color.paper}",
+          "oncePerDocument": true,
+          "voices": [
+            "display"
+          ],
+          "note": "One sentence at the display-01 ceiling."
+        },
+        "ground-shift": {
+          "grounds": 2,
+          "joinOnColumn": true,
+          "voices": [
+            "display",
+            "text"
+          ],
+          "note": "Two colour fields meeting off-centre on a column line, type crossing the join."
+        },
+        "datum": {
+          "ground": "any",
+          "figureVoice": "data",
+          "voices": [
+            "data",
+            "text"
+          ],
+          "note": "A single headline figure set in Plex Mono at display scale."
+        },
+        "bled-form": {
+          "markScale": 3,
+          "neverBehindBody": true,
+          "voices": [
+            "display",
+            "text"
+          ],
+          "note": "The contour mark at ~3x canvas, cropped, as texture. One per spread."
+        },
+        "index": {
+          "ground": "{color.paper}",
+          "voices": [
+            "display",
+            "data"
+          ],
+          "note": "Contents as a designed page: Fraunces titles, Mono numbers, hairlines."
+        },
+        "counterpoint": {
+          "ground": "{color.espresso}",
+          "voices": [
+            "display",
+            "data"
+          ],
+          "note": "Display voice against data voice on an espresso ground. Never teal."
+        },
+        "strata": {
+          "ground": "{color.ink}",
+          "voices": [
+            "display",
+            "data"
+          ],
+          "motion": "scroll",
+          "note": "The mark's rings unrolled into horizontal contour bands; values annotate the lines like a map. Experimental."
+        },
+        "ledger": {
+          "ground": "{color.paper}",
+          "voices": [
+            "data",
+            "display"
+          ],
+          "tabular": true,
+          "note": "A whole spread in the data voice: a sheet of evidence with one italic Fraunces word against it. Experimental."
+        },
+        "palimpsest": {
+          "ground": "{color.paper}",
+          "voices": [
+            "display"
+          ],
+          "layers": 3,
+          "note": "Display type overprinted in three grounds-as-ink, coming into register on scroll. Every layer clears 3:1. Experimental."
+        },
+        "marginalia": {
+          "ground": "{color.paper}",
+          "voices": [
+            "text",
+            "data",
+            "display"
+          ],
+          "sidenotes": true,
+          "note": "Narrow measure with the data voice as annotation in the margin. Experimental."
+        },
+        "counter": {
+          "ground": "{color.espresso}",
+          "figureVoice": "data",
+          "voices": [
+            "data",
+            "text"
+          ],
+          "motion": "scroll",
+          "note": "A Datum whose figure counts from the low bound of its interval to the estimate as the spread enters view. The interval is the motion. Experimental."
+        },
+        "hinge": {
+          "grounds": 2,
+          "joinOnColumn": true,
+          "voices": [
+            "display",
+            "text"
+          ],
+          "motion": "scroll",
+          "note": "A Ground shift whose join steps across column lines with scroll, always landing on one. Experimental."
+        },
+        "tessera": {
+          "ground": "{color.paper}",
+          "voices": [
+            "display",
+            "data"
+          ],
+          "panels": "1:1",
+          "note": "Four square Form panels across the grid, each a different g, with one line of display type beneath. Built from a recipe. Experimental."
+        },
+        "caesura": {
+          "ground": "{color.ink}",
+          "voices": [
+            "display",
+            "data"
+          ],
+          "note": "A statement on the left eight columns, figures on the right seven, and the ninth column left empty as the pause. Built from a recipe. Experimental."
+        },
+        "spine": {
+          "ground": "{color.espresso}",
+          "voices": [
+            "data",
+            "display"
+          ],
+          "rotation": -90,
+          "note": "A rotated data label runs down the first column; the statement starts at column three; a 3:2 Form panel sits on the right. Built from a recipe. Experimental."
+        }
+      },
+      "mark": {
+        "g": 0.25,
+        "lobes": 3,
+        "rings": 9,
+        "gap": 0,
+        "asym": 0,
+        "core": 3.5,
+        "strokeInner": 1,
+        "strokeOuter": 0.5,
+        "bledOpacity": 0.5,
+        "minSizePx": 48,
+        "asymMax": 0.08,
+        "coreMax": 8.7
+      },
+      "composition": {
+        "offsets": {
+          "horizontal": "column",
+          "vertical": "spacing",
+          "$description": "Absolutely or relatively placed elements sit on column lines horizontally and on the 8px scale vertically."
+        },
+        "rotation": [
+          0,
+          90,
+          -90
+        ],
+        "panels": "aspectRatios",
+        "bleeds": [
+          "half-gutter",
+          "column",
+          "frame"
+        ]
+      },
+      "recipes": {
+        "$description": "Each move as data. cells: grid-column range, layer, voice, role; optional aspect (a permitted ratio), offset {x: columns, y: spacing steps}, bleed (half-gutter | column | frame), rotation (0 | 90 | -90), motion (draw | register | count | step), form {g, lobes, ...}. The linter checks a data-spread section's grid children against its recipe; af move <name> emits the scaffold with the matching composition classes.",
+        "colossus": {
+          "ground": "paper",
+          "cells": [
+            {
+              "cell": "1 / -1",
+              "layer": "type",
+              "voice": "display",
+              "role": "statement"
+            }
+          ]
+        },
+        "ground-shift": {
+          "ground": "two-fields",
+          "cells": [
+            {
+              "cell": "1 / 11",
+              "layer": "ground",
+              "role": "field"
+            },
+            {
+              "cell": "11 / -1",
+              "layer": "ground",
+              "role": "field"
+            },
+            {
+              "cell": "6 / 16",
+              "layer": "type",
+              "voice": "display",
+              "role": "crossing"
+            },
+            {
+              "cell": "1 / 7",
+              "layer": "type",
+              "voice": "text",
+              "role": "caption"
+            }
+          ]
+        },
+        "datum": {
+          "ground": "espresso",
+          "cells": [
+            {
+              "cell": "1 / 11",
+              "layer": "data",
+              "voice": "data",
+              "role": "figure"
+            },
+            {
+              "cell": "11 / -1",
+              "layer": "type",
+              "voice": "text",
+              "role": "body"
+            }
+          ]
+        },
+        "bled-form": {
+          "ground": "ink",
+          "mark": {
+            "scale": 3,
+            "bleed": "frame",
+            "layer": "form"
+          },
+          "cells": [
+            {
+              "cell": "1 / 11",
+              "layer": "type",
+              "voice": "display",
+              "role": "statement"
+            }
+          ]
+        },
+        "index": {
+          "ground": "paper",
+          "cells": [
+            {
+              "cell": "1 / -1",
+              "layer": "type",
+              "voice": "display",
+              "role": "list"
+            }
+          ]
+        },
+        "counterpoint": {
+          "ground": "espresso",
+          "cells": [
+            {
+              "cell": "1 / 11",
+              "layer": "type",
+              "voice": "display",
+              "role": "statement"
+            },
+            {
+              "cell": "11 / -1",
+              "layer": "data",
+              "voice": "data",
+              "role": "figures"
+            }
+          ]
+        },
+        "strata": {
+          "ground": "ink",
+          "cells": [
+            {
+              "cell": "1 / 11",
+              "layer": "type",
+              "voice": "display",
+              "role": "statement"
+            },
+            {
+              "cell": "11 / -1",
+              "layer": "type",
+              "voice": "text",
+              "role": "body"
+            },
+            {
+              "cell": "1 / -1",
+              "layer": "form",
+              "role": "profile",
+              "motion": "draw"
+            }
+          ]
+        },
+        "ledger": {
+          "ground": "paper",
+          "cells": [
+            {
+              "cell": "1 / -1",
+              "layer": "type",
+              "role": "eyebrow"
+            },
+            {
+              "cell": "1 / -1",
+              "layer": "type",
+              "voice": "display",
+              "role": "word"
+            },
+            {
+              "cell": "1 / -1",
+              "layer": "data",
+              "voice": "data",
+              "role": "sheet"
+            }
+          ]
+        },
+        "palimpsest": {
+          "ground": "paper",
+          "cells": [
+            {
+              "cell": "1 / -1",
+              "layer": "type",
+              "role": "eyebrow"
+            },
+            {
+              "cell": "1 / -1",
+              "layer": "type",
+              "voice": "display",
+              "role": "stack",
+              "motion": "register"
+            },
+            {
+              "cell": "1 / -1",
+              "layer": "data",
+              "voice": "data",
+              "role": "note"
+            }
+          ]
+        },
+        "marginalia": {
+          "ground": "paper",
+          "cells": [
+            {
+              "cell": "1 / -1",
+              "layer": "type",
+              "role": "eyebrow"
+            },
+            {
+              "cell": "1 / 10",
+              "layer": "type",
+              "voice": "text",
+              "role": "body"
+            },
+            {
+              "cell": "11 / -1",
+              "layer": "data",
+              "voice": "data",
+              "role": "notes"
+            }
+          ]
+        },
+        "counter": {
+          "ground": "espresso",
+          "cells": [
+            {
+              "cell": "1 / 11",
+              "layer": "data",
+              "voice": "data",
+              "role": "figure",
+              "motion": "count"
+            },
+            {
+              "cell": "11 / -1",
+              "layer": "type",
+              "voice": "text",
+              "role": "body"
+            }
+          ]
+        },
+        "hinge": {
+          "ground": "two-fields",
+          "cells": [
+            {
+              "cell": "1 / -1",
+              "layer": "ground",
+              "role": "field",
+              "motion": "step"
+            },
+            {
+              "cell": "4 / 16",
+              "layer": "type",
+              "voice": "display",
+              "role": "crossing"
+            },
+            {
+              "cell": "1 / 6",
+              "layer": "type",
+              "voice": "text",
+              "role": "caption"
+            }
+          ]
+        },
+        "tessera": {
+          "ground": "paper",
+          "cells": [
+            {
+              "cell": "1 / 5",
+              "layer": "form",
+              "role": "panel",
+              "aspect": "1:1",
+              "form": {
+                "g": 0.12
+              }
+            },
+            {
+              "cell": "5 / 9",
+              "layer": "form",
+              "role": "panel",
+              "aspect": "1:1",
+              "form": {
+                "g": 0.4
+              }
+            },
+            {
+              "cell": "9 / 13",
+              "layer": "form",
+              "role": "panel",
+              "aspect": "1:1",
+              "form": {
+                "g": 0.7
+              }
+            },
+            {
+              "cell": "13 / -1",
+              "layer": "form",
+              "role": "panel",
+              "aspect": "1:1",
+              "form": {
+                "g": 0.95
+              }
+            },
+            {
+              "cell": "1 / -1",
+              "layer": "type",
+              "voice": "display",
+              "role": "statement"
+            }
+          ]
+        },
+        "caesura": {
+          "ground": "ink",
+          "cells": [
+            {
+              "cell": "1 / 9",
+              "layer": "type",
+              "voice": "display",
+              "role": "statement"
+            },
+            {
+              "cell": "10 / -1",
+              "layer": "data",
+              "voice": "data",
+              "role": "figures"
+            }
+          ]
+        },
+        "spine": {
+          "ground": "espresso",
+          "cells": [
+            {
+              "cell": "1 / 2",
+              "layer": "data",
+              "voice": "data",
+              "role": "spine",
+              "rotation": -90
+            },
+            {
+              "cell": "3 / 9",
+              "layer": "type",
+              "voice": "display",
+              "role": "statement"
+            },
+            {
+              "cell": "9 / -1",
+              "layer": "form",
+              "role": "panel",
+              "aspect": "3:2",
+              "form": {
+                "g": 0.4,
+                "lobes": 3
+              }
+            }
+          ]
+        },
+        "$authoredForColumns": 16
+      },
+      "prohibitions": {
+        "$description": "Colour prohibitions this system declares, stated as token references so another system states its own rather than inheriting Applied Form’s. neverGround is checked by support-as-ground; pairs by forbidden-pairing.",
+        "neverGround": [
+          "{color.teal}"
+        ],
+        "pairs": [
+          {
+            "text": "{color.white}",
+            "ground": "{color.clay}"
+          }
+        ]
+      }
+    }
+  },
+  "color": {
+    "$type": "color",
+    "paper": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.9647,
+          0.9647,
+          0.9569
+        ],
+        "hex": "#F6F6F4"
+      }
+    },
+    "sand": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.9216,
+          0.9216,
+          0.902
+        ],
+        "hex": "#EBEBE6"
+      }
+    },
+    "tint": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.8745,
+          0.8745,
+          0.8078
+        ],
+        "hex": "#DFDFCE"
+      }
+    },
+    "clay": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.4235,
+          0.5255,
+          0.5765
+        ],
+        "hex": "#6C8693"
+      }
+    },
+    "clay-light": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.6353,
+          0.7608,
+          0.8235
+        ],
+        "hex": "#A2C2D2"
+      },
+      "$description": "Clay for small text on dark grounds; plain clay fails 4.5:1 there."
+    },
+    "clay-deep": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.2314,
+          0.4353,
+          0.5373
+        ],
+        "hex": "#3B6F89"
+      },
+      "$description": "Clay for small text or chart marks on light grounds; plain clay fails 3:1 on white."
+    },
+    "terracotta": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.3451,
+          0.4588,
+          0.5176
+        ],
+        "hex": "#587584"
+      }
+    },
+    "terra-deep": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.2314,
+          0.3647,
+          0.4314
+        ],
+        "hex": "#3B5D6E"
+      }
+    },
+    "espresso": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.1686,
+          0.2902,
+          0.3529
+        ],
+        "hex": "#2B4A5A"
+      }
+    },
+    "ink": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.1333,
+          0.1569,
+          0.1686
+        ],
+        "hex": "#22282B"
+      }
+    },
+    "muted": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.3569,
+          0.4196,
+          0.4549
+        ],
+        "hex": "#5B6B74"
+      }
+    },
+    "teal": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.6745,
+          0.3255,
+          0.3843
+        ],
+        "hex": "#AC5362"
+      },
+      "$description": "Data-series colour only. Never a full-bleed ground."
+    },
+    "teal-deep": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.6706,
+          0.2863,
+          0.3529
+        ],
+        "hex": "#AB495A"
+      },
+      "$description": "Teal for small text on sand, paper or white; plain teal fails 4.5:1 on sand."
+    },
+    "white": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          1,
+          1,
+          1
+        ],
+        "hex": "#FFFFFF"
+      }
+    },
+    "layer-ii": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.9647,
+          0.9647,
+          0.9569
+        ],
+        "hex": "#F6F6F4"
+      }
+    },
+    "text-ii": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.0863,
+          0.1059,
+          0.1137
+        ],
+        "hex": "#161B1D"
+      }
+    },
+    "positive": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.2863,
+          0.4745,
+          0.4118
+        ],
+        "hex": "#497969"
+      }
+    },
+    "caution": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.7529,
+          0.5373,
+          0.1059
+        ],
+        "hex": "#C0891B"
+      },
+      "$description": "Fill only. Fails 4.5:1 as small text on white or paper."
+    },
+    "caution-deep": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.5412,
+          0.3882,
+          0.0784
+        ],
+        "hex": "#8A6314"
+      },
+      "$description": "Caution as text or a chart mark on light grounds; plain caution fails 3:1 on white."
+    },
+    "critical": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.7216,
+          0.2235,
+          0.1804
+        ],
+        "hex": "#B8392E"
+      }
+    },
+    "focus": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          1,
+          0.8667,
+          0
+        ],
+        "hex": "#FFDD00"
+      }
+    },
+    "positive-light": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.6353,
+          0.7333,
+          0.702
+        ],
+        "hex": "#A2BBB3"
+      },
+      "$description": "Positive as text on ink or espresso; plain positive fails 4.5:1 there."
+    },
+    "critical-light": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.8784,
+          0.6588,
+          0.6392
+        ],
+        "hex": "#E0A8A3"
+      },
+      "$description": "Critical as text on ink or espresso."
+    },
+    "teal-light": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.8196,
+          0.6667,
+          0.6941
+        ],
+        "hex": "#D1AAB1"
+      },
+      "$description": "Teal as text on ink or espresso; still a data-series colour, never a ground."
+    },
+    "terracotta-light": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.5451,
+          0.7333,
+          0.8275
+        ],
+        "hex": "#8BBBD3"
+      },
+      "$description": "Terracotta as small text on ink or espresso; the link colour for a dark surface."
+    }
+  },
+  "register": {
+    "$type": "color",
+    "i": {
+      "$description": "Brand. Anything meant to be chosen.",
+      "$extensions": {
+        "form.applied": {
+          "grounds": [
+            "{color.espresso}",
+            "{color.terracotta}",
+            "{color.ink}"
+          ]
+        }
+      },
+      "background": {
+        "$value": "{color.paper}"
+      },
+      "layer": {
+        "$value": "{color.sand}"
+      },
+      "text": {
+        "$value": "{color.ink}"
+      },
+      "accent": {
+        "$value": "{color.terracotta}"
+      },
+      "link": {
+        "$value": "{color.terracotta}"
+      },
+      "support": {
+        "$value": "{color.teal}"
+      },
+      "focus": {
+        "$value": "{color.focus}"
+      },
+      "muted": {
+        "$value": "{color.muted}"
+      },
+      "rule": {
+        "$value": "{color.sand}"
+      },
+      "positive": {
+        "$value": "{color.positive}"
+      },
+      "caution": {
+        "$value": "{color.caution-deep}"
+      },
+      "critical": {
+        "$value": "{color.critical}"
+      },
+      "on-accent": {
+        "$value": "{color.paper}"
+      }
+    },
+    "ii": {
+      "$description": "Product and documents. Anything meant to be used or relied on.",
+      "$extensions": {
+        "form.applied": {
+          "grounds": []
+        }
+      },
+      "background": {
+        "$value": "{color.white}"
+      },
+      "layer": {
+        "$value": "{color.layer-ii}"
+      },
+      "text": {
+        "$value": "{color.text-ii}"
+      },
+      "accent": {
+        "$value": "{color.terracotta}"
+      },
+      "link": {
+        "$value": "{color.terra-deep}"
+      },
+      "support": {
+        "$value": "{color.teal}"
+      },
+      "focus": {
+        "$value": "{color.focus}"
+      },
+      "muted": {
+        "$value": "{color.muted}"
+      },
+      "rule": {
+        "$value": "{color.sand}"
+      },
+      "positive": {
+        "$value": "{color.positive}"
+      },
+      "caution": {
+        "$value": "{color.caution-deep}"
+      },
+      "critical": {
+        "$value": "{color.critical}"
+      },
+      "on-accent": {
+        "$value": "{color.paper}"
+      }
+    },
+    "ii-dark": {
+      "$description": "Register II on a dark surface. A spike, not a promise: ink ground, paper text, light variants for links and semantics. Espresso is not viable as a document ground.",
+      "$extensions": {
+        "form.applied": {
+          "grounds": [],
+          "status": "experimental"
+        }
+      },
+      "background": {
+        "$value": "{color.ink}"
+      },
+      "layer": {
+        "$value": "{color.espresso}"
+      },
+      "text": {
+        "$value": "{color.paper}"
+      },
+      "accent": {
+        "$value": "{color.terracotta-light}"
+      },
+      "link": {
+        "$value": "{color.terracotta-light}"
+      },
+      "support": {
+        "$value": "{color.teal-light}"
+      },
+      "focus": {
+        "$value": "{color.focus}"
+      },
+      "muted": {
+        "$value": "{color.tint}"
+      },
+      "rule": {
+        "$value": "{color.espresso}"
+      },
+      "positive": {
+        "$value": "{color.positive-light}"
+      },
+      "caution": {
+        "$value": "{color.caution}"
+      },
+      "critical": {
+        "$value": "{color.critical-light}"
+      },
+      "on-accent": {
+        "$value": "{color.ink}"
+      }
+    }
+  },
+  "chart": {
+    "series": {
+      "1": {
+        "$value": "{color.terracotta}"
+      },
+      "2": {
+        "$value": "{color.teal}"
+      },
+      "3": {
+        "$value": "{color.clay}"
+      },
+      "4": {
+        "$value": "{color.espresso}"
+      },
+      "5": {
+        "$value": "{color.caution}"
+      },
+      "$type": "color",
+      "$description": "Brand series order. Use for fills and large marks; label every series directly."
+    },
+    "series-on-light": {
+      "1": {
+        "$value": "{color.terracotta}"
+      },
+      "2": {
+        "$value": "{color.teal}"
+      },
+      "3": {
+        "$value": "{color.clay-deep}"
+      },
+      "4": {
+        "$value": "{color.espresso}"
+      },
+      "5": {
+        "$value": "{color.caution-deep}"
+      },
+      "$type": "color",
+      "$description": "Same order, every colour clears 3:1 on white and paper for thin marks and lines."
+    },
+    "min-mark-contrast": {
+      "$type": "number",
+      "$value": 3
+    },
+    "min-neighbour-contrast": {
+      "$type": "number",
+      "$value": 1.5
+    },
+    "series-on-dark": {
+      "1": {
+        "$value": "{color.terracotta-light}"
+      },
+      "2": {
+        "$value": "{color.teal-light}"
+      },
+      "3": {
+        "$value": "{color.clay}"
+      },
+      "4": {
+        "$value": "{color.sand}"
+      },
+      "5": {
+        "$value": "{color.caution}"
+      },
+      "$type": "color",
+      "$description": "Series for ink grounds: every colour clears 3:1 on ink."
+    },
+    "stroke": {
+      "$type": "dimension",
+      "line": {
+        "$value": {
+          "value": 2,
+          "unit": "px"
+        }
+      },
+      "axis": {
+        "$value": {
+          "value": 1,
+          "unit": "px"
+        }
+      },
+      "spark": {
+        "$value": {
+          "value": 1.5,
+          "unit": "px"
+        }
+      }
+    },
+    "mark": {
+      "$type": "dimension",
+      "dot": {
+        "$value": {
+          "value": 8,
+          "unit": "px"
+        }
+      },
+      "bar-gap": {
+        "$value": {
+          "value": 16,
+          "unit": "px"
+        }
+      }
+    },
+    "label-offset": {
+      "$type": "dimension",
+      "$value": {
+        "value": 8,
+        "unit": "px"
+      }
+    },
+    "max-series": {
+      "$type": "number",
+      "$value": 3,
+      "$description": "Two or three series read; more is a small-multiples problem."
+    },
+    "scale-sequential": {
+      "1": {
+        "$value": "{color.sand}"
+      },
+      "2": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.6745,
+            0.7216,
+            0.7373
+          ],
+          "hex": "#ACB8BC"
+        }
+      },
+      "3": {
+        "$value": "{color.clay}"
+      },
+      "4": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.3294,
+            0.4471,
+            0.502
+          ],
+          "hex": "#547280"
+        }
+      },
+      "5": {
+        "$value": "{color.terra-deep}"
+      },
+      "$type": "color",
+      "$description": "Sequential scales are read by position, never by hue alone; every cell carries its value in the data voice."
+    },
+    "scale-diverging": {
+      "1": {
+        "$value": "{color.teal-deep}"
+      },
+      "2": {
+        "$value": "{color.teal-light}"
+      },
+      "3": {
+        "$value": "{color.sand}"
+      },
+      "4": {
+        "$value": "{color.clay}"
+      },
+      "5": {
+        "$value": "{color.terra-deep}"
+      },
+      "$type": "color",
+      "$description": "Sequential scales are read by position, never by hue alone; every cell carries its value in the data voice."
+    },
+    "scale-steps": {
+      "$type": "number",
+      "$value": 5,
+      "$description": "Sequential scales are read by position, never by hue alone; every cell carries its value in the data voice."
+    }
+  },
+  "font": {
+    "$type": "fontFamily",
+    "display": {
+      "$value": [
+        "Fraunces",
+        "Georgia",
+        "serif"
+      ]
+    },
+    "text": {
+      "$value": [
+        "Libre Franklin",
+        "Helvetica Neue",
+        "Arial",
+        "sans-serif"
+      ]
+    },
+    "data": {
+      "$value": [
+        "IBM Plex Mono",
+        "SFMono-Regular",
+        "Menlo",
+        "monospace"
+      ]
+    }
+  },
+  "type": {
+    "$type": "typography",
+    "display-01": {
+      "$value": {
+        "fontFamily": "{font.display}",
+        "fontWeight": 400,
+        "fontSize": {
+          "value": 48,
+          "unit": "px"
+        },
+        "lineHeight": 0.88,
+        "letterSpacing": {
+          "value": 0,
+          "unit": "px"
+        }
+      },
+      "$extensions": {
+        "form.applied": {
+          "voice": "display",
+          "fluidSize": "clamp(48px, 9vw, 160px)",
+          "registers": [
+            "i"
+          ],
+          "use": "Hero and spread statements"
+        }
+      }
+    },
+    "display-02": {
+      "$value": {
+        "fontFamily": "{font.display}",
+        "fontWeight": 400,
+        "fontSize": {
+          "value": 36,
+          "unit": "px"
+        },
+        "lineHeight": 0.98,
+        "letterSpacing": {
+          "value": 0,
+          "unit": "px"
+        }
+      },
+      "$extensions": {
+        "form.applied": {
+          "voice": "display",
+          "fluidSize": "clamp(36px, 5vw, 76px)",
+          "registers": [
+            "i"
+          ],
+          "use": "Section openers"
+        }
+      }
+    },
+    "heading-01": {
+      "$value": {
+        "fontFamily": "{font.display}",
+        "fontWeight": 400,
+        "fontSize": {
+          "value": 30,
+          "unit": "px"
+        },
+        "lineHeight": 1.12,
+        "letterSpacing": {
+          "value": 0,
+          "unit": "px"
+        }
+      },
+      "$extensions": {
+        "form.applied": {
+          "voice": "display",
+          "registers": [
+            "i"
+          ],
+          "use": "Sub-heads in brand contexts"
+        }
+      }
+    },
+    "heading-02": {
+      "$value": {
+        "fontFamily": "{font.text}",
+        "fontWeight": 700,
+        "fontSize": {
+          "value": 32,
+          "unit": "px"
+        },
+        "lineHeight": 1.13,
+        "letterSpacing": {
+          "value": 0,
+          "unit": "px"
+        }
+      },
+      "$extensions": {
+        "form.applied": {
+          "voice": "text",
+          "registers": [
+            "ii"
+          ],
+          "use": "Document H2"
+        }
+      }
+    },
+    "heading-03": {
+      "$value": {
+        "fontFamily": "{font.text}",
+        "fontWeight": 700,
+        "fontSize": {
+          "value": 22,
+          "unit": "px"
+        },
+        "lineHeight": 1.2,
+        "letterSpacing": {
+          "value": 0,
+          "unit": "px"
+        }
+      },
+      "$extensions": {
+        "form.applied": {
+          "voice": "text",
+          "registers": [
+            "ii"
+          ],
+          "use": "Document H3"
+        }
+      }
+    },
+    "body-01": {
+      "$value": {
+        "fontFamily": "{font.text}",
+        "fontWeight": 400,
+        "fontSize": {
+          "value": 19,
+          "unit": "px"
+        },
+        "lineHeight": 1.32,
+        "letterSpacing": {
+          "value": 0,
+          "unit": "px"
+        }
+      },
+      "$extensions": {
+        "form.applied": {
+          "voice": "text",
+          "registers": [
+            "ii"
+          ],
+          "use": "Document body, hard minimum"
+        }
+      }
+    },
+    "body-02": {
+      "$value": {
+        "fontFamily": "{font.text}",
+        "fontWeight": 400,
+        "fontSize": {
+          "value": 17,
+          "unit": "px"
+        },
+        "lineHeight": 1.55,
+        "letterSpacing": {
+          "value": 0,
+          "unit": "px"
+        }
+      },
+      "$extensions": {
+        "form.applied": {
+          "voice": "text",
+          "registers": [
+            "i"
+          ],
+          "use": "Brand body copy"
+        }
+      }
+    },
+    "label-01": {
+      "$value": {
+        "fontFamily": "{font.data}",
+        "fontWeight": 400,
+        "fontSize": {
+          "value": 11.5,
+          "unit": "px"
+        },
+        "lineHeight": 1.3,
+        "letterSpacing": {
+          "value": 1.15,
+          "unit": "px"
+        }
+      },
+      "$extensions": {
+        "form.applied": {
+          "voice": "data",
+          "registers": [
+            "i",
+            "ii"
+          ],
+          "transform": "uppercase",
+          "use": "Eyebrows, table headers, statuses",
+          "trackingEm": 0.1
+        }
+      }
+    },
+    "data-01": {
+      "$value": {
+        "fontFamily": "{font.data}",
+        "fontWeight": 300,
+        "fontSize": {
+          "value": 28,
+          "unit": "px"
+        },
+        "lineHeight": 1,
+        "letterSpacing": {
+          "value": 0,
+          "unit": "px"
+        }
+      },
+      "$extensions": {
+        "form.applied": {
+          "voice": "data",
+          "fluidSize": "clamp(28px, 4vw, 64px)",
+          "registers": [
+            "i",
+            "ii"
+          ],
+          "use": "Headline figures"
+        }
+      }
+    },
+    "data-02": {
+      "$value": {
+        "fontFamily": "{font.data}",
+        "fontWeight": 400,
+        "fontSize": {
+          "value": 15,
+          "unit": "px"
+        },
+        "lineHeight": 1.45,
+        "letterSpacing": {
+          "value": 0,
+          "unit": "px"
+        }
+      },
+      "$extensions": {
+        "form.applied": {
+          "voice": "data",
+          "registers": [
+            "i",
+            "ii"
+          ],
+          "use": "Inline values, units, IDs, provenance"
+        }
+      }
+    }
+  },
+  "display": {
+    "$type": "number",
+    "opsz-breakpoint": {
+      "$type": "dimension",
+      "$value": {
+        "value": 40,
+        "unit": "px"
+      },
+      "$description": "Above this rendered size, opsz 144; at or below, opsz 48."
+    },
+    "opsz-above": {
+      "$value": 144
+    },
+    "opsz-below": {
+      "$value": 48
+    },
+    "weight-min": {
+      "$value": 380
+    },
+    "weight-max": {
+      "$value": 470
+    }
+  },
+  "spacing": {
+    "$type": "dimension",
+    "$description": "8px mini-unit. Every margin, gap, and step is one of these or a multiple of 8 above 96.",
+    "01": {
+      "$value": {
+        "value": 8,
+        "unit": "px"
+      }
+    },
+    "02": {
+      "$value": {
+        "value": 16,
+        "unit": "px"
+      }
+    },
+    "03": {
+      "$value": {
+        "value": 24,
+        "unit": "px"
+      }
+    },
+    "04": {
+      "$value": {
+        "value": 32,
+        "unit": "px"
+      }
+    },
+    "05": {
+      "$value": {
+        "value": 48,
+        "unit": "px"
+      }
+    },
+    "06": {
+      "$value": {
+        "value": 64,
+        "unit": "px"
+      }
+    },
+    "07": {
+      "$value": {
+        "value": 80,
+        "unit": "px"
+      }
+    },
+    "08": {
+      "$value": {
+        "value": 96,
+        "unit": "px"
+      }
+    },
+    "$extensions": {
+      "form.applied": {
+        "unit": 8
+      }
+    }
+  },
+  "grid": {
+    "gutter": {
+      "$type": "dimension",
+      "$value": {
+        "value": 32,
+        "unit": "px"
+      }
+    },
+    "breakpoints": {
+      "sm": {
+        "min-width": {
+          "$type": "dimension",
+          "$value": {
+            "value": 320,
+            "unit": "px"
+          }
+        },
+        "columns": {
+          "$type": "number",
+          "$value": 4
+        },
+        "margin": {
+          "$type": "dimension",
+          "$value": {
+            "value": 0,
+            "unit": "px"
+          }
+        }
+      },
+      "md": {
+        "min-width": {
+          "$type": "dimension",
+          "$value": {
+            "value": 672,
+            "unit": "px"
+          }
+        },
+        "columns": {
+          "$type": "number",
+          "$value": 8
+        },
+        "margin": {
+          "$type": "dimension",
+          "$value": {
+            "value": 16,
+            "unit": "px"
+          }
+        }
+      },
+      "lg": {
+        "min-width": {
+          "$type": "dimension",
+          "$value": {
+            "value": 1056,
+            "unit": "px"
+          }
+        },
+        "columns": {
+          "$type": "number",
+          "$value": 16
+        },
+        "margin": {
+          "$type": "dimension",
+          "$value": {
+            "value": 16,
+            "unit": "px"
+          }
+        }
+      },
+      "xlg": {
+        "min-width": {
+          "$type": "dimension",
+          "$value": {
+            "value": 1312,
+            "unit": "px"
+          }
+        },
+        "columns": {
+          "$type": "number",
+          "$value": 16
+        },
+        "margin": {
+          "$type": "dimension",
+          "$value": {
+            "value": 16,
+            "unit": "px"
+          }
+        }
+      },
+      "max": {
+        "min-width": {
+          "$type": "dimension",
+          "$value": {
+            "value": 1584,
+            "unit": "px"
+          }
+        },
+        "columns": {
+          "$type": "number",
+          "$value": 16
+        },
+        "margin": {
+          "$type": "dimension",
+          "$value": {
+            "value": 24,
+            "unit": "px"
+          }
+        }
+      }
+    }
+  },
+  "floors": {
+    "$type": "number",
+    "$description": "Locked. Non-negotiable in both registers.",
+    "body-contrast": {
+      "$value": 4.5
+    },
+    "display-contrast": {
+      "$value": 3
+    },
+    "large-text-px": {
+      "$value": 24
+    },
+    "large-bold-text-px": {
+      "$value": 18.66
+    },
+    "max-measure-ch": {
+      "$value": 66
+    },
+    "body-min-px-register-ii": {
+      "$value": 19
+    },
+    "apca-body-advisory": {
+      "$value": 60,
+      "$description": "Advisory only. APCA Lc for body text; WCAG 2 floors remain the gate."
+    },
+    "apca-large-advisory": {
+      "$value": 45
+    },
+    "text-min-px": {
+      "$value": 11.5,
+      "$description": "Nothing in the system is set smaller than label-01, in any voice, in either register."
+    },
+    "label-apca": {
+      "$value": 60,
+      "$description": "Adopted from the advisory: text at label-01 size must also clear APCA Lc 60. WCAG 2 remains the gate for everything else."
+    },
+    "provenance-after-words": {
+      "$value": 800,
+      "$description": "A Register II document longer than this carries a provenance panel."
+    }
+  },
+  "motion": {
+    "$description": "Motion is structural, never decorative: it reveals order or data. All of it collapses to none under prefers-reduced-motion.",
+    "duration": {
+      "$type": "duration",
+      "short": {
+        "$value": {
+          "value": 200,
+          "unit": "ms"
+        }
+      },
+      "medium": {
+        "$value": {
+          "value": 480,
+          "unit": "ms"
+        }
+      },
+      "long": {
+        "$value": {
+          "value": 960,
+          "unit": "ms"
+        }
+      }
+    },
+    "easing": {
+      "$type": "cubicBezier",
+      "standard": {
+        "$value": [
+          0.2,
+          0,
+          0,
+          1
+        ]
+      },
+      "enter": {
+        "$value": [
+          0,
+          0,
+          0.2,
+          1
+        ]
+      },
+      "exit": {
+        "$value": [
+          0.4,
+          0,
+          1,
+          1
+        ]
+      }
+    }
+  },
+  "rule": {
+    "$type": "dimension",
+    "$description": "Rules and hairlines. Nothing thicker than the heavy rule; no rounded corners anywhere.",
+    "hairline": {
+      "$value": {
+        "value": 1,
+        "unit": "px"
+      }
+    },
+    "rule": {
+      "$value": {
+        "value": 2,
+        "unit": "px"
+      }
+    },
+    "heavy": {
+      "$value": {
+        "value": 4,
+        "unit": "px"
+      }
+    },
+    "radius": {
+      "$value": {
+        "value": 0,
+        "unit": "px"
+      }
+    }
+  },
+  "opacity": {
+    "$type": "number",
+    "bled-form": {
+      "$value": 0.35
+    },
+    "layer-ink": {
+      "$value": 0.85,
+      "$description": "Palimpsest overprint layers use multiply at this opacity so the base layer keeps its floor."
+    }
+  },
+  "focus": {
+    "$type": "dimension",
+    "$description": "The focus indicator: a yellow field ringed in ink so it clears 3:1 on every ground.",
+    "ring": {
+      "$value": {
+        "value": 3,
+        "unit": "px"
+      }
+    },
+    "bar": {
+      "$value": {
+        "value": 2,
+        "unit": "px"
+      }
+    }
+  },
+  "layer": {
+    "$type": "number",
+    "$description": "Named z-planes. z-index must be one of these. Type is always above Form.",
+    "ground": {
+      "$value": 0
+    },
+    "form": {
+      "$value": 1
+    },
+    "type": {
+      "$value": 2
+    },
+    "data": {
+      "$value": 3
+    },
+    "overlay": {
+      "$value": 4
+    }
+  },
+  "bleed": {
+    "$type": "dimension",
+    "$description": "How far an element may run past its grid container: half a gutter, one column (plus its gutter), or past the frame (any amount beyond the viewport edge).",
+    "half-gutter": {
+      "$value": {
+        "value": 16,
+        "unit": "px"
+      }
+    },
+    "column": {
+      "$value": {
+        "value": 0,
+        "unit": "px"
+      },
+      "$description": "One column width plus one gutter, resolved from the grid at runtime."
+    }
+  },
+  "print": {
+    "$description": "Documents are printed. Page size and margins are tokens; running heads carry the wordmark and the provenance line.",
+    "page": {
+      "$type": "dimension",
+      "width": {
+        "$value": {
+          "value": 210,
+          "unit": "mm"
+        }
+      },
+      "height": {
+        "$value": {
+          "value": 297,
+          "unit": "mm"
+        }
+      }
+    },
+    "margin": {
+      "$type": "dimension",
+      "top": {
+        "$value": {
+          "value": 20,
+          "unit": "mm"
+        }
+      },
+      "bottom": {
+        "$value": {
+          "value": 24,
+          "unit": "mm"
+        }
+      },
+      "inline": {
+        "$value": {
+          "value": 22,
+          "unit": "mm"
+        }
+      }
+    }
+  },
+  "state": {
+    "$description": "Interaction states — hover, active, disabled, selected, error — layered on top of the register palette. Every leaf aliases an existing colour, except disabled.opacity, which is a plain number.",
+    "hover": {
+      "link": {
+        "$type": "color",
+        "$value": "{color.terra-deep}"
+      },
+      "button": {
+        "$type": "color",
+        "$value": "{color.terra-deep}"
+      }
+    },
+    "active": {
+      "button": {
+        "$type": "color",
+        "$value": "{color.espresso}"
+      }
+    },
+    "disabled": {
+      "opacity": {
+        "$type": "number",
+        "$value": 0.5
+      },
+      "text": {
+        "$type": "color",
+        "$value": "{color.muted}"
+      }
+    },
+    "selected": {
+      "bar": {
+        "$type": "color",
+        "$value": "{color.terracotta}"
+      },
+      "background": {
+        "$type": "color",
+        "$value": "{color.sand}"
+      }
+    },
+    "error": {
+      "text": {
+        "$type": "color",
+        "$value": "{color.critical}"
+      },
+      "border": {
+        "$type": "color",
+        "$value": "{color.critical}"
+      }
+    }
+  }
+}

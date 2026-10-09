@@ -1,0 +1,826 @@
+{
+  "measured": {
+    "pages": 3,
+    "elements": 938,
+    "textElements": 242,
+    "urls": [
+      "https://fluent2.microsoft.design/",
+      "https://fluent2.microsoft.design/components/web/react/core/button/usage",
+      "https://fluent2.microsoft.design/color"
+    ],
+    "viewports": [
+      1280
+    ],
+    "measuredAt": "2026-10-08T10:45:13.405Z"
+  },
+  "system": {
+    "colour": {
+      "tokens": [
+        {
+          "value": "#FFFFFF",
+          "weight": 0.96,
+          "members": 2,
+          "share": 0.3825,
+          "roles": [
+            "ground"
+          ]
+        },
+        {
+          "value": "#1B1A19",
+          "weight": 0.7,
+          "members": 1,
+          "share": 0.278,
+          "roles": [
+            "text"
+          ]
+        },
+        {
+          "value": "#F5F5F5",
+          "weight": 0.3,
+          "members": 2,
+          "share": 0.1187,
+          "roles": [
+            "ground",
+            "border"
+          ]
+        },
+        {
+          "value": "#000000",
+          "weight": 0.13,
+          "members": 1,
+          "share": 0.0508,
+          "roles": [
+            "text",
+            "ground",
+            "border"
+          ]
+        },
+        {
+          "value": "#E0E0E0",
+          "weight": 0.1,
+          "members": 2,
+          "share": 0.0392,
+          "roles": [
+            "border"
+          ]
+        },
+        {
+          "value": "#616161",
+          "weight": 0.07,
+          "members": 2,
+          "share": 0.0284,
+          "roles": [
+            "text",
+            "border"
+          ]
+        },
+        {
+          "value": "#424242",
+          "weight": 0.05,
+          "members": 2,
+          "share": 0.0219,
+          "roles": [
+            "text"
+          ]
+        },
+        {
+          "value": "#D1D1D1",
+          "weight": 0.04,
+          "members": 2,
+          "share": 0.0179,
+          "roles": [
+            "border"
+          ]
+        },
+        {
+          "value": "#242424",
+          "weight": 0.04,
+          "members": 2,
+          "share": 0.0173,
+          "roles": [
+            "text",
+            "ground"
+          ]
+        },
+        {
+          "value": "#B8B8B8",
+          "weight": 0.03,
+          "members": 2,
+          "share": 0.0101,
+          "roles": [
+            "border"
+          ]
+        },
+        {
+          "value": "#EEEBF0",
+          "weight": 0.02,
+          "members": 1,
+          "share": 0.0094,
+          "roles": [
+            "ground"
+          ]
+        },
+        {
+          "value": "#707070",
+          "weight": 0.01,
+          "members": 1,
+          "share": 0.0057,
+          "roles": [
+            "text"
+          ]
+        }
+      ],
+      "coverage": 0.98,
+      "distinct": 46,
+      "sprawl": 3.83,
+      "nearMisses": [
+        {
+          "value": "#F0F0F0",
+          "weight": 0.03311984191952362,
+          "nearestToken": "#F5F5F5",
+          "distance": 1.74
+        },
+        {
+          "value": "#FAFAFA",
+          "weight": 0.027939282433518016,
+          "nearestToken": "#FFFFFF",
+          "distance": 1.73
+        },
+        {
+          "value": "#E6E6E6",
+          "weight": 0.011203928011432208,
+          "nearestToken": "#E0E0E0",
+          "distance": 2.12
+        },
+        {
+          "value": "#D6D6D6",
+          "weight": 0.001449385918071554,
+          "nearestToken": "#D1D1D1",
+          "distance": 1.79
+        },
+        {
+          "value": "#444444",
+          "weight": 0.0012968189793271796,
+          "nearestToken": "#424242",
+          "distance": 0.88
+        },
+        {
+          "value": "#BDBDBD",
+          "weight": 0.0004577008162331223,
+          "nearestToken": "#B8B8B8",
+          "distance": 1.83
+        },
+        {
+          "value": "#5D5D5D",
+          "weight": 0.00014143007562270887,
+          "nearestToken": "#616161",
+          "distance": 1.65
+        },
+        {
+          "value": "#222222",
+          "weight": 0.00001106976425967783,
+          "nearestToken": "#242424",
+          "distance": 0.97
+        }
+      ],
+      "tail": [
+        {
+          "value": "#4D4D4D",
+          "weight": 0.01
+        },
+        {
+          "value": "#AF4E63",
+          "weight": 0.01
+        },
+        {
+          "value": "#107C10",
+          "weight": 0.01
+        },
+        {
+          "value": "#767686",
+          "weight": 0.01
+        },
+        {
+          "value": "#C50F1F",
+          "weight": 0.01
+        },
+        {
+          "value": "#0000EE",
+          "weight": 0
+        },
+        {
+          "value": "#BDBDFB",
+          "weight": 0
+        },
+        {
+          "value": "#484644",
+          "weight": 0
+        },
+        {
+          "value": "#D13438",
+          "weight": 0
+        },
+        {
+          "value": "#EBEBEB",
+          "weight": 0
+        },
+        {
+          "value": "#0078D4",
+          "weight": 0
+        },
+        {
+          "value": "#0C0C0C",
+          "weight": 0
+        },
+        {
+          "value": "#107C41",
+          "weight": 0
+        },
+        {
+          "value": "#F2C811",
+          "weight": 0
+        },
+        {
+          "value": "#D83B01",
+          "weight": 0
+        },
+        {
+          "value": "#C43E1C",
+          "weight": 0
+        },
+        {
+          "value": "#077568",
+          "weight": 0
+        },
+        {
+          "value": "#BC1948",
+          "weight": 0
+        },
+        {
+          "value": "#008272",
+          "weight": 0
+        },
+        {
+          "value": "#00BCF2",
+          "weight": 0
+        },
+        {
+          "value": "#5B5FC7",
+          "weight": 0
+        },
+        {
+          "value": "#3955A3",
+          "weight": 0
+        },
+        {
+          "value": "#185ABD",
+          "weight": 0
+        },
+        {
+          "value": "#742774",
+          "weight": 0
+        },
+        {
+          "value": "#00A99D",
+          "weight": 0
+        },
+        {
+          "value": "#B4D6FA",
+          "weight": 0
+        }
+      ],
+      "drift": 47.69
+    },
+    "spacing": {
+      "step": 2,
+      "coverage": 0.8363,
+      "onScale": false,
+      "residual": 0.166,
+      "offScale": [
+        {
+          "value": 1,
+          "weight": 63,
+          "off": 1
+        },
+        {
+          "value": 3,
+          "weight": 36,
+          "off": 1
+        },
+        {
+          "value": 5,
+          "weight": 21,
+          "off": 1
+        },
+        {
+          "value": 11,
+          "weight": 8,
+          "off": 1
+        },
+        {
+          "value": 15,
+          "weight": 8,
+          "off": 1
+        },
+        {
+          "value": 75,
+          "weight": 3,
+          "off": 1
+        },
+        {
+          "value": 9,
+          "weight": 3,
+          "off": 1
+        },
+        {
+          "value": 13,
+          "weight": 2,
+          "off": 1
+        },
+        {
+          "value": 7,
+          "weight": 1,
+          "off": 1
+        },
+        {
+          "value": 33,
+          "weight": 1,
+          "off": 1
+        },
+        {
+          "value": 19,
+          "weight": 1,
+          "off": 1
+        }
+      ],
+      "considered": [
+        {
+          "step": 2,
+          "coverage": 0.8363
+        },
+        {
+          "step": 3,
+          "coverage": 0.3519
+        },
+        {
+          "step": 4,
+          "coverage": 0.5947
+        },
+        {
+          "step": 5,
+          "coverage": 0.196
+        },
+        {
+          "step": 6,
+          "coverage": 0.2906
+        },
+        {
+          "step": 7,
+          "coverage": 0.0312
+        },
+        {
+          "step": 8,
+          "coverage": 0.3575
+        },
+        {
+          "step": 9,
+          "coverage": 0.0178
+        },
+        {
+          "step": 10,
+          "coverage": 0.1604
+        },
+        {
+          "step": 11,
+          "coverage": 0.029
+        },
+        {
+          "step": 12,
+          "coverage": 0.1882
+        },
+        {
+          "step": 13,
+          "coverage": 0.0022
+        },
+        {
+          "step": 14,
+          "coverage": 0.0301
+        },
+        {
+          "step": 15,
+          "coverage": 0.02
+        },
+        {
+          "step": 16,
+          "coverage": 0.1414
+        },
+        {
+          "step": 17,
+          "coverage": 0
+        },
+        {
+          "step": 18,
+          "coverage": 0.0145
+        },
+        {
+          "step": 19,
+          "coverage": 0.0056
+        },
+        {
+          "step": 20,
+          "coverage": 0.1036
+        },
+        {
+          "step": 21,
+          "coverage": 0
+        },
+        {
+          "step": 22,
+          "coverage": 0.0189
+        },
+        {
+          "step": 23,
+          "coverage": 0.0022
+        },
+        {
+          "step": 24,
+          "coverage": 0.078
+        }
+      ]
+    },
+    "type": {
+      "values": [
+        {
+          "value": 10,
+          "weight": 21,
+          "share": 0.0016,
+          "members": 1
+        },
+        {
+          "value": 12,
+          "weight": 279,
+          "share": 0.0213,
+          "members": 1
+        },
+        {
+          "value": 14,
+          "weight": 1840,
+          "share": 0.1404,
+          "members": 1
+        },
+        {
+          "value": 16,
+          "weight": 9925,
+          "share": 0.7571,
+          "members": 1
+        },
+        {
+          "value": 18,
+          "weight": 43,
+          "share": 0.0033,
+          "members": 1
+        },
+        {
+          "value": 20,
+          "weight": 404,
+          "share": 0.0308,
+          "members": 1
+        },
+        {
+          "value": 24,
+          "weight": 366,
+          "share": 0.0279,
+          "members": 1
+        },
+        {
+          "value": 32,
+          "weight": 160,
+          "share": 0.0122,
+          "members": 1
+        },
+        {
+          "value": 40,
+          "weight": 29,
+          "share": 0.0022,
+          "members": 1
+        },
+        {
+          "value": 52,
+          "weight": 11,
+          "share": 0.0008,
+          "members": 1
+        },
+        {
+          "value": 68,
+          "weight": 11,
+          "share": 0.0008,
+          "members": 1
+        },
+        {
+          "value": 128,
+          "weight": 20,
+          "share": 0.0015,
+          "members": 1
+        }
+      ],
+      "distinct": 12,
+      "incidental": [
+        {
+          "value": 10,
+          "weight": 21,
+          "share": 0.0016,
+          "members": 1
+        },
+        {
+          "value": 18,
+          "weight": 43,
+          "share": 0.0033,
+          "members": 1
+        },
+        {
+          "value": 40,
+          "weight": 29,
+          "share": 0.0022,
+          "members": 1
+        },
+        {
+          "value": 52,
+          "weight": 11,
+          "share": 0.0008,
+          "members": 1
+        },
+        {
+          "value": 68,
+          "weight": 11,
+          "share": 0.0008,
+          "members": 1
+        },
+        {
+          "value": 128,
+          "weight": 20,
+          "share": 0.0015,
+          "members": 1
+        }
+      ],
+      "ratio": {
+        "ratio": 1.2,
+        "spread": 0.771,
+        "steps": 12
+      }
+    },
+    "families": {
+      "values": [
+        {
+          "value": "Segoe UI",
+          "weight": 13087,
+          "share": 99.8
+        },
+        {
+          "value": "Menlo",
+          "weight": 19,
+          "share": 0.1
+        },
+        {
+          "value": "monospace",
+          "weight": 3,
+          "share": 0
+        }
+      ],
+      "distinct": 3
+    },
+    "leading": {
+      "values": [
+        {
+          "value": 0.9,
+          "weight": 3,
+          "share": 0.0002,
+          "members": 1
+        },
+        {
+          "value": 1,
+          "weight": 31,
+          "share": 0.0024,
+          "members": 1
+        },
+        {
+          "value": 1.15,
+          "weight": 219,
+          "share": 0.0167,
+          "members": 1
+        },
+        {
+          "value": 1.25,
+          "weight": 160,
+          "share": 0.0122,
+          "members": 1
+        },
+        {
+          "value": 1.31,
+          "weight": 739,
+          "share": 0.0564,
+          "members": 2
+        },
+        {
+          "value": 1.33,
+          "weight": 645,
+          "share": 0.0492,
+          "members": 1
+        },
+        {
+          "value": 1.35,
+          "weight": 11,
+          "share": 0.0008,
+          "members": 1
+        },
+        {
+          "value": 1.38,
+          "weight": 446,
+          "share": 0.034,
+          "members": 2
+        },
+        {
+          "value": 1.4,
+          "weight": 422,
+          "share": 0.0322,
+          "members": 1
+        },
+        {
+          "value": 1.43,
+          "weight": 1410,
+          "share": 0.1076,
+          "members": 1
+        },
+        {
+          "value": 1.5,
+          "weight": 9023,
+          "share": 0.6883,
+          "members": 1
+        }
+      ],
+      "distinct": 13,
+      "incidental": [
+        {
+          "value": 0.9,
+          "weight": 3,
+          "share": 0.0002,
+          "members": 1
+        },
+        {
+          "value": 1,
+          "weight": 31,
+          "share": 0.0024,
+          "members": 1
+        },
+        {
+          "value": 1.35,
+          "weight": 11,
+          "share": 0.0008,
+          "members": 1
+        }
+      ]
+    },
+    "radius": {
+      "absent": false,
+      "scale": [
+        {
+          "value": 2,
+          "weight": 184,
+          "share": 0.2644,
+          "members": 1
+        },
+        {
+          "value": 4,
+          "weight": 72,
+          "share": 0.1034,
+          "members": 1
+        },
+        {
+          "value": 6,
+          "weight": 12,
+          "share": 0.0172,
+          "members": 1
+        },
+        {
+          "value": 8,
+          "weight": 120,
+          "share": 0.1724,
+          "members": 1
+        },
+        {
+          "value": 12,
+          "weight": 4,
+          "share": 0.0057,
+          "members": 1
+        },
+        {
+          "value": 16,
+          "weight": 44,
+          "share": 0.0632,
+          "members": 1
+        },
+        {
+          "value": 20,
+          "weight": 8,
+          "share": 0.0115,
+          "members": 1
+        },
+        {
+          "value": 22,
+          "weight": 152,
+          "share": 0.2184,
+          "members": 1
+        },
+        {
+          "value": 24,
+          "weight": 12,
+          "share": 0.0172,
+          "members": 1
+        },
+        {
+          "value": 64,
+          "weight": 16,
+          "share": 0.023,
+          "members": 1
+        },
+        {
+          "value": 100,
+          "weight": 72,
+          "share": 0.1034,
+          "members": 1
+        }
+      ],
+      "distinct": 11
+    },
+    "borders": {
+      "values": [
+        {
+          "value": 1,
+          "weight": 230,
+          "share": 0.935,
+          "members": 1
+        },
+        {
+          "value": 2,
+          "weight": 16,
+          "share": 0.065,
+          "members": 1
+        }
+      ],
+      "distinct": 2,
+      "incidental": []
+    },
+    "shadow": {
+      "values": [
+        {
+          "value": "rgba(0, 0, 0, 0.14) 0px 2px 4px 0px, rgba(0, 0, 0, 0.12) 0px 0px 2px 0px",
+          "weight": 12,
+          "share": 50
+        },
+        {
+          "value": "rgba(0, 0, 0, 0.12) 0px 0px 2px 0px, rgba(0, 0, 0, 0.14) 0px 2px 4px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 2px inset",
+          "weight": 6,
+          "share": 25
+        },
+        {
+          "value": "rgba(0, 0, 0, 0.12) 0px 0px 2px 0px, rgba(0, 0, 0, 0.14) 0px 4px 8px 0px",
+          "weight": 3,
+          "share": 12.5
+        },
+        {
+          "value": "rgba(0, 0, 0, 0.14) 0px 8px 16px 0px",
+          "weight": 1,
+          "share": 4.2
+        },
+        {
+          "value": "rgba(0, 0, 0, 0.12) 0px 0px 2px 0px, rgba(0, 0, 0, 0.14) 0px 8px 16px 0px",
+          "weight": 1,
+          "share": 4.2
+        },
+        {
+          "value": "rgb(68, 68, 68) 0px 0px 4px -2px",
+          "weight": 1,
+          "share": 4.2
+        }
+      ],
+      "distinct": 6
+    }
+  },
+  "numbers": {
+    "size": 28,
+    "coverage": 98,
+    "spacingCoverage": 83.6,
+    "sprawl": 3.5,
+    "wasteValues": 8,
+    "wasteShare": 3
+  },
+  "findings": [
+    "46 distinct colours render across the pages surveyed. 12 of them account for 98% of the colour on the page.",
+    "8 colours sit within a just-noticeable difference of a colour already in use and cannot be told apart by eye — together 3% of the colour on the page. The heaviest is #F0F0F0, which is 1.74 from #F5F5F5.",
+    "Spacing follows no consistent step. The closest candidate is 2px and it explains only 83.6%.",
+    "11 spacing values sit off that step, the most frequent being 1px, which is 1px from the nearest multiple.",
+    "12 distinct font sizes are in use across 12 steps. The sizes sit on roughly a 1.2 ratio.",
+    "6 of those sizes carry under 1% of the text each, which is the signature of a one-off rather than a step.",
+    "11 corner radii are in use, clustering into 11 steps.",
+    "6 distinct shadows are in use. An elevation scale usually has two or three."
+  ]
+}

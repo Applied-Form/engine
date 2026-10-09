@@ -1,0 +1,17 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Modern colour</title>
+<style>
+  body { background: #FFFFFF; color: #222222; font-family: Georgia, serif; font-size: 16px; padding: 24px; }
+  .a { color: oklch(0.55 0.15 29); }
+  .b { color: color(display-p3 0.69 0.31 0.18); }
+  .c { color: lab(45% 35 30); }
+  .d { color: color-mix(in oklab, #B0502E 70%, white); }
+  .e { background: oklch(0.95 0.02 60); padding: 16px; }
+  .f { color: rgb(176 80 46 / 0.9); }
+</style></head><body>
+<p class="a">An oklch accent, which is what a modern brand actually ships.</p>
+<p class="b">A display-p3 accent for wide-gamut screens.</p>
+<p class="c">A lab() colour.</p>
+<p class="d">A colour-mix tint.</p>
+<div class="e"><p>A ground declared in oklch.</p></div>
+<p class="f">Space-separated rgb with a slash alpha.</p>
+</body></html>

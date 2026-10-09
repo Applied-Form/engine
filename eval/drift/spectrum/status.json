@@ -1,0 +1,15 @@
+{
+  "key": "spectrum",
+  "name": "Spectrum (Adobe)",
+  "pages": [
+    "https://spectrum.adobe.com/",
+    "https://spectrum.adobe.com/page/button/",
+    "https://spectrum.adobe.com/page/color-system/"
+  ],
+  "started": "2026-10-08T10:45:08.458Z",
+  "finished": "2026-10-08T10:45:09.947Z",
+  "ok": true,
+  "exit": 0,
+  "stdout": "wrote eval/drift/spectrum/survey.json\nwrote eval/drift/spectrum/report.json\n\nSurveyed 3 page-viewport pairs, 57 rendered elements, measured 2026-10-08.\n\n  system size      16 values describe the site\n  colour coverage  99.6% of the colour on the page\n  spacing step     2px, explaining 93.7%\n  sprawl           1.8x more distinct values than tokens\n  waste            0 indistinguishable colours, 0% of the page\n\n· 10 distinct colours render across the pages surveyed. 9 of them account for 99.6% of the colour on the page.\n· Spacing follows a 2px step, which explains 93.7% of the margins, padding and gaps measured.\n· 1 spacing values sit off that step, the most frequent being 102.656px, which is 0.66px from the nearest multiple.\n· 5 distinct font sizes are in use across 5 steps. The sizes sit on roughly a 1.371 ratio.\n· 3 corner radii are in use, clustering into 3 steps.\n\n",
+  "stderr": ""
+}

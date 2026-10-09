@@ -1,0 +1,15 @@
+{
+  "key": "fluent",
+  "name": "Fluent 2 (Microsoft)",
+  "pages": [
+    "https://fluent2.microsoft.design/",
+    "https://fluent2.microsoft.design/components/web/react/core/button/usage",
+    "https://fluent2.microsoft.design/color"
+  ],
+  "started": "2026-10-08T10:45:09.947Z",
+  "finished": "2026-10-08T10:45:13.437Z",
+  "ok": true,
+  "exit": 0,
+  "stdout": "wrote eval/drift/fluent/survey.json\nwrote eval/drift/fluent/report.json\n\nSurveyed 3 page-viewport pairs, 938 rendered elements, measured 2026-10-08.\n\n  system size      28 values describe the site\n  colour coverage  98% of the colour on the page\n  spacing step     2px, explaining 83.6%\n  sprawl           3.5x more distinct values than tokens\n  waste            8 indistinguishable colours, 3% of the page\n\n· 46 distinct colours render across the pages surveyed. 12 of them account for 98% of the colour on the page.\n· 8 colours sit within a just-noticeable difference of a colour already in use and cannot be told apart by eye — together 3% of the colour on the page. The heaviest is #F0F0F0, which is 1.74 from #F5F5F5.\n· Spacing follows no consistent step. The closest candidate is 2px and it explains only 83.6%.\n· 11 spacing values sit off that step, the most frequent being 1px, which is 1px from the nearest multiple.\n· 12 distinct font sizes are in use across 12 steps. The sizes sit on roughly a 1.2 ratio.\n· 6 of those sizes carry under 1% of the text each, which is the signature of a one-off rather than a step.\n· 11 corner radii are in use, clustering into 11 steps.\n· 6 distinct shadows are in use. An elevation scale usually has two or three.\n\n",
+  "stderr": ""
+}

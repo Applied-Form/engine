@@ -1,0 +1,15 @@
+{
+  "key": "material",
+  "name": "Material 3 (Google)",
+  "pages": [
+    "https://m3.material.io/",
+    "https://m3.material.io/components/buttons/overview",
+    "https://m3.material.io/styles/color/overview"
+  ],
+  "started": "2026-10-08T10:44:45.760Z",
+  "finished": "2026-10-08T10:44:49.894Z",
+  "ok": true,
+  "exit": 0,
+  "stdout": "wrote eval/drift/material/survey.json\nwrote eval/drift/material/report.json\n\nSurveyed 3 page-viewport pairs, 540 rendered elements, measured 2026-10-08.\n\n  system size      22 values describe the site\n  colour coverage  99.6% of the colour on the page\n  spacing step     2px, explaining 79.5%\n  sprawl           2x more distinct values than tokens\n  waste            1 indistinguishable colours, 3% of the page\n\n· 13 distinct colours render across the pages surveyed. 9 of them account for 99.6% of the colour on the page.\n· 1 colours sit within a just-noticeable difference of a colour already in use and cannot be told apart by eye — together 3% of the colour on the page. The heaviest is #F5EFF1, which is 1.05 from #F2ECEE.\n· Spacing follows no consistent step. The closest candidate is 2px and it explains only 79.5%.\n· 2 spacing values sit off that step, the most frequent being 1px, which is 1px from the nearest multiple.\n· 9 distinct font sizes are in use across 9 steps. The sizes sit on roughly a 1.155 ratio.\n· 3 of those sizes carry under 1% of the text each, which is the signature of a one-off rather than a step.\n· 7 corner radii are in use, clustering into 7 steps.\n· 1 distinct shadows are in use. An elevation scale usually has two or three.\n\n",
+  "stderr": ""
+}

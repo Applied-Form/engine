@@ -1,0 +1,13 @@
+{
+  "key": "example",
+  "name": "example",
+  "pages": [
+    "https://example.com/"
+  ],
+  "started": "2026-10-08T11:10:34.354Z",
+  "finished": "2026-10-08T11:10:34.890Z",
+  "ok": true,
+  "exit": 0,
+  "stdout": "wrote eval/drift/example/survey.json\nwrote eval/drift/example/report.json\n\nSurveyed 1 page-viewport pairs, 13 rendered elements, measured 2026-10-08.\n\n  system size      6 values describe the site\n  colour coverage  100% of the colour on the page\n  spacing step     2px, explaining 95%\n  sprawl           1.8x more distinct values than tokens\n  waste            0 indistinguishable colours, 0% of the page\n\n· 2 distinct colours render across the pages surveyed. 2 of them account for 100% of the colour on the page.\n· Spacing follows a 2px step, which explains 95% of the margins, padding and gaps measured.\n· 1 spacing values sit off that step, the most frequent being 225px, which is 1px from the nearest multiple.\n· 2 distinct font sizes are in use across 2 steps.\n· None of the 13 rendered elements has a corner radius. That is a decision, and a system built from this site should record it as one rather than leave it unstated.\n\n",
+  "stderr": ""
+}

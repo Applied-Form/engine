@@ -1,0 +1,29 @@
+{
+  "note": "Pilot briefs. Written without reference to examples/, so no arm can succeed by imitating a page it was shown. Each is given to the model alone; the file is never passed whole.",
+  "briefs": [
+    { "id": "b01", "register": "i", "density": "sparse", "chart": false,
+      "brief": "A single page announcing that a small research lab is opening its measurement toolkit to the public. It should feel like a statement of intent, not a product page. One headline, a short argument in three or four paragraphs, and a way to get the toolkit." },
+    { "id": "b02", "register": "i", "density": "sparse", "chart": false,
+      "brief": "A page for a one-day conference on instrumentation and craft. Name, date, city, a paragraph on why it exists, the six talks with speaker names, and a registration call to action." },
+    { "id": "b03", "register": "i", "density": "medium", "chart": false,
+      "brief": "A point-of-view page arguing that most organisations measure the wrong things. Long-form and opinionated, with a strong opening claim, three supporting sections, and a closing position. Written to be read, not skimmed." },
+    { "id": "b04", "register": "i", "density": "medium", "chart": false,
+      "brief": "A hiring page for a four-person team that builds internal tooling. What the team does, how it works, the two open roles with responsibilities, and how to apply. Should read as though a person wrote it." },
+    { "id": "b05", "register": "i", "density": "sparse", "chart": false,
+      "brief": "A page marking the tenth release of a long-running open-source library. A retrospective note, the three changes that mattered most, thanks to contributors, and where to read the changelog." },
+    { "id": "b06", "register": "i", "density": "medium", "chart": true,
+      "brief": "A public transparency page for a small company: how many customers it serves, uptime over the last year, and how it spends revenue. One chart of uptime by month, one of spend by category, and honest commentary on both." },
+    { "id": "b07", "register": "ii", "density": "dense", "chart": false,
+      "brief": "An incident postmortem for a four-hour outage of a payments service. Summary, timeline with timestamps, root cause, customer impact, what went well, what did not, and dated remediation items with owners." },
+    { "id": "b08", "register": "ii", "density": "dense", "chart": true,
+      "brief": "A quarterly operating review for an internal audience. Headline metrics, a chart of monthly active accounts across the quarter, a chart of support ticket volume by category, a table of the top five accounts by usage, and terse analytical commentary." },
+    { "id": "b09", "register": "ii", "density": "dense", "chart": false,
+      "brief": "A pricing and plan comparison for a developer tool with three tiers. A comparison table covering at least ten capabilities, the limits of each tier, notes on overage billing, and a short FAQ." },
+    { "id": "b10", "register": "ii", "density": "dense", "chart": false,
+      "brief": "A reference page documenting the fields of an event payload: field name, type, whether required, default, and description, for about eighteen fields, grouped into three sections, with a worked example payload." },
+    { "id": "b11", "register": "ii", "density": "medium", "chart": false,
+      "brief": "A settings page for a notification system: grouped preference controls with labels and explanatory text, toggles and radio choices, a destructive action, and a save control. Interactive form controls throughout." },
+    { "id": "b12", "register": "ii", "density": "medium", "chart": true,
+      "brief": "A summary of an A/B experiment that did not reach significance. The hypothesis, the design, a chart of the two arms over time, the observed effect with its confidence interval, and a recommendation not to ship." }
+  ]
+}

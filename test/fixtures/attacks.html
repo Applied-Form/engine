@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en" data-register="ii">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Four attacks on the instrument</title>
+<style>
+  /* Each block here is one of the four bypasses the research report proposed. The page exists to
+     fail: test/attacks.test.mjs asserts every one of them is now caught. Nothing here is a
+     pattern to copy. */
+  body { margin: 0; font-family: system-ui; background: #FFFFFF; color: #161B1D; }
+
+  /* Attack 3 · the interface is painted, not marked up. Every rule that reads the DOM sees an
+     empty page, so the page breaks nothing. */
+  #painted { display: block; width: 100vw; height: 60vh; }
+
+  /* Attack 4 · absolute placement with hand-written pixel values, outside any declared grid.
+     The check used to require a [data-grid] ancestor, so a page that never used the attribute
+     could put anything anywhere. */
+  .hijack { position: absolute; left: 123px; top: 47px; }
+
+  /* Attack 6 · an interactive control hidden from assistive technology, and a figure whose
+     content is words painted into an SVG with nothing to describe it. */
+  .ghost { width: 44px; height: 44px; }
+</style>
+</head>
+<body>
+  <canvas id="painted" width="1200" height="500"></canvas>
+
+  <div class="hijack">Placed by hand, at no offset the system declares.</div>
+
+  <button class="ghost" aria-hidden="true">Buy</button>
+
+  <figure data-figure="plot">
+    <svg data-figure="plot" data-generated="chart:bar" width="320" height="180" viewBox="0 0 320 180" role="img">
+      <text x="8" y="24" font-size="14">Revenue by region, 2026, in millions of pounds sterling</text>
+      <text x="8" y="48" font-size="14">North 412 · South 388 · East 275 · West 190</text>
+      <rect x="8" y="64" width="180" height="12" fill="#161B1D"></rect>
+    </svg>
+  </figure>
+</body>
+</html>
