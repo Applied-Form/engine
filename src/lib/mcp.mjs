@@ -8,10 +8,11 @@
  * written for. Nothing here re-serves a ruleset.
  *
  * Why a server rather than a paragraph in a prompt. A model handed a design system as text has to
- * hold every rule in context and check its own work against them, which is exactly the task the
- * instruction-following literature says degrades as the rules accumulate. A model handed `af_lint`
- * checks nothing: it writes a page, calls a tool, and is told what is wrong and what to change.
- * The rules stay out of the context window and the judgement stays out of the model.
+ * hold every rule in context and check its own work against them. A model handed `af_lint` has
+ * the check made for it from the rendered page: it writes a page, calls a tool, and is told what
+ * is wrong and what to change. Whether that yields better pages than the rules alone is what the
+ * evaluation tests; the pilot found it removes most violations of the rules it checks and does
+ * not improve the rules it does not (docs/pilot-results.md).
  *
  * JSON-RPC 2.0 over newline-delimited stdio, no dependencies beyond what the linter already needs.
  */
@@ -134,12 +135,15 @@ function draftFiles(docs) {
 export const HANDLERS = {
   async af_lint({ html, url, register, viewports } = {}) {
     if (!html && !url) throw new Error('af_lint needs html or url');
-    const { lintPages, VIEWPORTS, sampledViewports } = await import('./page-lint.mjs');
+    const { lintPages, VIEWPORTS, sampledViewports, ENGINE_ROOT } = await import('./page-lint.mjs');
     // The register is assumed by the linter itself, so a URL gets it as well as a draft.
     const [target] = html ? draftFiles([html]) : [url];
     const widths = viewports?.length ? viewports : [...VIEWPORTS, ...sampledViewports(2)].sort((a, b) => a - b);
     {
-      const results = await lintPages([target], { viewports: widths, browser: await browser(), register: register ?? null });
+      // A draft is a model's page: it may read its own directory and the engine's files, and not
+      // the directory the server runs in, which is usually the person's project.
+      const fileRoots = html ? [ENGINE_ROOT] : undefined;
+      const results = await lintPages([target], { viewports: widths, browser: await browser(), register: register ?? null, fileRoots });
       const fixOf = Object.fromEntries(RULES.map((r) => [r.id, r.fix]));
       const violations = [];
       for (const r of results) {
@@ -164,9 +168,12 @@ export const HANDLERS = {
   async af_drift({ html, urls, declared, viewports } = {}) {
     const { surveyPages } = await import('./survey.mjs');
     const { driftReport } = await import('./drift.mjs');
+    const { ENGINE_ROOT } = await import('./page-lint.mjs');
     const targets = [...(urls ?? []), ...draftFiles(html ?? [])];
     if (!targets.length) throw new Error('af_drift needs html or urls');
-    const { merged, pages } = await surveyPages(targets, { browser: await browser(), viewports: viewports?.length ? viewports : [1280] });
+    // Drafts may be among the targets, so every page gets a draft's roots.
+    const fileRoots = html?.length ? [ENGINE_ROOT] : undefined;
+    const { merged, pages } = await surveyPages(targets, { browser: await browser(), viewports: viewports?.length ? viewports : [1280], fileRoots });
     merged.pages = pages.length;
     const report = driftReport(merged, { declared: declared?.length ? declared : null });
     return text({

@@ -1,0 +1,43 @@
+{
+  "judges": {
+    "kept": [],
+    "excluded": [
+      {
+        "judge": "azure:gpt-5-mini",
+        "attention": 0.5
+      },
+      {
+        "judge": "sonnet-5-5",
+        "attention": 0.667
+      }
+    ],
+    "attentionFloor": 0.8,
+    "routes": [
+      "azure",
+      "anthropic"
+    ],
+    "generatorRoutes": [
+      "anthropic"
+    ],
+    "sameFamilyOnly": false
+  },
+  "arms": [],
+  "anchors": [],
+  "floorAnchorLost": null,
+  "conformanceVsPreference": {
+    "spearman": null,
+    "arms": 0,
+    "reading": "not computable: fewer than three arms carry both numbers",
+    "caveat": "Descriptive, not a test. Eight arms give a correlation with an interval too wide to reject anything; the decision-relevant output of this round is the floor-anchor check and the sign."
+  },
+  "valid": false,
+  "items": 288,
+  "judgements": 576,
+  "unparsed": 1,
+  "screenshot": {
+    "width": 1280,
+    "height": 1600,
+    "fullPage": false
+  },
+  "ceilingAnchor": "absent: no human-designed page exists for these briefs, so the ceiling check did not run"
+}

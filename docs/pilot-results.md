@@ -10,7 +10,7 @@ Records · `eval/results/pilot-haiku-4-5.jsonl`, `pilot-sonnet-5.jsonl`, `pilot-
 Runs · Evaluation workflow runs 37833276081, 37833273511, 37833270079, 2026-10-08, one runner each, four cells at a time
 Tables · `node eval/tables.mjs eval/results/pilot-*.jsonl`, seeded, so every number below reruns exactly
 Cost · $173.65 at list price: Haiku 4.5 $11.70, Sonnet 5 $38.59, Opus 5 $123.37
-Not yet run · the judging round (H4), a model from another provider, the ablations
+Since run (2026-10-10, section "Judging rounds and a second provider") · the judging round (H4), a model from another provider. Not yet run · human judges, a ceiling anchor, the ablations
 :::
 
 ## The answer
@@ -51,14 +51,14 @@ Failures are excluded from every rate and never counted as clean pages. There we
 | P7 | Cross-generation variance falls monotonically from A to F (moderate) | Palette-drift spread: A 1.24, B 2.00, C 0.51, E 0.49, F 0.52. It falls once, when the token file arrives, and not again | Not met |
 | P8 | F costs 2 to 4 times E in tokens (high) | 4.1 times pooled; 4.1, 3.6 and 4.7 by model | Met, at the top of the range |
 | P9 | F's advantage over the compiled rules is smaller than over E, because part of the latter is prompt length (moderate) | Larger: 0.77 (0.64 to 0.92) against the compiled rules, 0.98 against E. Compiling the rules made them worse, 1.27 of E | Not met, in the opposite direction |
-| P10 | G is not measurably more conformant than F, and is preferred by blind judges more often (deliberately uncertain) | Not more conformant: 1.09 of F (1.02 to 1.19), slightly less. Preference not yet measured | First half met; the second waits on judging |
+| P10 | G is not measurably more conformant than F, and is preferred by blind judges more often (deliberately uncertain) | Not more conformant: 1.09 of F (1.02 to 1.19), slightly less. Not preferred either: model judges chose F over G in 0.45 to 0.61 of pairs, above 0.50 on Opus (0.51 to 0.71) | First half met; second half not met |
 
 | Hypothesis | Verdict on this pilot |
 |---|---|
 | H1 · executable beats a prose guide with the same rules | Not supported on held-out rules. Supported, by a factor of about 25, on the rules the gate enforces |
 | H2 · most of the gain is the feedback loop, not the written rules | Not supported. On held-out rules the written rules carry the whole gain (E against A, 0.66) and the loop adds nothing to the full text (F against E, 0.98). It beats the compiled text (0.77) because the compiled text is worse than the full one |
 | H3 · the system reduces variance more than it raises the mean | Not supported as stated. Palette drift's mean falls 5.4 times and its spread 2.4 times; both fall, and the mean falls more |
-| H4 · enforcement costs quality | Not yet measured. The judging round has not run |
+| H4 · enforcement costs quality | Model judges only. On Haiku and Opus the page written with no system is preferred to the loop's (shares 0.32 and 0.35, intervals below 0.50); on Sonnet and GPT-5-mini neither is. The loop is not preferred to rules read anywhere; it is preferred to the prose guide on Sonnet and GPT-5-mini and not on Haiku. See "Judging rounds and a second provider" |
 
 ## What each part of the system does
 
@@ -123,10 +123,70 @@ The loop costs three to four times reading the rules, almost all of it repair ro
 2. A model from another provider (GPT-5 on Azure), so the result is a property of the method and not of one model family.
 3. The repair-budget and feedback-richness ablations, on Haiku, where the loop is cheapest and its effect largest.
 
+## Judging rounds and a second provider (added 2026-10-10)
+
+The judging rounds completed on 2026-10-10 over the pilot pages, and GPT-5-mini on Azure was run
+as a fourth generator under the same protocol. Records: `eval/results/pilot-*.judging.jsonl` and
+`.json`; `eval/results/pilot-gpt-5-mini.jsonl` and `.analysis.txt`.
+
+The first rounds were judged under an attention check the judge often could not see: on a long
+page the cut fell below the screenshot, so "tie" was the attentive answer and was scored as
+inattention. That, not the judges, made the Opus round invalid and dropped GPT-5-mini from the
+Haiku round. The protocol's amendment of 2026-10-10 fixed the check and all four rounds were judged
+again under it (round `50ab8f75`). Those are the records above and the figures below. The first
+rounds stay as `pilot-*.judging-v1-cb1fb2ad.*`: on every pair judged in both, the share moved by
+0.09 or less, so the judges' answers repeat even where the check did not work.
+
+The panel is two model judges, `azure:gpt-5-mini` and `sonnet-5-5`, dropped below 0.8 on the
+attention checks as pre-registered. All four rounds are valid with both judges kept: of 48 checks,
+47 were answered for the intact page and none was a tie. The floor anchor lost in every round. No
+ceiling anchor exists, because no human-designed page exists for these briefs, and no human has
+judged.
+
+Share of head-to-head judgements won by the gate loop (rules-run), ties counted as half, with a
+95% Wilson interval, both judges pooled. Each row is one pre-registered pair; 0.50 is no
+preference. The interval treats judgements as independent; they are clustered by brief, so it is
+narrower than it should be, and a cell whose interval only just clears 0.50 is not settled.
+
+| Generator | vs none | vs prose | vs rules-read | vs primed | vs components |
+|---|---|---|---|---|---|
+| Haiku 4.5 | 0.32 (0.23-0.42) n=96 | 0.38 (0.29-0.48) n=95 | 0.40 (0.31-0.51) n=94 | 0.56 (0.46-0.66) n=96 | 0.50 (0.38-0.62) n=64 |
+| Sonnet 5 | 0.54 (0.44-0.64) n=96 | 0.76 (0.66-0.83) n=96 | 0.51 (0.41-0.61) n=96 | 0.55 (0.45-0.65) n=96 | 0.68 (0.58-0.76) n=96 |
+| Opus 5 | 0.35 (0.26-0.45) n=92 | 0.49 (0.39-0.59) n=92 | 0.46 (0.36-0.56) n=95 | 0.61 (0.51-0.71) n=96 | 0.48 (0.38-0.58) n=92 |
+| GPT-5-mini | 0.50 (0.40-0.60) n=96 | 0.68 (0.58-0.76) n=96 | 0.46 (0.36-0.56) n=96 | 0.45 (0.35-0.55) n=96 | 0.58 (0.48-0.68) n=96 |
+
+Reading, in the protocol's terms:
+
+- **The gate loop is not preferred to no system at all, and on two generators it is preferred
+  less.** On Haiku and Opus the judges would rather publish the page written with no design system
+  (0.32 and 0.35, both intervals below 0.50); on Sonnet and GPT-5-mini neither is preferred. This
+  is H4's risk, seen by model judges: enforcement can cost appeal.
+- **H1, the loop against the same rules written as prose,** favours the loop on Sonnet and
+  GPT-5-mini, favours prose on Haiku, and is even on Opus. Mixed; not a general result.
+- **P10, the primed loop against the plain one,** is not preferred on any generator; on Opus the
+  plain loop is (0.61).
+- **H2, the loop against the rules read,** is not distinguishable on any generator, matching the
+  conformance result (0.98). Haiku comes closest to favouring reading (0.40, 0.31 to 0.51).
+- **Components.** Shipping the system as components gives the lowest held-out violation rate on
+  all four generators (Haiku 0.106, Sonnet 0.122, Opus 0.128, GPT-5-mini 0.100, against 0.218 to
+  0.255 with no system). Judges did not prefer component pages to the loop's; on Sonnet they
+  preferred the loop's (0.68).
+- **The second provider repeats the Claude pattern on conformance.** On GPT-5-mini the loop is not
+  distinguishable from prose, rules read or no system on the held-out rate, and the token file cuts
+  palette drift from 13.70 to 1.70.
+
+What this licenses: conformance claims about the gate on the rules it checks, the token file's
+effect on palette drift and serious axe-core violations, and the components result above, each
+with the limits of a pilot. What it does not license: any claim that the gate, or any arm, makes
+pages people prefer. That needs human judges and a ceiling anchor.
+
+These shares are computed from the raw judgement records by pre-registered pair; the harness's
+own summary pools wins across pairs, which the table above does not.
+
 ## Threats
 
 - **Circularity.** The disclosed-rule results are scored by the instrument the loop was shown. They are reported as enforcement, never as generalisation; the held-out rate and axe-core carry every generalisation claim.
-- **One family.** All three generators are Claude models.
+- **One family, mostly.** Three generators are Claude models; GPT-5-mini is the only other family, and only one model judge is outside Claude.
 - **Pilot size.** Twelve briefs, two samples. Intervals are a cluster bootstrap over briefs, which is honest about that and wide because of it; the mixed-effects model the protocol specifies has not been fitted.
 - **The held-out metric leans on two rules.** Link underlining and aspect ratio have the highest rates in every arm, so movement on the metric is largely movement on those two.
 - **List prices.** Cost is computed from recorded token usage at list price on the day; it ignores caching and batch discounts.

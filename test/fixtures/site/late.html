@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>A page that builds itself after load</title>
+<style>
+  body { margin: 0; padding: 16px; background: #FFFFFF; color: #222222; font: 16px/1.5 system-ui, sans-serif; }
+  .card { padding: 16px; margin: 8px 0; border: 1px solid #DDDDDD; }
+  .card a { color: #B0502E; }
+</style>
+</head>
+<body>
+<main id="app"><p>Loading</p></main>
+<script>
+  // The shell is one paragraph. The content arrives 350ms after load, as a client-rendered
+  // site's does. A survey that reads the page at `load` measures the shell.
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      const app = document.getElementById('app');
+      app.innerHTML = '';
+      for (let i = 0; i < 40; i++) {
+        const card = document.createElement('article');
+        card.className = 'card';
+        card.innerHTML = '<h2>Card ' + i + '</h2><p>Rendered after load, with a <a href="#">link</a> in the accent.</p>';
+        app.appendChild(card);
+      }
+    }, 350);
+  });
+</script>
+</body>
+</html>

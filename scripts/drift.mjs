@@ -74,7 +74,9 @@ if (fromSurvey) {
   const surveyed = await surveyPages(targets.map(toUrl), { viewports });
   merged = surveyed.merged;
   merged.pages = surveyed.pages.length;
-  provenance = { urls: targets, viewports, measuredAt: new Date().toISOString(), pages: surveyed.pages.length };
+  // What each page-viewport pair settled on: a survey cut off by the settle deadline is a
+  // measurement of whatever had rendered by then, and the provenance has to say so.
+  provenance = { urls: targets, viewports, measuredAt: new Date().toISOString(), pages: surveyed.pages.length, settled: surveyed.pages.map((p) => ({ url: p.url, viewport: p.viewport, ...p.settled })) };
   const saveTo = flag('save-survey');
   if (saveTo) {
     writeFileSync(saveTo, `${JSON.stringify({ measured: provenance, merged }, null, 2)}\n`);

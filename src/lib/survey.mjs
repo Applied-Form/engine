@@ -38,7 +38,7 @@
  * floors, the token file and every rule here are defined in sRGB, so a P3 colour has to be judged
  * there regardless.
  */
-import { launchBrowser } from './page-lint.mjs';
+import { launchBrowser, confine, DEFAULT_FILE_ROOTS } from './page-lint.mjs';
 
 /** Runs inside the page. Returns weighted samples, one array per design dimension. */
 /* c8 ignore start -- executes in the browser, covered by test/survey.test.mjs through Chromium */
@@ -192,21 +192,44 @@ export function mergeSurveys(surveys) {
 }
 
 /**
+ * Wait for a page to stop building itself. `load` fires when the shell has arrived; a site that
+ * renders in the browser adds its content afterwards, and a survey taken at `load` measures the
+ * shell — Spectrum's came back as 57 elements across three pages. The page is settled when the
+ * element count has held for `quiet` ms, or `max` ms have passed, whichever comes first; what
+ * was waited and what it ended on is recorded with the survey, so a reader can tell a settled
+ * page from one the deadline cut off.
+ */
+export async function settle(page, { quiet = 500, max = 8000, poll = 100 } = {}) {
+  const count = () => page.evaluate(() => document.getElementsByTagName('*').length);
+  const started = Date.now();
+  let last = await count(), since = Date.now(), changes = 0;
+  while (Date.now() - started < max) {
+    await page.waitForTimeout(poll);
+    const now = await count();
+    if (now !== last) { last = now; since = Date.now(); changes += 1; }
+    else if (Date.now() - since >= quiet) return { ms: Date.now() - started, elements: last, changes, settled: true };
+  }
+  return { ms: Date.now() - started, elements: last, changes, settled: false };
+}
+
+/**
  * Survey one or more pages. `urls` are file:// or https:// — in practice file://, because a
  * report you can re-run against a frozen snapshot is reproducible and one that re-scrapes is not.
  */
-export async function surveyPages(urls, { browser: given = null, viewports = [1280], timeout = 20000 } = {}) {
+export async function surveyPages(urls, { browser: given = null, viewports = [1280], timeout = 20000, quiet = 500, max = 8000, fileRoots = DEFAULT_FILE_ROOTS() } = {}) {
   const browser = given ?? await launchBrowser();
   const pages = [];
   try {
     for (const url of urls) {
       for (const width of viewports) {
         const page = await browser.newPage({ viewport: { width, height: 900 } });
+        await confine(page, url, fileRoots);
         try {
           await page.goto(url, { waitUntil: 'load', timeout });
+          const settled = await settle(page, { quiet, max });
           await page.evaluate(() => document.fonts.ready);
           const survey = await page.evaluate(collect);
-          pages.push({ url, viewport: width, survey });
+          pages.push({ url, viewport: width, survey, settled });
         } finally {
           await page.close();
         }

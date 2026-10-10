@@ -9,7 +9,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { MODELS, ROUTES, resolveModel, chatRequest, chatBody, credentialled, available, generate, claudeClient, postRetrying, retryAfter, routeIdentity } from '../eval/providers.mjs';
+import { MODELS, ROUTES, resolveModel, chatRequest, chatBody, credentialled, available, generate, judge, claudeClient, postRetrying, retryAfter, routeIdentity } from '../eval/providers.mjs';
 
 test('every table entry names a route that exists', () => {
   for (const [key, m] of Object.entries(MODELS)) assert.ok(ROUTES[m.route], `${key} routes to ${m.route}, which has no transport`);
@@ -94,6 +94,24 @@ test('the body names the wire id, carries the system prompt first, and the recor
   assert.deepEqual(out.usage, { input: 3, output: 2 });
   assert.match(seen.url, /^https:\/\/openrouter\.ai\//);
   assert.equal(JSON.parse(seen.init.body).model, 'anthropic/claude-haiku-5-5');
+});
+
+test('a judge has room to reason before its one word, on every route', async () => {
+  // A reasoning model spends its completion budget thinking before it answers. At 64 tokens
+  // gpt-5-mini on Azure spent all 64 reasoning and returned an empty answer, which the round
+  // records as unparsed and excludes: a judge that never votes.
+  process.env.AZURE_OPENAI_API_KEY = 'test';
+  process.env.AZURE_OPENAI_ENDPOINT = 'https://example.openai.azure.com';
+  let seen;
+  const fetchImpl = async (url, init) => {
+    seen = JSON.parse(init.body);
+    return { ok: true, json: async () => ({ choices: [{ message: { content: 'a' }, finish_reason: 'stop' }], usage: { prompt_tokens: 3, completion_tokens: 1 } }) };
+  };
+  const out = await judge([Buffer.from('x'), Buffer.from('y')], 'Which?', 'azure:gpt-5-mini', { fetchImpl });
+  delete process.env.AZURE_OPENAI_API_KEY;
+  delete process.env.AZURE_OPENAI_ENDPOINT;
+  assert.equal(out.text, 'a');
+  assert.ok(seen.max_completion_tokens >= 1024, `the judge's budget is ${seen.max_completion_tokens} tokens`);
 });
 
 test('no route uses a server-side fallback, because the model is the independent variable', () => {

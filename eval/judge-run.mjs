@@ -20,6 +20,8 @@
  *
  *   An attention check is a strongest page truncated at six tenths of its length, against the
  *   intact page, with the intact page expected to win. Checks are interleaved by `buildItems`.
+ *   The cut must be one the judge can see: where six tenths falls below the screenshot, the cut
+ *   steps back a tenth at a time until the page ends inside it (`visibleCut`).
  *
  *   Screenshots are taken once per page at one width, not full-page, so every judge sees the same
  *   pixels and a long page is not an advantage. The width is recorded.
@@ -41,7 +43,7 @@ import { resolve, dirname, basename } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { launchBrowser } from '../src/lib/page-lint.mjs';
 import { buildItems, summarise, QUESTION } from './judge.mjs';
-import { harnessFingerprint } from './run.mjs';  // the same tree hash: the items, question, conformance rates, transport and browser all live in it
+import { harnessFingerprint, fileSafe } from './run.mjs';  // the same tree hash: the items, question, conformance rates, transport and browser all live in it
 import { judge, resolveModel, available, routeIdentity } from './providers.mjs';
 import { load, summarise as analyse } from './analyse.mjs';
 
@@ -55,7 +57,27 @@ export function unstyle(html) {
 }
 
 /** Cut at six tenths, mid-whatever. A judge who prefers this is not looking. */
-export const truncate = (html) => html.slice(0, Math.floor(html.length * 0.6));
+export const truncate = (html, fraction = 0.6) => html.slice(0, Math.floor(html.length * fraction));
+
+/**
+ * Write the check page cut deep enough that it ends inside the screenshot, and return the fraction.
+ * At six tenths a long page is cut below the fold: the judge is shown two identical images, and
+ * "tie" is then the attentive answer, which the check scores as a failure. In the pilot rounds two
+ * of six Opus checks were byte-identical, and every tie the Sonnet judge gave was on one of them.
+ */
+export async function visibleCut(browser, intactFile, cutFile, { width, height }) {
+  const html = readFileSync(intactFile, 'utf8');
+  const fractions = [0.6, 0.5, 0.4, 0.3, 0.2, 0.1];
+  for (const f of fractions) {
+    writeFileSync(cutFile, truncate(html, f));
+    const page = await browser.newPage({ viewport: { width, height } });
+    try {
+      await page.goto(pathToFileURL(cutFile).href, { waitUntil: 'load' });
+      if (await page.evaluate(() => document.documentElement.scrollHeight) <= height) return f;
+    } finally { await page.close(); }
+  }
+  return fractions.at(-1);
+}
 
 /** The one word a judge was asked for, or null. Never coerced. */
 export function parseChoice(text) {
@@ -100,11 +122,11 @@ export function prepare(jsonl, { seed = 1, checkEvery = 4 } = {}) {
   const anchors = ({ brief, model, sample, strongest }) => {
     const g = `${brief}|${model}|${sample}`;
     const html = readFileSync(strongest.file, 'utf8');
-    const floor = resolve(dir, `${brief}-${model}-s${sample}-floor.html`);
+    const floor = resolve(dir, `${brief}-${fileSafe(model)}-s${sample}-floor.html`);
     if (!files.has(floor)) { writeFileSync(floor, unstyle(html)); files.set(floor, floor); }
     if (!checks.has(g)) {
       if (checks.size % checkEvery === 0) {
-        const cut = resolve(dir, `${brief}-${model}-s${sample}-truncated.html`);
+        const cut = resolve(dir, `${brief}-${fileSafe(model)}-s${sample}-truncated.html`);
         writeFileSync(cut, truncate(html));
         files.set(cut, cut);
         checks.set(g, { key: cut, against: keyOf(strongest) });
@@ -138,6 +160,17 @@ export async function judgeRound(jsonl, { judges, out, seed = 1, width = 1280, h
   const gens = generatorRoutes(prepared.usable);
   const same = [...judgeRoutes].every((r) => gens.has(r)) && judgeRoutes.size > 0 && !judgeRoutes.has('stub');
   if (same && !allowSameFamily) throw new Error(`every judge (${[...judgeRoutes].join(', ')}) shares a family with the generators (${[...gens].join(', ')}); add a judge from another family, or pass --allow-same-family`);
+
+  // Before the round's identity is taken, because the check pages are part of it. Deterministic, so
+  // a resumed attempt rewrites the same files and arrives at the same round.
+  if (browser) {
+    const cuts = new Map();
+    for (const item of items.filter((i) => i.kind === 'check')) {
+      const [cut, intact] = item.left.endsWith('-truncated.html') ? [item.left, item.right] : [item.right, item.left];
+      if (!cuts.has(cut)) cuts.set(cut, await visibleCut(browser, files.get(intact), files.get(cut), { width, height }));
+    }
+    if (cuts.size) log(`attention checks cut at ${[...cuts.values()].join(', ')} of their length, so each ends on screen`);
+  }
 
   // A round resumes from its own record only under the panel that started it, exactly. Every row in
   // the file is counted, so a judge dropped from the panel would still vote, and a judge added after

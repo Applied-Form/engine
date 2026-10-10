@@ -1,0 +1,78 @@
+{
+  "judges": {
+    "kept": [
+      "sonnet-5-5"
+    ],
+    "excluded": [
+      {
+        "judge": "azure:gpt-5-mini",
+        "attention": 0.667
+      }
+    ],
+    "attentionFloor": 0.8,
+    "routes": [
+      "azure",
+      "anthropic"
+    ],
+    "generatorRoutes": [
+      "anthropic"
+    ],
+    "sameFamilyOnly": false
+  },
+  "arms": [
+    {
+      "arm": "rules-run",
+      "wins": 100,
+      "share": 0.4525
+    },
+    {
+      "arm": "prose",
+      "wins": 31,
+      "share": 0.1403
+    },
+    {
+      "arm": "none",
+      "wins": 27,
+      "share": 0.1222
+    },
+    {
+      "arm": "rules-read",
+      "wins": 25,
+      "share": 0.1131
+    },
+    {
+      "arm": "rules-run-primed",
+      "wins": 21,
+      "share": 0.095
+    },
+    {
+      "arm": "components",
+      "wins": 17,
+      "share": 0.0769
+    }
+  ],
+  "anchors": [
+    {
+      "pair": "floor vs rules-run",
+      "anchorWins": 0,
+      "armWins": 48
+    }
+  ],
+  "floorAnchorLost": true,
+  "conformanceVsPreference": {
+    "spearman": 0.0286,
+    "arms": 6,
+    "reading": "conformance and preference are unrelated here. The gate enforces conformance and nothing more, which is the ceiling on every claim made from the primary metric",
+    "caveat": "Descriptive, not a test. Eight arms give a correlation with an interval too wide to reject anything; the decision-relevant output of this round is the floor-anchor check and the sign."
+  },
+  "valid": true,
+  "items": 278,
+  "judgements": 556,
+  "unparsed": 3,
+  "screenshot": {
+    "width": 1280,
+    "height": 1600,
+    "fullPage": false
+  },
+  "ceilingAnchor": "absent: no human-designed page exists for these briefs, so the ceiling check did not run"
+}

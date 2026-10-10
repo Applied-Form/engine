@@ -103,6 +103,24 @@ test('a site with no spacing system says so instead of asserting one', () => {
   assert.ok(s.coverage < 0.9);
 });
 
+test('a 2px or 3px step is not a finding: the smallest step named is 4px', () => {
+  // Almost every integer a browser renders is even, so a 2px step clears the target on nearly any
+  // site and says nothing. The nine-system survey of 2026-10-08 named 2px for five of them. A site
+  // of even values with no coarser structure has no spacing system the instrument can see.
+  const s = inferStep([w(6, 1), w(10, 1), w(14, 1), w(18, 1), w(22, 1), w(26, 1)]);
+  assert.equal(s.onScale, false, 'nothing from 4px up explains these');
+  assert.ok(s.step >= 4, `the candidate named must be at least 4px, got ${s.step}`);
+  assert.ok(s.considered.every((c) => c.step >= 4), 'no candidate below 4px is scored as a step');
+  // The fine steps are still measured, so the report can say what 2px would have explained.
+  assert.equal(s.fine.find((f) => f.step === 2).coverage, 1);
+});
+
+test('a 4px system is still found when 2px would also explain it', () => {
+  const s = inferStep([w(4, 5), w(12, 5), w(20, 5), w(28, 5)]);
+  assert.equal(s.step, 4);
+  assert.equal(s.onScale, true);
+});
+
 test('numeric clusters merge within tolerance and flag what is too slight to be a step', () => {
   const c = clusterNumeric([w(16, 1000), w(16.2, 50), w(20, 300), w(11, 2)], { tolerance: 0.5, minShare: 0.01 });
   assert.deepEqual(c.values.map((v) => v.value), [11, 16, 20]);
@@ -163,6 +181,21 @@ test('a declared palette is compared in both directions', () => {
   assert.equal(report.declared.adherence, 100);
   assert.deepEqual(report.declared.undeclared, []);
   assert.deepEqual(report.declared.unused, ['#00AA55'], 'a token nobody renders is as much a finding as a colour nobody declared');
+});
+
+test('a site with only a 2px step is told so, and 2px is not called its system', () => {
+  const report = driftReport({
+    ground: [{ value: '#FFFFFF', weight: 1000 }],
+    textColor: [{ value: '#222222', weight: 500 }],
+    borderColor: [], spacing: [6, 10, 14, 18, 22, 26].map((value) => ({ value, weight: 1 })),
+    fontSize: [{ value: 16, weight: 400 }], fontFamily: [], lineHeight: [],
+    radius: [], borderWidth: [], shadow: [], elements: 9, textElements: 3,
+  });
+  assert.equal(report.system.spacing.onScale, false);
+  assert.ok(report.system.spacing.step >= 4);
+  const sentence = report.findings.find((f) => f.startsWith('Spacing follows no consistent step'));
+  assert.ok(sentence, JSON.stringify(report.findings));
+  assert.match(sentence, /A 2px step would explain 100%, which is not a spacing system\./);
 });
 
 test('every finding carries the measurement that produced it', () => {

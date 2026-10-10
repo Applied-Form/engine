@@ -285,6 +285,10 @@ export const ROUTES = {
  * drives the tests: a stub that prefers more rendered content loses the unstyled floor anchor and
  * passes a truncated attention check, so the round's own instruments can be exercised offline.
  */
+// One budget for every route. The answer is one word, but a reasoning model spends its completion
+// tokens thinking first: at 64, gpt-5-mini spent them all and answered nothing.
+const JUDGE_MAX_TOKENS = 4096;
+
 export async function judge(images, question, modelKey, { fetchImpl = fetch } = {}) {
   const model = resolveModel(modelKey);
   const started = Date.now();
@@ -296,7 +300,7 @@ export async function judge(images, question, modelKey, { fetchImpl = fetch } = 
   } else if (model.route === 'anthropic' || model.route === 'foundry') {
     const client = claudeClient(model.route);
     const message = await client.messages.create({
-      model: model.id, max_tokens: 4096,
+      model: model.id, max_tokens: JUDGE_MAX_TOKENS,
       ...(model.effort ? { output_config: { effort: model.effort } } : {}),
       messages: [{ role: 'user', content: [
         ...images.map((b) => ({ type: 'image', source: { type: 'base64', media_type: 'image/png', data: png(b) } })),
@@ -309,7 +313,7 @@ export async function judge(images, question, modelKey, { fetchImpl = fetch } = 
     if (!key) throw new Error('GOOGLE_API_KEY is not set');
     const res = await postRetrying(fetchImpl, `https://generativelanguage.googleapis.com/v1beta/models/${model.id}:generateContent`, {
       method: 'POST', headers: { 'content-type': 'application/json', 'x-goog-api-key': key },
-      body: JSON.stringify({ contents: [{ role: 'user', parts: [...images.map((b) => ({ inlineData: { mimeType: 'image/png', data: png(b) } })), { text: question }] }], generationConfig: { maxOutputTokens: 64 } }),
+      body: JSON.stringify({ contents: [{ role: 'user', parts: [...images.map((b) => ({ inlineData: { mimeType: 'image/png', data: png(b) } })), { text: question }] }], generationConfig: { maxOutputTokens: JUDGE_MAX_TOKENS } }),
     });
     if (!res.ok) throw new Error(`google ${res.status}: ${(await res.text()).slice(0, 300)}`);
     const body = await res.json();
@@ -319,7 +323,7 @@ export async function judge(images, question, modelKey, { fetchImpl = fetch } = 
     const { url, headers } = chatRequest(model.route);
     const res = await postRetrying(fetchImpl, url, {
       method: 'POST', headers: { 'content-type': 'application/json', ...headers },
-      body: JSON.stringify({ model: model.id, max_completion_tokens: 64, messages: [{ role: 'user', content: [
+      body: JSON.stringify({ model: model.id, max_completion_tokens: JUDGE_MAX_TOKENS, messages: [{ role: 'user', content: [
         ...images.map((b) => ({ type: 'image_url', image_url: { url: `data:image/png;base64,${png(b)}` } })),
         { type: 'text', text: question },
       ] }] }),

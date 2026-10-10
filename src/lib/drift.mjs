@@ -180,9 +180,14 @@ function findings(report, declared) {
     out.push(`${colour.nearMisses.length} colours sit within a just-noticeable difference of a colour already in use and cannot be told apart by eye — together ${n.wasteShare}% of the colour on the page. The heaviest is ${worst.value}, which is ${worst.distance} from ${worst.nearestToken}.`);
   }
   if (spacing.step) {
+    // A 2px step is not named as a system: nearly every rendered integer is even, so it would clear
+    // the target almost anywhere. When nothing coarser clears, what 2px would have explained is
+    // stated so the reader can see that the fine step is the only one the site has.
+    const fine = (spacing.fine ?? []).find((f) => f.step === 2);
+    const fineText = fine ? ` A 2px step would explain ${pct(fine.coverage)}%, which is not a spacing system.` : '';
     out.push(spacing.onScale
       ? `Spacing follows ${article(spacing.step)} ${spacing.step}px step, which explains ${n.spacingCoverage}% of the margins, padding and gaps measured.`
-      : `Spacing follows no consistent step. The closest candidate is ${spacing.step}px and it explains only ${n.spacingCoverage}%.`);
+      : `Spacing follows no consistent step. The closest candidate is ${spacing.step}px and it explains only ${n.spacingCoverage}%.${fineText}`);
   }
   if (spacing.offScale.length) {
     out.push(`${spacing.offScale.length} spacing values sit off that step, the most frequent being ${spacing.offScale[0].value}px, which is ${spacing.offScale[0].off}px from the nearest multiple.`);

@@ -13,7 +13,7 @@ import { writeFileSync, mkdtempSync, mkdirSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { launchBrowser } from '../src/lib/page-lint.mjs';
-import { unstyle, truncate, parseChoice, prepare, judgeRound } from '../eval/judge-run.mjs';
+import { unstyle, truncate, parseChoice, prepare, judgeRound, visibleCut } from '../eval/judge-run.mjs';
 import { judge } from '../eval/providers.mjs';
 
 test('unstyle removes every styling a page carries and nothing else', () => {
@@ -134,4 +134,34 @@ test('a panel drawn entirely from the generators’ family is refused unless exp
 
 test('truncate cuts mid-page', () => {
   assert.equal(truncate('0123456789').length, 6);
+});
+
+test('an attention check is cut where the judge can see it', async () => {
+  // The pilot rounds cut every check at six tenths of its HTML. On a long page that is below the
+  // screenshot, so the judge saw two identical images, answered "tie", and failed the check: two of
+  // the six Opus checks were byte-identical, and every tie the Sonnet judge gave was on one of them.
+  let browser = null;
+  try { browser = await launchBrowser(); } catch (e) { if (process.env.CI) throw e; return; }
+  try {
+    const dir = mkdtempSync(join(tmpdir(), 'af-cut-'));
+    const long = `<!doctype html><html><head><style>body{margin:0;padding:32px;font:19px/1.5 system-ui}</style></head><body>${'<p>A paragraph of body copy long enough to wrap and fill the page.</p>'.repeat(120)}</body></html>`;
+    const intact = join(dir, 'intact.html'), cut = join(dir, 'cut.html');
+    writeFileSync(intact, long);
+    const size = { width: 1280, height: 1600 };
+    const fraction = await visibleCut(browser, intact, cut, size);
+    assert.ok(fraction < 0.6, `a long page needs a deeper cut than six tenths, got ${fraction}`);
+    const shot = async (f) => {
+      const page = await browser.newPage({ viewport: size });
+      await page.goto(`file://${f}`, { waitUntil: 'load' });
+      const out = { png: await page.screenshot({ type: 'png' }), h: await page.evaluate(() => document.documentElement.scrollHeight) };
+      await page.close(); return out;
+    };
+    const [a, b] = await Promise.all([shot(cut), shot(intact)]);
+    assert.ok(a.h <= size.height, `the cut page ends inside the screenshot (${a.h}px)`);
+    assert.ok(!a.png.equals(b.png), 'the judge is shown two different images');
+    // A page short enough to end on screen keeps the registered cut.
+    writeFileSync(intact, long.replace(/(<p>.*?<\/p>)+/, '<p>Short.</p>'.repeat(3)));
+    assert.equal(await visibleCut(browser, intact, cut, size), 0.6);
+    rmSync(dir, { recursive: true });
+  } finally { await browser.close(); }
 });

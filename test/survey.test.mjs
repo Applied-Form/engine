@@ -146,6 +146,18 @@ test('a colour the browser cannot parse stays null rather than becoming black', 
   assert.equal(resolves.real, true, 'and must accept a real one');
 });
 
+test('a page that builds itself after load is surveyed once it has settled', { skip }, async () => {
+  // Spectrum's site rendered 57 elements across three pages in the survey of 2026-10-08: the
+  // pages build themselves in the browser after `load`, and the survey did not wait. A survey
+  // of a shell is a measurement of the shell.
+  const late = pathToFileURL(root + 'test/fixtures/site/late.html').href;
+  const { pages } = await surveyPages([late], { browser });
+  const s = pages[0].survey;
+  assert.ok(s.elements >= 40, `the elements added after load are counted: got ${s.elements}`);
+  assert.ok(s.textColor.some((t) => t.value === '#B0502E'), 'late-rendered text carries its colour');
+  assert.ok(pages[0].settled.ms >= 300, `settling waited for the late render: ${JSON.stringify(pages[0].settled)}`);
+});
+
 test('a saved survey reproduces its report exactly, with no browser', { skip }, async () => {
   // This is what makes `af drift --save-survey` / `--from-survey` sound, and it is the property
   // the reproducibility claim rests on: measure once on a machine that can reach the site,

@@ -7,12 +7,12 @@ drew, not what the stylesheet says.
 
 The engine is open so the evidence about it can be checked. Every comparison it is quoted in can be
 rerun from this repository: the gate beside axe-core and stylelint, the drift survey of public
-design systems, and the model study and its judging round.
+design systems, and the model study and its judging rounds, with every record they were scored from.
 
 ## Install
 
 ```sh
-npm install @appliedform/engine
+npm install github:Applied-Form/engine   # the npm package is not published yet
 npx playwright install chromium
 ```
 

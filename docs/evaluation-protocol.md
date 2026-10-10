@@ -332,6 +332,25 @@ things that assumed it ran in order were fixed, all found in review before any p
   refused. The workflow commits results from a worktree of their own, so the checkout a round runs
   in is never pulled into mid-run.
 
+### Amendment, 2026-10-10 — an attention check the judge cannot see is not a check
+
+Written after the first model-judged rounds, and said so: this change follows results. The first
+rounds over the four pilots (panel `azure:gpt-5-mini,sonnet-5-5`) excluded gpt-5-mini from the
+Haiku round and both judges from the Opus round, which made it invalid, all on the attention
+check. No judge preferred a truncated page in any round; every failure was a tie. The check cut
+each page at six tenths of its HTML, and a judge sees one 1280 by 1600 screenshot from the top, so
+on a long page the cut fell below what was shown. Two of the six Opus checks gave the judge two
+byte-identical images, and every tie the Sonnet judge gave in that round was on one of them. "Tie"
+was the attentive answer, and the check scored it as inattention.
+
+The check is now cut where it can be seen: six tenths where that ends inside the screenshot, and
+otherwise a tenth less at a time until it does (`visibleCut` in `eval/judge-run.mjs`). On the Opus
+pages that gives cuts of 0.4 to 0.6 and no identical pair. Nothing else moves: the exclusion floor
+stays 0.8, the pairs, question, anchors and panel are as registered. Because the fix changes the
+instrument, all four rounds are judged again under it, not only the invalid one; re-judging only
+the round that failed would select on the result. The first rounds stay in `eval/results/` as
+`*.judging-v1-cb1fb2ad.*`, and the earlier partial ones as `*.judging-partial-3c563c7e.*`.
+
 ## Measures
 
 Primary:

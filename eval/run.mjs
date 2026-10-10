@@ -39,6 +39,13 @@ const MAX_REPAIRS = Number(opt('repairs', 3));
 const disclosedOnly = (violations) => partition(violations).disclosed;
 
 /**
+ * A model key as it can appear in a file name. A `route:id` key carries a colon, which an artifact
+ * upload refuses, and an aggregator's id carries a slash, which would make a directory. A table key
+ * has neither and is returned unchanged, so pages already recorded keep their names.
+ */
+export const fileSafe = (key) => key.replace(/[^A-Za-z0-9._-]/g, '_');
+
+/**
  * Why a page is unusable, or null if it is fine.
  *
  * A page the model could not finish is a result, not an absence. Truncation and unclosed markup
@@ -105,7 +112,7 @@ async function generatePage(brief, arm, model, sample, browser, pageDir) {
     html = normalise(extracted.html, brief.register).html;
     // The sample is in the name: two samples of one cell run at once, and one sharing a file would
     // overwrite the other's page between its write and its lint.
-    file = resolve(pageDir, `${brief.id}-${arm}-${model}-s${sample}-r${rounds}.html`);
+    file = resolve(pageDir, `${brief.id}-${arm}-${fileSafe(model)}-s${sample}-r${rounds}.html`);
     writeFileSync(file, html);
 
     if (!REPAIR_ARMS.has(arm) || rounds >= MAX_REPAIRS) break;

@@ -1,7 +1,40 @@
 /** Playwright driver: open each URL at each viewport, extract, lint, advise. */
+import { fileURLToPath } from 'node:url';
+import { dirname, resolve, sep } from 'node:path';
 import { specFromPage } from './page-spec.mjs';
 import { lint, advise } from './rules.mjs';
 import { aspectRatios, registers, grid, layers, composition, recipes, motion, print, fonts, recipeColumns } from './tokens.mjs';
+
+/** The engine's own files: its stylesheets, fonts and modules, which a page it renders may load. */
+export const ENGINE_ROOT = fileURLToPath(new URL('../../', import.meta.url));
+
+/**
+ * What a page loaded from a file may read: its own directory and the roots given, nothing else.
+ *
+ * `--allow-file-access-from-files` (below) lets a `file://` page read any local file by
+ * XMLHttpRequest or an iframe, not only the stylesheets, fonts and modules it is meant to load.
+ * Measured on 2026-10-10: a draft read a secret from another directory by both routes. The MCP
+ * server renders drafts a model wrote, so that was a model reading the user's files. Every
+ * `file://` request is now checked against the page's directory and the roots, and refused
+ * outside them. Requests over the network are not touched; a page served over http cannot read a
+ * local file in any case.
+ *
+ * The default roots are the working directory, where a person's own page may keep its assets,
+ * and the engine's files. A caller rendering something it did not write (the MCP server, for a
+ * draft) passes the engine's files alone.
+ */
+export const DEFAULT_FILE_ROOTS = () => [process.cwd(), ENGINE_ROOT];
+
+export async function confine(page, url, roots = DEFAULT_FILE_ROOTS()) {
+  if (!String(url).startsWith('file:')) return;
+  const within = [dirname(fileURLToPath(url)), ...roots].map((r) => resolve(r));
+  const allowed = (href) => {
+    let p;
+    try { p = resolve(fileURLToPath(href)); } catch { return false; }
+    return within.some((r) => p === r || p.startsWith(r.endsWith(sep) ? r : r + sep));
+  };
+  await page.route((u) => u.protocol === 'file:', (route) => (allowed(route.request().url()) ? route.continue() : route.abort('accessdenied')));
+}
 
 export const FAMILIES = Object.fromEntries(Object.entries(fonts).map(([voice, list]) => [list[0], voice]));
 export const VIEWPORTS = [320, 672, 1280, 1584];
@@ -80,12 +113,13 @@ const assume = (register) => (register ? (page) => page.addInitScript((r) => {
   }, { once: true, capture: true });
 }, register) : async () => {});
 
-export async function lintPages(urls, { viewports = VIEWPORTS, browser, register = null } = {}) {
+export async function lintPages(urls, { viewports = VIEWPORTS, browser, register = null, fileRoots = DEFAULT_FILE_ROOTS() } = {}) {
   if (register != null && !Object.hasOwn(registers, register)) throw new Error(`unknown register "${register}"; the tokens define ${Object.keys(registers).join(', ')}`);
   const own = !browser;
   browser ||= await launchBrowser();
   const tag = assume(register);
-  const open = async (options) => { const p = await browser.newPage(options); await tag(p); return p; };
+  let current = null;
+  const open = async (options) => { const p = await browser.newPage(options); await confine(p, current, fileRoots); await tag(p); return p; };
   const permittedRatios = aspectRatios.map((r) => r.split(':').map(Number));
   const layersByRegister = Object.fromEntries(Object.entries(registers).map(([k, r]) => [k, [r.layer]]));
   const breakpoints = Object.values(grid.breakpoints);
@@ -93,6 +127,7 @@ export async function lintPages(urls, { viewports = VIEWPORTS, browser, register
   const results = [];
   try {
     for (const url of urls) {
+      current = url;
       let printSpec = null, printDone = false;
       for (const width of viewports) {
         const page = await open({ viewport: { width, height: 900 } });

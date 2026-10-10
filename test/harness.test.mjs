@@ -19,7 +19,7 @@ import { pathToFileURL } from 'node:url';
 import { launchBrowser } from '../src/lib/page-lint.mjs';
 import { generate, extractHtml } from '../eval/providers.mjs';
 import { score, paletteFrom, normalise } from '../eval/score.mjs';
-import { classifyFailure, harnessFingerprint } from '../eval/run.mjs';
+import { classifyFailure, harnessFingerprint, fileSafe } from '../eval/run.mjs';
 
 let browser = null, launchError = null;
 try { browser = await launchBrowser(); } catch (e) { launchError = e; if (process.env.CI) throw e; }
@@ -160,4 +160,13 @@ test('the harness fingerprint moves when anything that defines the experiment mo
   writeFileSync(out, '{"brief":"b01"}\n');
   writeFileSync(join(root, 'eval', 'pilots', 'pages', 'p.html'), '<p>');
   assert.equal(harnessFingerprint(root, undefined, { outputs: [out, join(root, 'eval', 'pilots', 'pages')] }), before, 'an --out anywhere is its own output, not the experiment');
+});
+
+test('a route:id model key names a page file an artifact can carry', () => {
+  // The pilot of azure:gpt-5-mini generated every page and lost them all: the artifact upload
+  // refuses a colon in a file name, and an OpenRouter id's slash would have made a directory.
+  assert.equal(fileSafe('azure:gpt-5-mini'), 'azure_gpt-5-mini');
+  assert.equal(fileSafe('openrouter:anthropic/claude-sonnet-5'), 'openrouter_anthropic_claude-sonnet-5');
+  // A table key is already safe and keeps its name, so the committed pilots still find their pages.
+  for (const key of ['opus-5', 'haiku-4-5', 'sonnet-5-5', 'stub-flaky']) assert.equal(fileSafe(key), key);
 });

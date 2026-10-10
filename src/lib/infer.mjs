@@ -134,18 +134,25 @@ export function inferPalette(samples, { tolerance = JND, minShare = 0.005, maxTo
  * that clears the target. An 8px system reports 8 rather than 1, 2 or 4, because all four explain
  * the values and only one of them is the decision somebody made.
  */
-export function inferStep(samples, { candidates = null, tolerance = 0.5, target = 0.9 } = {}) {
+export function inferStep(samples, { candidates = null, tolerance = 0.5, target = 0.9, minStep = 4 } = {}) {
   const rows = clean(samples, (v) => Number.isFinite(Number(v)) && Number(v) > 0)
     .map(({ value, weight }) => ({ value: Number(value), weight }));
   const total = totalWeight(rows);
-  if (!total) return { step: null, coverage: 0, offScale: [], residual: null, considered: [] };
+  if (!total) return { step: null, coverage: 0, offScale: [], residual: null, considered: [], fine: [] };
 
-  const steps = candidates ?? Array.from({ length: 23 }, (_, i) => i + 2);
-  const scored = steps.map((step) => {
+  const score = (step) => {
     const off = (v) => Math.min(v % step, step - (v % step));
     const explained = rows.filter((r) => off(r.value) <= tolerance);
     return { step, coverage: share(totalWeight(explained), total) };
-  });
+  };
+  // A step below 4px is never named. Almost every integer a browser renders is even, so 2px clears
+  // the target on nearly any site and says nothing: the first survey of nine public systems named
+  // it for five of them. The fine steps are still scored and returned as `fine`, so a report can
+  // say what 2px would have explained without calling it a system.
+  const steps = (candidates ?? Array.from({ length: 23 }, (_, i) => i + 2)).filter((s) => s >= minStep);
+  const scored = steps.map(score);
+  const fine = (candidates ?? [2, 3]).filter((s) => s < minStep).map(score).map((s) => ({ step: s.step, coverage: round(s.coverage, 4) }));
+  if (!scored.length) return { step: null, coverage: 0, offScale: [], residual: null, considered: [], fine };
 
   const clears = scored.filter((s) => s.coverage >= target);
   // Nothing clears the bar when a site has no spacing system at all. Report the best candidate and
@@ -178,6 +185,7 @@ export function inferStep(samples, { candidates = null, tolerance = 0.5, target 
     residual: round(residuals.reduce((a, b) => a + b, 0) / total, 3),
     offScale,
     considered: scored.map((s) => ({ step: s.step, coverage: round(s.coverage, 4) })),
+    fine,
   };
 }
 
