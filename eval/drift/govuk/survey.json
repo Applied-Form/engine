@@ -8,8 +8,34 @@
     "viewports": [
       1280
     ],
-    "measuredAt": "2026-10-08T10:44:29.588Z",
-    "pages": 3
+    "measuredAt": "2026-10-10T13:27:40.410Z",
+    "pages": 3,
+    "settled": [
+      {
+        "url": "https://design-system.service.gov.uk/",
+        "viewport": 1280,
+        "ms": 514,
+        "elements": 512,
+        "changes": 0,
+        "settled": true
+      },
+      {
+        "url": "https://design-system.service.gov.uk/components/button/",
+        "viewport": 1280,
+        "ms": 511,
+        "elements": 1288,
+        "changes": 0,
+        "settled": true
+      },
+      {
+        "url": "https://design-system.service.gov.uk/styles/colour/",
+        "viewport": 1280,
+        "ms": 519,
+        "elements": 1231,
+        "changes": 0,
+        "settled": true
+      }
+    ]
   },
   "merged": {
     "elements": 1531,
@@ -2579,7 +2605,7 @@
       },
       {
         "value": "#FFFFFF",
-        "weight": 103705.6
+        "weight": 103449.6
       },
       {
         "value": "#F4F8FB",
@@ -2675,7 +2701,7 @@
       },
       {
         "value": "#FFFFFF",
-        "weight": 1213.5
+        "weight": 1051.7
       },
       {
         "value": "#FFFFFF",
@@ -7123,6 +7149,14 @@
       },
       {
         "value": 15,
+        "weight": 1
+      },
+      {
+        "value": 90,
+        "weight": 1
+      },
+      {
+        "value": 90,
         "weight": 1
       },
       {

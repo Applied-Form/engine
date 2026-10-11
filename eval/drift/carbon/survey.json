@@ -8,11 +8,37 @@
     "viewports": [
       1280
     ],
-    "measuredAt": "2026-10-08T10:44:45.714Z",
-    "pages": 3
+    "measuredAt": "2026-10-10T13:27:58.872Z",
+    "pages": 3,
+    "settled": [
+      {
+        "url": "https://carbondesignsystem.com/",
+        "viewport": 1280,
+        "ms": 2172,
+        "elements": 1188,
+        "changes": 4,
+        "settled": true
+      },
+      {
+        "url": "https://carbondesignsystem.com/components/button/usage/",
+        "viewport": 1280,
+        "ms": 2141,
+        "elements": 2975,
+        "changes": 4,
+        "settled": true
+      },
+      {
+        "url": "https://carbondesignsystem.com/elements/color/overview/",
+        "viewport": 1280,
+        "ms": 1138,
+        "elements": 1747,
+        "changes": 4,
+        "settled": true
+      }
+    ]
   },
   "merged": {
-    "elements": 4128,
+    "elements": 4134,
     "textElements": 817,
     "textColor": [
       {
@@ -48,79 +74,79 @@
         "weight": 8
       },
       {
-        "value": "#FFFFFF",
+        "value": "#505BA8",
         "weight": 1
       },
       {
-        "value": "#FFFFFF",
+        "value": "#505BA8",
         "weight": 1
       },
       {
-        "value": "#FFFFFF",
+        "value": "#505BA8",
         "weight": 1
       },
       {
-        "value": "#FFFFFF",
+        "value": "#505BA8",
         "weight": 1
       },
       {
-        "value": "#FFFFFF",
+        "value": "#505BA8",
         "weight": 1
       },
       {
-        "value": "#FFFFFF",
+        "value": "#505BA8",
         "weight": 1
       },
       {
-        "value": "#FFFFFF",
+        "value": "#505BA8",
         "weight": 1
       },
       {
-        "value": "#FFFFFF",
+        "value": "#505BA8",
         "weight": 1
       },
       {
-        "value": "#FFFFFF",
+        "value": "#505BA8",
         "weight": 1
       },
       {
-        "value": "#FFFFFF",
+        "value": "#505BA8",
         "weight": 1
       },
       {
-        "value": "#FFFFFF",
+        "value": "#505BA8",
         "weight": 1
       },
       {
-        "value": "#FFFFFF",
+        "value": "#505BA8",
         "weight": 1
       },
       {
-        "value": "#FFFFFF",
+        "value": "#505BA8",
         "weight": 1
       },
       {
-        "value": "#FFFFFF",
+        "value": "#505BA8",
         "weight": 1
       },
       {
-        "value": "#FFFFFF",
+        "value": "#505BA8",
         "weight": 1
       },
       {
-        "value": "#FFFFFF",
+        "value": "#505BA8",
         "weight": 1
       },
       {
-        "value": "#FFFFFF",
+        "value": "#505BA8",
         "weight": 1
       },
       {
-        "value": "#FFFFFF",
+        "value": "#505BA8",
         "weight": 19
       },
       {
-        "value": "#FFFFFF",
+        "value": "#6A71B1",
         "weight": 126
       },
       {
@@ -3310,16 +3336,16 @@
         "weight": 8724.48
       },
       {
-        "value": "#002D9C",
+        "value": "#A7D3F5",
         "weight": 8134.4
       },
       {
         "value": "#BAE6FF",
-        "weight": 876.57046875
+        "weight": 1332.895
       },
       {
         "value": "#BAE6FF",
-        "weight": 878.33953125
+        "weight": 1335.585
       },
       {
         "value": "#F4F4F4",
@@ -4043,11 +4069,11 @@
       },
       {
         "value": "#F4F4F4",
-        "weight": 236719.8
+        "weight": 242204.6
       },
       {
         "value": "#F4F4F4",
-        "weight": 236719.8
+        "weight": 242204.6
       },
       {
         "value": "#FFFFFF",
@@ -11234,6 +11260,22 @@
         "weight": 1
       },
       {
+        "value": 32,
+        "weight": 1
+      },
+      {
+        "value": 32,
+        "weight": 1
+      },
+      {
+        "value": 16,
+        "weight": 1
+      },
+      {
+        "value": 16,
+        "weight": 1
+      },
+      {
         "value": 16,
         "weight": 1
       },
@@ -14852,75 +14894,75 @@
         "weight": 8
       },
       {
-        "value": 166.4,
+        "value": 119.908,
         "weight": 1
       },
       {
-        "value": 166.4,
+        "value": 119.908,
         "weight": 1
       },
       {
-        "value": 166.4,
+        "value": 119.908,
         "weight": 1
       },
       {
-        "value": 166.4,
+        "value": 119.908,
         "weight": 1
       },
       {
-        "value": 166.4,
+        "value": 119.908,
         "weight": 1
       },
       {
-        "value": 166.4,
+        "value": 119.908,
         "weight": 1
       },
       {
-        "value": 166.4,
+        "value": 119.908,
         "weight": 1
       },
       {
-        "value": 166.4,
+        "value": 119.908,
         "weight": 1
       },
       {
-        "value": 166.4,
+        "value": 119.908,
         "weight": 1
       },
       {
-        "value": 166.4,
+        "value": 119.908,
         "weight": 1
       },
       {
-        "value": 166.4,
+        "value": 119.908,
         "weight": 1
       },
       {
-        "value": 166.4,
+        "value": 119.908,
         "weight": 1
       },
       {
-        "value": 166.4,
+        "value": 119.908,
         "weight": 1
       },
       {
-        "value": 166.4,
+        "value": 119.908,
         "weight": 1
       },
       {
-        "value": 166.4,
+        "value": 119.908,
         "weight": 1
       },
       {
-        "value": 166.4,
+        "value": 119.908,
         "weight": 1
       },
       {
-        "value": 166.4,
+        "value": 119.908,
         "weight": 1
       },
       {
-        "value": 166.4,
+        "value": 119.908,
         "weight": 19
       },
       {
@@ -60137,6 +60179,102 @@
       },
       {
         "value": 4,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
         "weight": 1
       },
       {

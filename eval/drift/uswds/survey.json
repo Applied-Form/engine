@@ -8,8 +8,34 @@
     "viewports": [
       1280
     ],
-    "measuredAt": "2026-10-08T10:45:02.153Z",
-    "pages": 3
+    "measuredAt": "2026-10-10T13:28:24.800Z",
+    "pages": 3,
+    "settled": [
+      {
+        "url": "https://designsystem.digital.gov/",
+        "viewport": 1280,
+        "ms": 529,
+        "elements": 634,
+        "changes": 0,
+        "settled": true
+      },
+      {
+        "url": "https://designsystem.digital.gov/components/button/",
+        "viewport": 1280,
+        "ms": 522,
+        "elements": 1897,
+        "changes": 0,
+        "settled": true
+      },
+      {
+        "url": "https://designsystem.digital.gov/design-tokens/color/overview/",
+        "viewport": 1280,
+        "ms": 518,
+        "elements": 1041,
+        "changes": 0,
+        "settled": true
+      }
+    ]
   },
   "merged": {
     "elements": 1556,

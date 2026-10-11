@@ -1,7 +1,7 @@
 {
   "measured": {
     "pages": 3,
-    "elements": 4128,
+    "elements": 4134,
     "textElements": 817,
     "urls": [
       "https://carbondesignsystem.com/",
@@ -11,7 +11,33 @@
     "viewports": [
       1280
     ],
-    "measuredAt": "2026-10-08T10:44:45.714Z"
+    "measuredAt": "2026-10-10T13:27:58.872Z",
+    "settled": [
+      {
+        "url": "https://carbondesignsystem.com/",
+        "viewport": 1280,
+        "ms": 2172,
+        "elements": 1188,
+        "changes": 4,
+        "settled": true
+      },
+      {
+        "url": "https://carbondesignsystem.com/components/button/usage/",
+        "viewport": 1280,
+        "ms": 2141,
+        "elements": 2975,
+        "changes": 4,
+        "settled": true
+      },
+      {
+        "url": "https://carbondesignsystem.com/elements/color/overview/",
+        "viewport": 1280,
+        "ms": 1138,
+        "elements": 1747,
+        "changes": 4,
+        "settled": true
+      }
+    ]
   },
   "system": {
     "colour": {
@@ -30,7 +56,7 @@
           "value": "#F4F4F4",
           "weight": 0.88,
           "members": 1,
-          "share": 0.3512,
+          "share": 0.3514,
           "roles": [
             "text",
             "ground"
@@ -49,7 +75,7 @@
           "value": "#FFFFFF",
           "weight": 0.14,
           "members": 1,
-          "share": 0.0559,
+          "share": 0.0543,
           "roles": [
             "text",
             "ground",
@@ -93,34 +119,39 @@
           "roles": [
             "border"
           ]
-        },
-        {
-          "value": "#002D9C",
-          "weight": 0.01,
-          "members": 1,
-          "share": 0.0057,
-          "roles": [
-            "text",
-            "ground",
-            "border"
-          ]
         }
       ],
-      "coverage": 0.9943,
-      "distinct": 16,
-      "sprawl": 1.78,
+      "coverage": 0.9871,
+      "distinct": 19,
+      "sprawl": 2.38,
       "nearMisses": [],
       "tail": [
         {
+          "value": "#002D9C",
+          "weight": 0.01
+        },
+        {
           "value": "#0043CE",
           "weight": 0.01
+        },
+        {
+          "value": "#A7D3F5",
+          "weight": 0
         },
         {
           "value": "#001D6C",
           "weight": 0
         },
         {
+          "value": "#6A71B1",
+          "weight": 0
+        },
+        {
           "value": "#BAE6FF",
+          "weight": 0
+        },
+        {
+          "value": "#505BA8",
           "weight": 0
         },
         {
@@ -140,11 +171,11 @@
           "weight": 0
         }
       ],
-      "drift": 14.74
+      "drift": 25.44
     },
     "spacing": {
       "step": 8,
-      "coverage": 0.9239,
+      "coverage": 0.924,
       "onScale": true,
       "residual": 0.126,
       "offScale": [
@@ -206,16 +237,8 @@
       ],
       "considered": [
         {
-          "step": 2,
-          "coverage": 0.9567
-        },
-        {
-          "step": 3,
-          "coverage": 0.1263
-        },
-        {
           "step": 4,
-          "coverage": 0.928
+          "coverage": 0.9281
         },
         {
           "step": 5,
@@ -223,7 +246,7 @@
         },
         {
           "step": 6,
-          "coverage": 0.1214
+          "coverage": 0.1212
         },
         {
           "step": 7,
@@ -231,7 +254,7 @@
         },
         {
           "step": 8,
-          "coverage": 0.9239
+          "coverage": 0.924
         },
         {
           "step": 9,
@@ -239,7 +262,7 @@
         },
         {
           "step": 10,
-          "coverage": 0.0239
+          "coverage": 0.0238
         },
         {
           "step": 11,
@@ -247,7 +270,7 @@
         },
         {
           "step": 12,
-          "coverage": 0.106
+          "coverage": 0.1059
         },
         {
           "step": 13,
@@ -263,7 +286,7 @@
         },
         {
           "step": 16,
-          "coverage": 0.8062
+          "coverage": 0.8065
         },
         {
           "step": 17,
@@ -279,7 +302,7 @@
         },
         {
           "step": 20,
-          "coverage": 0.0239
+          "coverage": 0.0238
         },
         {
           "step": 21,
@@ -295,7 +318,17 @@
         },
         {
           "step": 24,
-          "coverage": 0.1044
+          "coverage": 0.1042
+        }
+      ],
+      "fine": [
+        {
+          "step": 2,
+          "coverage": 0.9568
+        },
+        {
+          "step": 3,
+          "coverage": 0.1261
         }
       ]
     },
@@ -344,7 +377,7 @@
           "members": 1
         },
         {
-          "value": 166.4,
+          "value": 119.908,
           "weight": 36,
           "share": 0.0007,
           "members": 1
@@ -371,7 +404,7 @@
           "members": 1
         },
         {
-          "value": 166.4,
+          "value": 119.908,
           "weight": 36,
           "share": 0.0007,
           "members": 1
@@ -379,7 +412,7 @@
       ],
       "ratio": {
         "ratio": 1.354,
-        "spread": 1.457,
+        "spread": 0.731,
         "steps": 8
       }
     },
@@ -576,15 +609,15 @@
     }
   },
   "numbers": {
-    "size": 21,
-    "coverage": 99.4,
+    "size": 20,
+    "coverage": 98.7,
     "spacingCoverage": 92.4,
-    "sprawl": 2.6,
+    "sprawl": 2.9,
     "wasteValues": 0,
     "wasteShare": 0
   },
   "findings": [
-    "16 distinct colours render across the pages surveyed. 9 of them account for 99.4% of the colour on the page.",
+    "19 distinct colours render across the pages surveyed. 8 of them account for 98.7% of the colour on the page.",
     "Spacing follows an 8px step, which explains 92.4% of the margins, padding and gaps measured.",
     "11 spacing values sit off that step, the most frequent being 7px, which is 1px from the nearest multiple.",
     "10 distinct font sizes are in use across 8 steps. The sizes sit on roughly a 1.354 ratio.",

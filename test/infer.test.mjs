@@ -198,6 +198,51 @@ test('a site with only a 2px step is told so, and 2px is not called its system',
   assert.match(sentence, /A 2px step would explain 100%, which is not a spacing system\./);
 });
 
+test('a finding about one thing reads as one thing, and a trace of waste is not called zero', () => {
+  // The second survey of nine public systems wrote "1 colours sit", "1 corner radii are in use,
+  // clustering into 1 steps" and "together 0% of the colour" on a site that had waste. These
+  // sentences are the deliverable a client reads.
+  const report = driftReport({
+    ground: [{ value: '#FFFFFF', weight: 100000 }],
+    textColor: [{ value: '#222222', weight: 5000 }, { value: '#232323', weight: 1 }],
+    borderColor: [], spacing: [{ value: 8, weight: 50 }, { value: 16, weight: 50 }, { value: 13, weight: 1 }],
+    fontSize: [{ value: 16, weight: 400 }], fontFamily: [], lineHeight: [],
+    radius: [{ value: 4, weight: 9 }], borderWidth: [], shadow: [{ value: '0 1px 2px #000000', weight: 3 }],
+    elements: 9, textElements: 3,
+  });
+  const text = report.findings.join(' ');
+  assert.doesNotMatch(text, /\b1 (colours|spacing values|distinct font sizes|corner radii|distinct shadows|steps)\b/, text);
+  assert.match(text, /1 colour sits within a just-noticeable difference/);
+  assert.match(text, /together under 0\.1% of the colour/);
+  assert.match(text, /1 corner radius is in use, clustering into 1 step\./);
+  assert.match(text, /1 distinct shadow is in use\./);
+  assert.doesNotMatch(text, /elevation scale usually has two or three/, 'one shadow is not too many');
+});
+
+test('adherence is reported on the chromatic colours, which palettes do not all share', () => {
+  // Measured 2026-10-10 (decision 0024): nine flagship sites scored against all nine published
+  // palettes matched the wrong palette at 46 to 80% on average, because the neutrals every palette
+  // contains carry most of a page. Scored on chromatic colours only, the wrong palettes matched at
+  // 0 to 18%. A site whose accent is off its own palette must show it.
+  const site = {
+    ground: [{ value: '#FFFFFF', weight: 100000 }],
+    textColor: [{ value: '#161616', weight: 5000 }, { value: '#0F62FE', weight: 800 }],
+    borderColor: [], spacing: [], fontSize: [], fontFamily: [], lineHeight: [],
+    radius: [], borderWidth: [], shadow: [], elements: 9, textElements: 3,
+  };
+  const offAccent = driftReport(site, { declared: ['#FFFFFF', '#161616', '#DA1E28'] });
+  assert.ok(offAccent.declared.adherence > 60, `the neutrals match: ${offAccent.declared.adherence}`);
+  assert.equal(offAccent.declared.chromatic.adherence, 0, 'the one accent is not declared');
+  assert.deepEqual(offAccent.declared.chromatic.undeclared.map((u) => u.value), ['#0F62FE']);
+  assert.ok(offAccent.findings.some((f) => /on the 1 chromatic colour,.* 0% does\./.test(f)), offAccent.findings.join(' '));
+
+  const onAccent = driftReport(site, { declared: ['#FFFFFF', '#161616', '#0F62FE'] });
+  assert.equal(onAccent.declared.chromatic.adherence, 100);
+
+  const greysOnly = driftReport({ ...site, textColor: [{ value: '#161616', weight: 5000 }] }, { declared: ['#FFFFFF'] });
+  assert.equal(greysOnly.declared.chromatic.adherence, null, 'no chromatic colour rendered: nothing to score');
+});
+
 test('every finding carries the measurement that produced it', () => {
   const report = driftReport({
     ground: [{ value: '#FFFFFF', weight: 1000 }],

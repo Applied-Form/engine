@@ -1,8 +1,8 @@
 {
   "measured": {
     "pages": 3,
-    "elements": 750,
-    "textElements": 201,
+    "elements": 756,
+    "textElements": 204,
     "urls": [
       "https://polaris.shopify.com/",
       "https://polaris.shopify.com/components/actions/button",
@@ -11,34 +11,60 @@
     "viewports": [
       1280
     ],
-    "measuredAt": "2026-10-08T10:44:58.140Z"
+    "measuredAt": "2026-10-10T13:28:19.343Z",
+    "settled": [
+      {
+        "url": "https://polaris.shopify.com/",
+        "viewport": 1280,
+        "ms": 751,
+        "elements": 1143,
+        "changes": 2,
+        "settled": true
+      },
+      {
+        "url": "https://polaris.shopify.com/components/actions/button",
+        "viewport": 1280,
+        "ms": 773,
+        "elements": 1143,
+        "changes": 2,
+        "settled": true
+      },
+      {
+        "url": "https://polaris.shopify.com/design/colors",
+        "viewport": 1280,
+        "ms": 744,
+        "elements": 1143,
+        "changes": 2,
+        "settled": true
+      }
+    ]
   },
   "system": {
     "colour": {
       "tokens": [
         {
-          "value": "#FFFFFF",
-          "weight": 0.98,
-          "members": 2,
-          "share": 0.3938,
-          "roles": [
-            "ground"
-          ]
-        },
-        {
           "value": "#44474A",
           "weight": 0.78,
           "members": 1,
-          "share": 0.313,
+          "share": 0.3132,
           "roles": [
             "text"
           ]
         },
         {
+          "value": "#FFFFFF",
+          "weight": 0.9,
+          "members": 2,
+          "share": 0.3614,
+          "roles": [
+            "ground"
+          ]
+        },
+        {
           "value": "#D2D5D8",
-          "weight": 0.31,
+          "weight": 0.29,
           "members": 1,
-          "share": 0.1246,
+          "share": 0.1145,
           "roles": [
             "text",
             "border"
@@ -46,9 +72,9 @@
         },
         {
           "value": "#475F91",
-          "weight": 0.17,
+          "weight": 0.16,
           "members": 1,
-          "share": 0.0676,
+          "share": 0.0642,
           "roles": [
             "text",
             "border"
@@ -58,16 +84,25 @@
           "value": "#202223",
           "weight": 0.1,
           "members": 1,
-          "share": 0.0394,
+          "share": 0.0393,
           "roles": [
             "text"
           ]
         },
         {
-          "value": "#96C6DD",
-          "weight": 0.09,
+          "value": "#EEF3F7",
+          "weight": 0.08,
           "members": 1,
-          "share": 0.0356,
+          "share": 0.0333,
+          "roles": [
+            "ground"
+          ]
+        },
+        {
+          "value": "#96C6DD",
+          "weight": 0.08,
+          "members": 1,
+          "share": 0.0327,
           "roles": [
             "border"
           ]
@@ -76,46 +111,60 @@
           "value": "#6D7175",
           "weight": 0.05,
           "members": 1,
-          "share": 0.0199,
+          "share": 0.0198,
           "roles": [
             "text"
+          ]
+        },
+        {
+          "value": "#78A7BD",
+          "weight": 0.04,
+          "members": 1,
+          "share": 0.0163,
+          "roles": [
+            "border"
           ]
         },
         {
           "value": "#F6F6F7",
           "weight": 0.01,
           "members": 1,
-          "share": 0.0057,
+          "share": 0.0053,
           "roles": [
             "ground"
           ]
         }
       ],
-      "coverage": 0.9995,
-      "distinct": 10,
-      "sprawl": 1.25,
+      "coverage": 1,
+      "distinct": 11,
+      "sprawl": 1.1,
       "nearMisses": [
         {
           "value": "#FAFBFB",
-          "weight": 0.13914970163092732,
+          "weight": 0.12772214054155287,
           "nearestToken": "#FFFFFF",
           "distance": 1.5
         }
       ],
-      "tail": [
-        {
-          "value": "#EEF3F7",
-          "weight": 0
-        }
-      ],
-      "drift": 2.66
+      "tail": [],
+      "drift": null
     },
     "spacing": {
-      "step": 2,
-      "coverage": 0.9658,
-      "onScale": true,
-      "residual": 0.034,
+      "step": 4,
+      "coverage": 0.8033,
+      "onScale": false,
+      "residual": 0.36,
       "offScale": [
+        {
+          "value": 2,
+          "weight": 69,
+          "off": 2
+        },
+        {
+          "value": 6,
+          "weight": 48,
+          "off": 2
+        },
         {
           "value": 3,
           "weight": 15,
@@ -129,24 +178,16 @@
       ],
       "considered": [
         {
-          "step": 2,
-          "coverage": 0.9658
-        },
-        {
-          "step": 3,
-          "coverage": 0.3162
-        },
-        {
           "step": 4,
-          "coverage": 0.7991
+          "coverage": 0.8033
         },
         {
           "step": 5,
-          "coverage": 0.0812
+          "coverage": 0.0795
         },
         {
           "step": 6,
-          "coverage": 0.2949
+          "coverage": 0.2887
         },
         {
           "step": 7,
@@ -154,7 +195,7 @@
         },
         {
           "step": 8,
-          "coverage": 0.4444
+          "coverage": 0.4561
         },
         {
           "step": 9,
@@ -162,7 +203,7 @@
         },
         {
           "step": 10,
-          "coverage": 0.0684
+          "coverage": 0.0669
         },
         {
           "step": 11,
@@ -170,7 +211,7 @@
         },
         {
           "step": 12,
-          "coverage": 0.2265
+          "coverage": 0.2218
         },
         {
           "step": 13,
@@ -182,11 +223,11 @@
         },
         {
           "step": 15,
-          "coverage": 0.0256
+          "coverage": 0.0251
         },
         {
           "step": 16,
-          "coverage": 0.1709
+          "coverage": 0.1674
         },
         {
           "step": 17,
@@ -202,7 +243,7 @@
         },
         {
           "step": 20,
-          "coverage": 0.0684
+          "coverage": 0.0669
         },
         {
           "step": 21,
@@ -218,7 +259,17 @@
         },
         {
           "step": 24,
-          "coverage": 0.0171
+          "coverage": 0.0167
+        }
+      ],
+      "fine": [
+        {
+          "step": 2,
+          "coverage": 0.9665
+        },
+        {
+          "step": 3,
+          "coverage": 0.3096
         }
       ]
     },
@@ -227,25 +278,25 @@
         {
           "value": 12,
           "weight": 105,
-          "share": 0.0153,
+          "share": 0.0152,
           "members": 1
         },
         {
           "value": 14,
           "weight": 3438,
-          "share": 0.4998,
+          "share": 0.4983,
           "members": 1
         },
         {
           "value": 16,
-          "weight": 3006,
-          "share": 0.437,
+          "weight": 3027,
+          "share": 0.4387,
           "members": 1
         },
         {
           "value": 24,
           "weight": 276,
-          "share": 0.0401,
+          "share": 0.04,
           "members": 1
         },
         {
@@ -274,7 +325,7 @@
       "values": [
         {
           "value": "Inter",
-          "weight": 6876,
+          "weight": 6897,
           "share": 100
         },
         {
@@ -290,31 +341,31 @@
         {
           "value": 1.17,
           "weight": 276,
-          "share": 0.0401,
+          "share": 0.04,
           "members": 1
         },
         {
           "value": 1.25,
           "weight": 438,
-          "share": 0.0637,
+          "share": 0.0635,
           "members": 1
         },
         {
           "value": 1.33,
           "weight": 105,
-          "share": 0.0153,
+          "share": 0.0152,
           "members": 1
         },
         {
           "value": 1.43,
           "weight": 3438,
-          "share": 0.4998,
+          "share": 0.4983,
           "members": 1
         },
         {
           "value": 1.5,
-          "weight": 2562,
-          "share": 0.3724,
+          "weight": 2583,
+          "share": 0.3743,
           "members": 1
         },
         {
@@ -340,29 +391,35 @@
         {
           "value": 3,
           "weight": 12,
-          "share": 0.0667,
+          "share": 0.0625,
           "members": 1
         },
         {
           "value": 4,
           "weight": 12,
-          "share": 0.0667,
+          "share": 0.0625,
           "members": 1
         },
         {
           "value": 8,
           "weight": 156,
-          "share": 0.8667,
+          "share": 0.8125,
+          "members": 1
+        },
+        {
+          "value": 16,
+          "weight": 12,
+          "share": 0.0625,
           "members": 1
         }
       ],
-      "distinct": 3
+      "distinct": 4
     },
     "borders": {
       "values": [
         {
           "value": 1,
-          "weight": 135,
+          "weight": 147,
           "share": 1,
           "members": 1
         }
@@ -392,21 +449,21 @@
     }
   },
   "numbers": {
-    "size": 16,
+    "size": 18,
     "coverage": 100,
-    "spacingCoverage": 96.6,
-    "sprawl": 1.9,
+    "spacingCoverage": 80.3,
+    "sprawl": 1.7,
     "wasteValues": 1,
-    "wasteShare": 5.6
+    "wasteShare": 5.1
   },
   "findings": [
-    "10 distinct colours render across the pages surveyed. 8 of them account for 100% of the colour on the page.",
-    "1 colours sit within a just-noticeable difference of a colour already in use and cannot be told apart by eye — together 5.6% of the colour on the page. The heaviest is #FAFBFB, which is 1.5 from #FFFFFF.",
-    "Spacing follows a 2px step, which explains 96.6% of the margins, padding and gaps measured.",
-    "2 spacing values sit off that step, the most frequent being 3px, which is 1px from the nearest multiple.",
+    "11 distinct colours render across the pages surveyed. 10 of them account for 100% of the colour on the page.",
+    "1 colours sit within a just-noticeable difference of a colour already in use and cannot be told apart by eye — together 5.1% of the colour on the page. The heaviest is #FAFBFB, which is 1.5 from #FFFFFF.",
+    "Spacing follows no consistent step. The closest candidate is 4px and it explains only 80.3%. A 2px step would explain 96.7%, which is not a spacing system.",
+    "4 spacing values sit off that step, the most frequent being 2px, which is 2px from the nearest multiple.",
     "5 distinct font sizes are in use across 5 steps. The sizes sit on roughly a 1.25 ratio.",
     "1 of those sizes carry under 1% of the text each, which is the signature of a one-off rather than a step.",
-    "3 corner radii are in use, clustering into 3 steps.",
+    "4 corner radii are in use, clustering into 4 steps.",
     "3 distinct shadows are in use. An elevation scale usually has two or three."
   ]
 }

@@ -10,7 +10,7 @@ Records · `eval/results/pilot-haiku-4-5.jsonl`, `pilot-sonnet-5.jsonl`, `pilot-
 Runs · Evaluation workflow runs 37833276081, 37833273511, 37833270079, 2026-10-08, one runner each, four cells at a time
 Tables · `node eval/tables.mjs eval/results/pilot-*.jsonl`, seeded, so every number below reruns exactly
 Cost · $173.65 at list price: Haiku 4.5 $11.70, Sonnet 5 $38.59, Opus 5 $123.37
-Since run (2026-10-10, section "Judging rounds and a second provider") · the judging round (H4), a model from another provider. Not yet run · human judges, a ceiling anchor, the ablations
+Since run (2026-10-10, section "Judging rounds and a second provider") · the judging round (H4), a model from another provider. The full study, thirty-six briefs and four generators, is read in `docs/study-results.md`. Not yet run · human judges, a ceiling anchor, the ablations
 :::
 
 ## The answer

@@ -8,12 +8,38 @@
     "viewports": [
       1280
     ],
-    "measuredAt": "2026-10-08T10:44:58.140Z",
-    "pages": 3
+    "measuredAt": "2026-10-10T13:28:19.343Z",
+    "pages": 3,
+    "settled": [
+      {
+        "url": "https://polaris.shopify.com/",
+        "viewport": 1280,
+        "ms": 751,
+        "elements": 1143,
+        "changes": 2,
+        "settled": true
+      },
+      {
+        "url": "https://polaris.shopify.com/components/actions/button",
+        "viewport": 1280,
+        "ms": 773,
+        "elements": 1143,
+        "changes": 2,
+        "settled": true
+      },
+      {
+        "url": "https://polaris.shopify.com/design/colors",
+        "viewport": 1280,
+        "ms": 744,
+        "elements": 1143,
+        "changes": 2,
+        "settled": true
+      }
+    ]
   },
   "merged": {
-    "elements": 750,
-    "textElements": 201,
+    "elements": 756,
+    "textElements": 204,
     "textColor": [
       {
         "value": "#475F91",
@@ -61,7 +87,7 @@
       },
       {
         "value": "#44474A",
-        "weight": 16
+        "weight": 14
       },
       {
         "value": "#202223",
@@ -282,6 +308,10 @@
       {
         "value": "#44474A",
         "weight": 15
+      },
+      {
+        "value": "#44474A",
+        "weight": 9
       },
       {
         "value": "#475F91",
@@ -329,7 +359,7 @@
       },
       {
         "value": "#44474A",
-        "weight": 16
+        "weight": 14
       },
       {
         "value": "#202223",
@@ -550,6 +580,10 @@
       {
         "value": "#44474A",
         "weight": 15
+      },
+      {
+        "value": "#44474A",
+        "weight": 9
       },
       {
         "value": "#475F91",
@@ -597,7 +631,7 @@
       },
       {
         "value": "#44474A",
-        "weight": 16
+        "weight": 14
       },
       {
         "value": "#202223",
@@ -818,6 +852,10 @@
       {
         "value": "#44474A",
         "weight": 15
+      },
+      {
+        "value": "#44474A",
+        "weight": 9
       }
     ],
     "ground": [
@@ -890,6 +928,10 @@
         "weight": 3054.08
       },
       {
+        "value": "#EEF3F7",
+        "weight": 5064
+      },
+      {
         "value": "#FFFFFF",
         "weight": 23617.55
       },
@@ -958,6 +1000,10 @@
         "weight": 3054.08
       },
       {
+        "value": "#EEF3F7",
+        "weight": 5064
+      },
+      {
         "value": "#FFFFFF",
         "weight": 23617.55
       },
@@ -1024,6 +1070,10 @@
       {
         "value": "#FAFBFB",
         "weight": 3054.08
+      },
+      {
+        "value": "#EEF3F7",
+        "weight": 5064
       }
     ],
     "borderColor": [
@@ -1208,183 +1258,19 @@
         "weight": 1
       },
       {
-        "value": "#96C6DD",
+        "value": "#78A7BD",
         "weight": 1
       },
       {
-        "value": "#96C6DD",
+        "value": "#78A7BD",
         "weight": 1
       },
       {
-        "value": "#96C6DD",
+        "value": "#78A7BD",
         "weight": 1
       },
       {
-        "value": "#96C6DD",
-        "weight": 1
-      },
-      {
-        "value": "#96C6DD",
-        "weight": 1
-      },
-      {
-        "value": "#96C6DD",
-        "weight": 1
-      },
-      {
-        "value": "#96C6DD",
-        "weight": 1
-      },
-      {
-        "value": "#96C6DD",
-        "weight": 1
-      },
-      {
-        "value": "#475F91",
-        "weight": 1
-      },
-      {
-        "value": "#475F91",
-        "weight": 1
-      },
-      {
-        "value": "#475F91",
-        "weight": 1
-      },
-      {
-        "value": "#475F91",
-        "weight": 1
-      },
-      {
-        "value": "#475F91",
-        "weight": 1
-      },
-      {
-        "value": "#475F91",
-        "weight": 1
-      },
-      {
-        "value": "#D2D5D8",
-        "weight": 1
-      },
-      {
-        "value": "#475F91",
-        "weight": 1
-      },
-      {
-        "value": "#475F91",
-        "weight": 1
-      },
-      {
-        "value": "#D2D5D8",
-        "weight": 1
-      },
-      {
-        "value": "#D2D5D8",
-        "weight": 1
-      },
-      {
-        "value": "#D2D5D8",
-        "weight": 1
-      },
-      {
-        "value": "#D2D5D8",
-        "weight": 1
-      },
-      {
-        "value": "#D2D5D8",
-        "weight": 1
-      },
-      {
-        "value": "#D2D5D8",
-        "weight": 1
-      },
-      {
-        "value": "#D2D5D8",
-        "weight": 1
-      },
-      {
-        "value": "#D2D5D8",
-        "weight": 1
-      },
-      {
-        "value": "#D2D5D8",
-        "weight": 1
-      },
-      {
-        "value": "#475F91",
-        "weight": 1
-      },
-      {
-        "value": "#D2D5D8",
-        "weight": 1
-      },
-      {
-        "value": "#D2D5D8",
-        "weight": 1
-      },
-      {
-        "value": "#D2D5D8",
-        "weight": 1
-      },
-      {
-        "value": "#D2D5D8",
-        "weight": 1
-      },
-      {
-        "value": "#D2D5D8",
-        "weight": 1
-      },
-      {
-        "value": "#D2D5D8",
-        "weight": 1
-      },
-      {
-        "value": "#D2D5D8",
-        "weight": 1
-      },
-      {
-        "value": "#D2D5D8",
-        "weight": 1
-      },
-      {
-        "value": "#D2D5D8",
-        "weight": 1
-      },
-      {
-        "value": "#D2D5D8",
-        "weight": 1
-      },
-      {
-        "value": "#D2D5D8",
-        "weight": 1
-      },
-      {
-        "value": "#D2D5D8",
-        "weight": 1
-      },
-      {
-        "value": "#D2D5D8",
-        "weight": 1
-      },
-      {
-        "value": "#D2D5D8",
-        "weight": 1
-      },
-      {
-        "value": "#D2D5D8",
-        "weight": 1
-      },
-      {
-        "value": "#D2D5D8",
-        "weight": 1
-      },
-      {
-        "value": "#D2D5D8",
-        "weight": 1
-      },
-      {
-        "value": "#D2D5D8",
+        "value": "#78A7BD",
         "weight": 1
       },
       {
@@ -1565,6 +1451,218 @@
       },
       {
         "value": "#D2D5D8",
+        "weight": 1
+      },
+      {
+        "value": "#78A7BD",
+        "weight": 1
+      },
+      {
+        "value": "#78A7BD",
+        "weight": 1
+      },
+      {
+        "value": "#78A7BD",
+        "weight": 1
+      },
+      {
+        "value": "#78A7BD",
+        "weight": 1
+      },
+      {
+        "value": "#96C6DD",
+        "weight": 1
+      },
+      {
+        "value": "#96C6DD",
+        "weight": 1
+      },
+      {
+        "value": "#96C6DD",
+        "weight": 1
+      },
+      {
+        "value": "#96C6DD",
+        "weight": 1
+      },
+      {
+        "value": "#96C6DD",
+        "weight": 1
+      },
+      {
+        "value": "#96C6DD",
+        "weight": 1
+      },
+      {
+        "value": "#96C6DD",
+        "weight": 1
+      },
+      {
+        "value": "#96C6DD",
+        "weight": 1
+      },
+      {
+        "value": "#475F91",
+        "weight": 1
+      },
+      {
+        "value": "#475F91",
+        "weight": 1
+      },
+      {
+        "value": "#475F91",
+        "weight": 1
+      },
+      {
+        "value": "#475F91",
+        "weight": 1
+      },
+      {
+        "value": "#475F91",
+        "weight": 1
+      },
+      {
+        "value": "#475F91",
+        "weight": 1
+      },
+      {
+        "value": "#D2D5D8",
+        "weight": 1
+      },
+      {
+        "value": "#475F91",
+        "weight": 1
+      },
+      {
+        "value": "#475F91",
+        "weight": 1
+      },
+      {
+        "value": "#D2D5D8",
+        "weight": 1
+      },
+      {
+        "value": "#D2D5D8",
+        "weight": 1
+      },
+      {
+        "value": "#D2D5D8",
+        "weight": 1
+      },
+      {
+        "value": "#D2D5D8",
+        "weight": 1
+      },
+      {
+        "value": "#D2D5D8",
+        "weight": 1
+      },
+      {
+        "value": "#D2D5D8",
+        "weight": 1
+      },
+      {
+        "value": "#D2D5D8",
+        "weight": 1
+      },
+      {
+        "value": "#D2D5D8",
+        "weight": 1
+      },
+      {
+        "value": "#D2D5D8",
+        "weight": 1
+      },
+      {
+        "value": "#475F91",
+        "weight": 1
+      },
+      {
+        "value": "#D2D5D8",
+        "weight": 1
+      },
+      {
+        "value": "#D2D5D8",
+        "weight": 1
+      },
+      {
+        "value": "#D2D5D8",
+        "weight": 1
+      },
+      {
+        "value": "#D2D5D8",
+        "weight": 1
+      },
+      {
+        "value": "#D2D5D8",
+        "weight": 1
+      },
+      {
+        "value": "#D2D5D8",
+        "weight": 1
+      },
+      {
+        "value": "#D2D5D8",
+        "weight": 1
+      },
+      {
+        "value": "#D2D5D8",
+        "weight": 1
+      },
+      {
+        "value": "#D2D5D8",
+        "weight": 1
+      },
+      {
+        "value": "#D2D5D8",
+        "weight": 1
+      },
+      {
+        "value": "#D2D5D8",
+        "weight": 1
+      },
+      {
+        "value": "#D2D5D8",
+        "weight": 1
+      },
+      {
+        "value": "#D2D5D8",
+        "weight": 1
+      },
+      {
+        "value": "#D2D5D8",
+        "weight": 1
+      },
+      {
+        "value": "#D2D5D8",
+        "weight": 1
+      },
+      {
+        "value": "#D2D5D8",
+        "weight": 1
+      },
+      {
+        "value": "#D2D5D8",
+        "weight": 1
+      },
+      {
+        "value": "#D2D5D8",
+        "weight": 1
+      },
+      {
+        "value": "#78A7BD",
+        "weight": 1
+      },
+      {
+        "value": "#78A7BD",
+        "weight": 1
+      },
+      {
+        "value": "#78A7BD",
+        "weight": 1
+      },
+      {
+        "value": "#78A7BD",
         "weight": 1
       }
     ],
@@ -2506,6 +2604,26 @@
         "weight": 1
       },
       {
+        "value": 8,
+        "weight": 1
+      },
+      {
+        "value": 8,
+        "weight": 1
+      },
+      {
+        "value": 8,
+        "weight": 1
+      },
+      {
+        "value": 8,
+        "weight": 1
+      },
+      {
+        "value": 8,
+        "weight": 1
+      },
+      {
         "value": 12,
         "weight": 1
       },
@@ -3442,6 +3560,26 @@
         "weight": 1
       },
       {
+        "value": 8,
+        "weight": 1
+      },
+      {
+        "value": 8,
+        "weight": 1
+      },
+      {
+        "value": 8,
+        "weight": 1
+      },
+      {
+        "value": 8,
+        "weight": 1
+      },
+      {
+        "value": 8,
+        "weight": 1
+      },
+      {
         "value": 12,
         "weight": 1
       },
@@ -4375,6 +4513,26 @@
       },
       {
         "value": 4,
+        "weight": 1
+      },
+      {
+        "value": 8,
+        "weight": 1
+      },
+      {
+        "value": 8,
+        "weight": 1
+      },
+      {
+        "value": 8,
+        "weight": 1
+      },
+      {
+        "value": 8,
+        "weight": 1
+      },
+      {
+        "value": 8,
         "weight": 1
       }
     ],
@@ -4425,7 +4583,7 @@
       },
       {
         "value": 16,
-        "weight": 16
+        "weight": 14
       },
       {
         "value": 32,
@@ -4646,6 +4804,10 @@
       {
         "value": 14,
         "weight": 15
+      },
+      {
+        "value": 16,
+        "weight": 9
       },
       {
         "value": 16,
@@ -4693,7 +4855,7 @@
       },
       {
         "value": 16,
-        "weight": 16
+        "weight": 14
       },
       {
         "value": 32,
@@ -4914,6 +5076,10 @@
       {
         "value": 14,
         "weight": 15
+      },
+      {
+        "value": 16,
+        "weight": 9
       },
       {
         "value": 16,
@@ -4961,7 +5127,7 @@
       },
       {
         "value": 16,
-        "weight": 16
+        "weight": 14
       },
       {
         "value": 32,
@@ -5182,6 +5348,10 @@
       {
         "value": 14,
         "weight": 15
+      },
+      {
+        "value": 16,
+        "weight": 9
       }
     ],
     "fontFamily": [
@@ -5231,7 +5401,7 @@
       },
       {
         "value": "Inter",
-        "weight": 16
+        "weight": 14
       },
       {
         "value": "Inter",
@@ -5452,6 +5622,10 @@
       {
         "value": "Inter",
         "weight": 15
+      },
+      {
+        "value": "Inter",
+        "weight": 9
       },
       {
         "value": "Inter",
@@ -5499,7 +5673,7 @@
       },
       {
         "value": "Inter",
-        "weight": 16
+        "weight": 14
       },
       {
         "value": "Inter",
@@ -5720,6 +5894,10 @@
       {
         "value": "Inter",
         "weight": 15
+      },
+      {
+        "value": "Inter",
+        "weight": 9
       },
       {
         "value": "Inter",
@@ -5767,7 +5945,7 @@
       },
       {
         "value": "Inter",
-        "weight": 16
+        "weight": 14
       },
       {
         "value": "Inter",
@@ -5988,6 +6166,10 @@
       {
         "value": "Inter",
         "weight": 15
+      },
+      {
+        "value": "Inter",
+        "weight": 9
       }
     ],
     "fontWeight": [
@@ -6037,7 +6219,7 @@
       },
       {
         "value": 400,
-        "weight": 16
+        "weight": 14
       },
       {
         "value": 600,
@@ -6258,6 +6440,10 @@
       {
         "value": 400,
         "weight": 15
+      },
+      {
+        "value": 400,
+        "weight": 9
       },
       {
         "value": 400,
@@ -6305,7 +6491,7 @@
       },
       {
         "value": 400,
-        "weight": 16
+        "weight": 14
       },
       {
         "value": 600,
@@ -6526,6 +6712,10 @@
       {
         "value": 400,
         "weight": 15
+      },
+      {
+        "value": 400,
+        "weight": 9
       },
       {
         "value": 400,
@@ -6573,7 +6763,7 @@
       },
       {
         "value": 400,
-        "weight": 16
+        "weight": 14
       },
       {
         "value": 600,
@@ -6794,6 +6984,10 @@
       {
         "value": 400,
         "weight": 15
+      },
+      {
+        "value": 400,
+        "weight": 9
       }
     ],
     "lineHeight": [
@@ -6843,7 +7037,7 @@
       },
       {
         "value": 1.5,
-        "weight": 16
+        "weight": 14
       },
       {
         "value": 1.25,
@@ -7064,6 +7258,10 @@
       {
         "value": 1.43,
         "weight": 15
+      },
+      {
+        "value": 1.5,
+        "weight": 9
       },
       {
         "value": 2.5,
@@ -7111,7 +7309,7 @@
       },
       {
         "value": 1.5,
-        "weight": 16
+        "weight": 14
       },
       {
         "value": 1.25,
@@ -7332,6 +7530,10 @@
       {
         "value": 1.43,
         "weight": 15
+      },
+      {
+        "value": 1.5,
+        "weight": 9
       },
       {
         "value": 2.5,
@@ -7379,7 +7581,7 @@
       },
       {
         "value": 1.5,
-        "weight": 16
+        "weight": 14
       },
       {
         "value": 1.25,
@@ -7600,6 +7802,10 @@
       {
         "value": 1.43,
         "weight": 15
+      },
+      {
+        "value": 1.5,
+        "weight": 9
       }
     ],
     "radius": [
@@ -11604,6 +11810,38 @@
         "weight": 1
       },
       {
+        "value": 16,
+        "weight": 1
+      },
+      {
+        "value": 16,
+        "weight": 1
+      },
+      {
+        "value": 16,
+        "weight": 1
+      },
+      {
+        "value": 16,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
         "value": 0,
         "weight": 1
       },
@@ -15604,6 +15842,38 @@
         "weight": 1
       },
       {
+        "value": 16,
+        "weight": 1
+      },
+      {
+        "value": 16,
+        "weight": 1
+      },
+      {
+        "value": 16,
+        "weight": 1
+      },
+      {
+        "value": 16,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
         "value": 0,
         "weight": 1
       },
@@ -19585,6 +19855,38 @@
       },
       {
         "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 0,
+        "weight": 1
+      },
+      {
+        "value": 16,
+        "weight": 1
+      },
+      {
+        "value": 16,
+        "weight": 1
+      },
+      {
+        "value": 16,
+        "weight": 1
+      },
+      {
+        "value": 16,
         "weight": 1
       },
       {
@@ -19605,6 +19907,54 @@
       }
     ],
     "borderWidth": [
+      {
+        "value": 1,
+        "weight": 1
+      },
+      {
+        "value": 1,
+        "weight": 1
+      },
+      {
+        "value": 1,
+        "weight": 1
+      },
+      {
+        "value": 1,
+        "weight": 1
+      },
+      {
+        "value": 1,
+        "weight": 1
+      },
+      {
+        "value": 1,
+        "weight": 1
+      },
+      {
+        "value": 1,
+        "weight": 1
+      },
+      {
+        "value": 1,
+        "weight": 1
+      },
+      {
+        "value": 1,
+        "weight": 1
+      },
+      {
+        "value": 1,
+        "weight": 1
+      },
+      {
+        "value": 1,
+        "weight": 1
+      },
+      {
+        "value": 1,
+        "weight": 1
+      },
       {
         "value": 1,
         "weight": 1

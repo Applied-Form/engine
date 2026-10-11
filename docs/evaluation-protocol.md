@@ -351,6 +351,27 @@ instrument, all four rounds are judged again under it, not only the invalid one;
 the round that failed would select on the result. The first rounds stay in `eval/results/` as
 `*.judging-v1-cb1fb2ad.*`, and the earlier partial ones as `*.judging-partial-3c563c7e.*`.
 
+### Amendment, 2026-10-10 — the full study's thirty-six briefs
+
+Recorded before any page for the new briefs exists. The pilot's twelve briefs covered seven of the
+twelve strata the design names (register, density, chart): no dense or charted sparse brief in
+register I, no sparse brief in register II. Twenty-four briefs, `b13` to `b36` in
+`eval/briefs.json`, fill every stratum to three, for thirty-six, inside the 30–40 above. They were
+written the way the first twelve were, without reference to `examples/`, and none was run, shown
+to a judge or revised after any generation. `test/eval.test.mjs` holds the design: thirty-six ids,
+three per stratum, and a chart flag that matches what the brief asks for.
+
+Why thirty-six and not forty. The pilot's intervals are a bootstrap over briefs, so the brief count
+sets their width. Synthetic studies drawn from the pilot's own records put the half-width of the
+loop against reading the rules, on Haiku, at 0.39 on the log scale with twelve briefs, 0.22 with
+thirty-six and 0.18 with forty-eight; pooled across models, 0.08, 0.05 and 0.04. Thirty-six takes
+most of what more briefs can give and divides evenly into the strata; forty-eight would cost a
+third more in pages for a tenth narrower intervals. The estimate reuses the pilot's briefs, so it assumes new briefs vary as much as
+those did; that is its limit.
+
+The pilot's twelve stay in the set. The full study generates every brief afresh, under new run
+names, and is not pooled with the pilot.
+
 ## Measures
 
 Primary:

@@ -4,7 +4,7 @@ Machinery for `docs/evaluation-protocol.md`. Read the protocol first: it says wh
 and why the design is shaped this way. This file says how to run it.
 
     eval/
-      briefs.json      12 pilot briefs, held out from examples/
+      briefs.json      36 briefs (b01-b12 the pilot's), held out from examples/
       split.mjs        which rules are disclosed to the arms, and which are scored
       arms.mjs         the eight conditions, the compiled core, and the repair prompt
       providers.mjs    generation, one function per provider, plus an offline stub

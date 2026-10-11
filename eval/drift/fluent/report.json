@@ -1,8 +1,8 @@
 {
   "measured": {
     "pages": 3,
-    "elements": 938,
-    "textElements": 242,
+    "elements": 1305,
+    "textElements": 352,
     "urls": [
       "https://fluent2.microsoft.design/",
       "https://fluent2.microsoft.design/components/web/react/core/button/usage",
@@ -11,7 +11,33 @@
     "viewports": [
       1280
     ],
-    "measuredAt": "2026-10-08T10:45:13.405Z"
+    "measuredAt": "2026-10-10T13:28:41.162Z",
+    "settled": [
+      {
+        "url": "https://fluent2.microsoft.design/",
+        "viewport": 1280,
+        "ms": 519,
+        "elements": 847,
+        "changes": 0,
+        "settled": true
+      },
+      {
+        "url": "https://fluent2.microsoft.design/components/web/react/core/button/usage",
+        "viewport": 1280,
+        "ms": 540,
+        "elements": 955,
+        "changes": 0,
+        "settled": true
+      },
+      {
+        "url": "https://fluent2.microsoft.design/color",
+        "viewport": 1280,
+        "ms": 636,
+        "elements": 914,
+        "changes": 1,
+        "settled": true
+      }
+    ]
   },
   "system": {
     "colour": {
@@ -20,25 +46,26 @@
           "value": "#FFFFFF",
           "weight": 0.96,
           "members": 2,
-          "share": 0.3825,
+          "share": 0.3845,
           "roles": [
+            "text",
             "ground"
           ]
         },
         {
           "value": "#1B1A19",
-          "weight": 0.7,
+          "weight": 0.65,
           "members": 1,
-          "share": 0.278,
+          "share": 0.2611,
           "roles": [
             "text"
           ]
         },
         {
           "value": "#F5F5F5",
-          "weight": 0.3,
+          "weight": 0.24,
           "members": 2,
-          "share": 0.1187,
+          "share": 0.0978,
           "roles": [
             "ground",
             "border"
@@ -46,9 +73,9 @@
         },
         {
           "value": "#000000",
-          "weight": 0.13,
+          "weight": 0.14,
           "members": 1,
-          "share": 0.0508,
+          "share": 0.0551,
           "roles": [
             "text",
             "ground",
@@ -56,59 +83,59 @@
           ]
         },
         {
-          "value": "#E0E0E0",
+          "value": "#D1D1D1",
           "weight": 0.1,
           "members": 2,
-          "share": 0.0392,
+          "share": 0.0401,
           "roles": [
             "border"
           ]
         },
         {
           "value": "#616161",
-          "weight": 0.07,
-          "members": 2,
-          "share": 0.0284,
+          "weight": 0.09,
+          "members": 1,
+          "share": 0.0348,
           "roles": [
             "text",
             "border"
           ]
         },
         {
-          "value": "#424242",
-          "weight": 0.05,
+          "value": "#E0E0E0",
+          "weight": 0.08,
           "members": 2,
-          "share": 0.0219,
-          "roles": [
-            "text"
-          ]
-        },
-        {
-          "value": "#D1D1D1",
-          "weight": 0.04,
-          "members": 2,
-          "share": 0.0179,
+          "share": 0.0309,
           "roles": [
             "border"
           ]
         },
         {
           "value": "#242424",
-          "weight": 0.04,
+          "weight": 0.05,
           "members": 2,
-          "share": 0.0173,
+          "share": 0.0198,
           "roles": [
             "text",
             "ground"
           ]
         },
         {
-          "value": "#B8B8B8",
-          "weight": 0.03,
+          "value": "#424242",
+          "weight": 0.05,
           "members": 2,
-          "share": 0.0101,
+          "share": 0.021,
           "roles": [
-            "border"
+            "text"
+          ]
+        },
+        {
+          "value": "#484644",
+          "weight": 0.03,
+          "members": 1,
+          "share": 0.0117,
+          "roles": [
+            "text"
           ]
         },
         {
@@ -121,75 +148,68 @@
           ]
         },
         {
-          "value": "#707070",
-          "weight": 0.01,
+          "value": "#AF4E63",
+          "weight": 0.02,
           "members": 1,
-          "share": 0.0057,
+          "share": 0.0093,
           "roles": [
-            "text"
+            "text",
+            "border"
           ]
         }
       ],
-      "coverage": 0.98,
-      "distinct": 46,
-      "sprawl": 3.83,
+      "coverage": 0.9756,
+      "distinct": 45,
+      "sprawl": 3.75,
       "nearMisses": [
         {
-          "value": "#F0F0F0",
-          "weight": 0.03311984191952362,
-          "nearestToken": "#F5F5F5",
-          "distance": 1.74
-        },
-        {
           "value": "#FAFAFA",
-          "weight": 0.027939282433518016,
+          "weight": 0.027828633795808085,
           "nearestToken": "#FFFFFF",
           "distance": 1.73
         },
         {
+          "value": "#F0F0F0",
+          "weight": 0.02703087311374424,
+          "nearestToken": "#F5F5F5",
+          "distance": 1.74
+        },
+        {
           "value": "#E6E6E6",
-          "weight": 0.011203928011432208,
+          "weight": 0.006711409395973154,
           "nearestToken": "#E0E0E0",
           "distance": 2.12
         },
         {
-          "value": "#D6D6D6",
-          "weight": 0.001449385918071554,
-          "nearestToken": "#D1D1D1",
-          "distance": 1.79
-        },
-        {
           "value": "#444444",
-          "weight": 0.0012968189793271796,
+          "weight": 0.0035569814479006834,
           "nearestToken": "#424242",
           "distance": 0.88
         },
         {
-          "value": "#BDBDBD",
-          "weight": 0.0004577008162331223,
-          "nearestToken": "#B8B8B8",
-          "distance": 1.83
-        },
-        {
-          "value": "#5D5D5D",
-          "weight": 0.00014143007562270887,
-          "nearestToken": "#616161",
-          "distance": 1.65
+          "value": "#D6D6D6",
+          "weight": 0.001325149951178686,
+          "nearestToken": "#D1D1D1",
+          "distance": 1.79
         },
         {
           "value": "#222222",
-          "weight": 0.00001106976425967783,
+          "weight": 0.000011025924395929793,
           "nearestToken": "#242424",
           "distance": 0.97
         }
       ],
       "tail": [
         {
-          "value": "#4D4D4D",
+          "value": "#B8B8B8",
+          "weight": 0.02
+        },
+        {
+          "value": "#707070",
           "weight": 0.01
         },
         {
-          "value": "#AF4E63",
+          "value": "#4D4D4D",
           "weight": 0.01
         },
         {
@@ -197,23 +217,23 @@
           "weight": 0.01
         },
         {
-          "value": "#767686",
-          "weight": 0.01
-        },
-        {
           "value": "#C50F1F",
           "weight": 0.01
         },
         {
-          "value": "#0000EE",
+          "value": "#BDBDBD",
           "weight": 0
         },
         {
-          "value": "#BDBDFB",
+          "value": "#A63F50",
           "weight": 0
         },
         {
-          "value": "#484644",
+          "value": "#115EA3",
+          "weight": 0
+        },
+        {
+          "value": "#FAD6DC",
           "weight": 0
         },
         {
@@ -222,6 +242,10 @@
         },
         {
           "value": "#EBEBEB",
+          "weight": 0
+        },
+        {
+          "value": "#B4D6FA",
           "weight": 0
         },
         {
@@ -283,23 +307,44 @@
         {
           "value": "#00A99D",
           "weight": 0
-        },
-        {
-          "value": "#B4D6FA",
-          "weight": 0
         }
       ],
-      "drift": 47.69
+      "drift": 34.57
     },
     "spacing": {
-      "step": 2,
-      "coverage": 0.8363,
+      "step": 4,
+      "coverage": 0.5392,
       "onScale": false,
-      "residual": 0.166,
+      "residual": 0.791,
       "offScale": [
+        {
+          "value": 6,
+          "weight": 226,
+          "off": 2
+        },
+        {
+          "value": 2,
+          "weight": 123,
+          "off": 2
+        },
         {
           "value": 1,
           "weight": 63,
+          "off": 1
+        },
+        {
+          "value": 14,
+          "weight": 48,
+          "off": 2
+        },
+        {
+          "value": 10,
+          "weight": 47,
+          "off": 2
+        },
+        {
+          "value": 5,
+          "weight": 41,
           "off": 1
         },
         {
@@ -308,14 +353,24 @@
           "off": 1
         },
         {
-          "value": 5,
-          "weight": 21,
+          "value": 11,
+          "weight": 24,
           "off": 1
         },
         {
-          "value": 11,
+          "value": 22,
+          "weight": 17,
+          "off": 2
+        },
+        {
+          "value": 2.5,
+          "weight": 12,
+          "off": 1.5
+        },
+        {
+          "value": 18,
           "weight": 8,
-          "off": 1
+          "off": 2
         },
         {
           "value": 15,
@@ -323,7 +378,27 @@
           "off": 1
         },
         {
+          "value": 38,
+          "weight": 4,
+          "off": 2
+        },
+        {
+          "value": 50,
+          "weight": 4,
+          "off": 2
+        },
+        {
           "value": 75,
+          "weight": 3,
+          "off": 1
+        },
+        {
+          "value": 7,
+          "weight": 3,
+          "off": 1
+        },
+        {
+          "value": 33,
           "weight": 3,
           "off": 1
         },
@@ -333,19 +408,24 @@
           "off": 1
         },
         {
+          "value": 30,
+          "weight": 2,
+          "off": 2
+        },
+        {
+          "value": 46,
+          "weight": 2,
+          "off": 2
+        },
+        {
           "value": 13,
           "weight": 2,
           "off": 1
         },
         {
-          "value": 7,
+          "value": 90,
           "weight": 1,
-          "off": 1
-        },
-        {
-          "value": 33,
-          "weight": 1,
-          "off": 1
+          "off": 2
         },
         {
           "value": 19,
@@ -355,64 +435,56 @@
       ],
       "considered": [
         {
-          "step": 2,
-          "coverage": 0.8363
-        },
-        {
-          "step": 3,
-          "coverage": 0.3519
-        },
-        {
           "step": 4,
-          "coverage": 0.5947
+          "coverage": 0.5392
         },
         {
           "step": 5,
-          "coverage": 0.196
+          "coverage": 0.138
         },
         {
           "step": 6,
-          "coverage": 0.2906
+          "coverage": 0.3728
         },
         {
           "step": 7,
-          "coverage": 0.0312
+          "coverage": 0.0419
         },
         {
           "step": 8,
-          "coverage": 0.3575
+          "coverage": 0.2855
         },
         {
           "step": 9,
-          "coverage": 0.0178
+          "coverage": 0.0907
         },
         {
           "step": 10,
-          "coverage": 0.1604
+          "coverage": 0.1028
         },
         {
           "step": 11,
-          "coverage": 0.029
+          "coverage": 0.0298
         },
         {
           "step": 12,
-          "coverage": 0.1882
+          "coverage": 0.2124
         },
         {
           "step": 13,
-          "coverage": 0.0022
+          "coverage": 0.0014
         },
         {
           "step": 14,
-          "coverage": 0.0301
+          "coverage": 0.0399
         },
         {
           "step": 15,
-          "coverage": 0.02
+          "coverage": 0.0135
         },
         {
           "step": 16,
-          "coverage": 0.1414
+          "coverage": 0.094
         },
         {
           "step": 17,
@@ -420,15 +492,15 @@
         },
         {
           "step": 18,
-          "coverage": 0.0145
+          "coverage": 0.0886
         },
         {
           "step": 19,
-          "coverage": 0.0056
+          "coverage": 0.0034
         },
         {
           "step": 20,
-          "coverage": 0.1036
+          "coverage": 0.0663
         },
         {
           "step": 21,
@@ -436,15 +508,25 @@
         },
         {
           "step": 22,
-          "coverage": 0.0189
+          "coverage": 0.0115
         },
         {
           "step": 23,
-          "coverage": 0.0022
+          "coverage": 0.0014
         },
         {
           "step": 24,
-          "coverage": 0.078
+          "coverage": 0.048
+        }
+      ],
+      "fine": [
+        {
+          "step": 2,
+          "coverage": 0.8735
+        },
+        {
+          "step": 3,
+          "coverage": 0.4168
         }
       ]
     },
@@ -453,55 +535,55 @@
         {
           "value": 10,
           "weight": 21,
-          "share": 0.0016,
+          "share": 0.0015,
           "members": 1
         },
         {
           "value": 12,
-          "weight": 279,
-          "share": 0.0213,
+          "weight": 465,
+          "share": 0.0324,
           "members": 1
         },
         {
           "value": 14,
-          "weight": 1840,
-          "share": 0.1404,
+          "weight": 2893,
+          "share": 0.2018,
           "members": 1
         },
         {
           "value": 16,
           "weight": 9925,
-          "share": 0.7571,
+          "share": 0.6922,
           "members": 1
         },
         {
           "value": 18,
-          "weight": 43,
-          "share": 0.0033,
+          "weight": 33,
+          "share": 0.0023,
           "members": 1
         },
         {
           "value": 20,
           "weight": 404,
-          "share": 0.0308,
+          "share": 0.0282,
           "members": 1
         },
         {
           "value": 24,
           "weight": 366,
-          "share": 0.0279,
+          "share": 0.0255,
           "members": 1
         },
         {
           "value": 32,
           "weight": 160,
-          "share": 0.0122,
+          "share": 0.0112,
           "members": 1
         },
         {
           "value": 40,
           "weight": 29,
-          "share": 0.0022,
+          "share": 0.002,
           "members": 1
         },
         {
@@ -519,7 +601,7 @@
         {
           "value": 128,
           "weight": 20,
-          "share": 0.0015,
+          "share": 0.0014,
           "members": 1
         }
       ],
@@ -528,19 +610,19 @@
         {
           "value": 10,
           "weight": 21,
-          "share": 0.0016,
+          "share": 0.0015,
           "members": 1
         },
         {
           "value": 18,
-          "weight": 43,
-          "share": 0.0033,
+          "weight": 33,
+          "share": 0.0023,
           "members": 1
         },
         {
           "value": 40,
           "weight": 29,
-          "share": 0.0022,
+          "share": 0.002,
           "members": 1
         },
         {
@@ -558,7 +640,7 @@
         {
           "value": 128,
           "weight": 20,
-          "share": 0.0015,
+          "share": 0.0014,
           "members": 1
         }
       ],
@@ -572,7 +654,7 @@
       "values": [
         {
           "value": "Segoe UI",
-          "weight": 13087,
+          "weight": 14316,
           "share": 99.8
         },
         {
@@ -599,61 +681,55 @@
         {
           "value": 1,
           "weight": 31,
-          "share": 0.0024,
+          "share": 0.0022,
           "members": 1
         },
         {
           "value": 1.15,
-          "weight": 219,
-          "share": 0.0167,
+          "weight": 450,
+          "share": 0.0314,
           "members": 1
         },
         {
           "value": 1.25,
           "weight": 160,
-          "share": 0.0122,
+          "share": 0.0112,
           "members": 1
         },
         {
           "value": 1.31,
           "weight": 739,
-          "share": 0.0564,
+          "share": 0.0515,
           "members": 2
         },
         {
           "value": 1.33,
-          "weight": 645,
-          "share": 0.0492,
+          "weight": 831,
+          "share": 0.058,
           "members": 1
         },
         {
-          "value": 1.35,
-          "weight": 11,
-          "share": 0.0008,
-          "members": 1
-        },
-        {
-          "value": 1.38,
-          "weight": 446,
-          "share": 0.034,
-          "members": 2
+          "value": 1.36,
+          "weight": 880,
+          "share": 0.0614,
+          "members": 3
         },
         {
           "value": 1.4,
           "weight": 422,
-          "share": 0.0322,
+          "share": 0.0294,
           "members": 1
         },
         {
           "value": 1.43,
-          "weight": 1410,
-          "share": 0.1076,
+          "weight": 1799,
+          "share": 0.1255,
           "members": 1
         },
         {
           "value": 1.5,
           "weight": 9023,
-          "share": 0.6883,
+          "share": 0.6293,
           "members": 1
         }
       ],
@@ -668,13 +744,7 @@
         {
           "value": 1,
           "weight": 31,
-          "share": 0.0024,
-          "members": 1
-        },
-        {
-          "value": 1.35,
-          "weight": 11,
-          "share": 0.0008,
+          "share": 0.0022,
           "members": 1
         }
       ]
@@ -685,67 +755,67 @@
         {
           "value": 2,
           "weight": 184,
-          "share": 0.2644,
+          "share": 0.1649,
           "members": 1
         },
         {
           "value": 4,
-          "weight": 72,
-          "share": 0.1034,
+          "weight": 148,
+          "share": 0.1326,
           "members": 1
         },
         {
           "value": 6,
           "weight": 12,
-          "share": 0.0172,
+          "share": 0.0108,
           "members": 1
         },
         {
           "value": 8,
-          "weight": 120,
-          "share": 0.1724,
+          "weight": 432,
+          "share": 0.3871,
           "members": 1
         },
         {
           "value": 12,
-          "weight": 4,
-          "share": 0.0057,
+          "weight": 20,
+          "share": 0.0179,
           "members": 1
         },
         {
           "value": 16,
           "weight": 44,
-          "share": 0.0632,
+          "share": 0.0394,
           "members": 1
         },
         {
           "value": 20,
-          "weight": 8,
-          "share": 0.0115,
+          "weight": 24,
+          "share": 0.0215,
           "members": 1
         },
         {
           "value": 22,
           "weight": 152,
-          "share": 0.2184,
+          "share": 0.1362,
           "members": 1
         },
         {
           "value": 24,
           "weight": 12,
-          "share": 0.0172,
+          "share": 0.0108,
           "members": 1
         },
         {
           "value": 64,
           "weight": 16,
-          "share": 0.023,
+          "share": 0.0143,
           "members": 1
         },
         {
           "value": 100,
           "weight": 72,
-          "share": 0.1034,
+          "share": 0.0645,
           "members": 1
         }
       ],
@@ -755,14 +825,14 @@
       "values": [
         {
           "value": 1,
-          "weight": 230,
-          "share": 0.935,
+          "weight": 298,
+          "share": 0.9255,
           "members": 1
         },
         {
           "value": 2,
-          "weight": 16,
-          "share": 0.065,
+          "weight": 24,
+          "share": 0.0745,
           "members": 1
         }
       ],
@@ -774,32 +844,32 @@
         {
           "value": "rgba(0, 0, 0, 0.14) 0px 2px 4px 0px, rgba(0, 0, 0, 0.12) 0px 0px 2px 0px",
           "weight": 12,
-          "share": 50
+          "share": 40
         },
         {
           "value": "rgba(0, 0, 0, 0.12) 0px 0px 2px 0px, rgba(0, 0, 0, 0.14) 0px 2px 4px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 2px inset",
           "weight": 6,
-          "share": 25
+          "share": 20
         },
         {
           "value": "rgba(0, 0, 0, 0.12) 0px 0px 2px 0px, rgba(0, 0, 0, 0.14) 0px 4px 8px 0px",
           "weight": 3,
-          "share": 12.5
+          "share": 10
         },
         {
           "value": "rgba(0, 0, 0, 0.14) 0px 8px 16px 0px",
-          "weight": 1,
-          "share": 4.2
+          "weight": 3,
+          "share": 10
         },
         {
           "value": "rgba(0, 0, 0, 0.12) 0px 0px 2px 0px, rgba(0, 0, 0, 0.14) 0px 8px 16px 0px",
-          "weight": 1,
-          "share": 4.2
+          "weight": 3,
+          "share": 10
         },
         {
           "value": "rgb(68, 68, 68) 0px 0px 4px -2px",
-          "weight": 1,
-          "share": 4.2
+          "weight": 3,
+          "share": 10
         }
       ],
       "distinct": 6
@@ -807,17 +877,17 @@
   },
   "numbers": {
     "size": 28,
-    "coverage": 98,
-    "spacingCoverage": 83.6,
+    "coverage": 97.6,
+    "spacingCoverage": 53.9,
     "sprawl": 3.5,
-    "wasteValues": 8,
-    "wasteShare": 3
+    "wasteValues": 6,
+    "wasteShare": 2.7
   },
   "findings": [
-    "46 distinct colours render across the pages surveyed. 12 of them account for 98% of the colour on the page.",
-    "8 colours sit within a just-noticeable difference of a colour already in use and cannot be told apart by eye — together 3% of the colour on the page. The heaviest is #F0F0F0, which is 1.74 from #F5F5F5.",
-    "Spacing follows no consistent step. The closest candidate is 2px and it explains only 83.6%.",
-    "11 spacing values sit off that step, the most frequent being 1px, which is 1px from the nearest multiple.",
+    "45 distinct colours render across the pages surveyed. 12 of them account for 97.6% of the colour on the page.",
+    "6 colours sit within a just-noticeable difference of a colour already in use and cannot be told apart by eye — together 2.7% of the colour on the page. The heaviest is #FAFAFA, which is 1.73 from #FFFFFF.",
+    "Spacing follows no consistent step. The closest candidate is 4px and it explains only 53.9%. A 2px step would explain 87.4%, which is not a spacing system.",
+    "23 spacing values sit off that step, the most frequent being 6px, which is 2px from the nearest multiple.",
     "12 distinct font sizes are in use across 12 steps. The sizes sit on roughly a 1.2 ratio.",
     "6 of those sizes carry under 1% of the text each, which is the signature of a one-off rather than a step.",
     "11 corner radii are in use, clustering into 11 steps.",

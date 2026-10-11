@@ -11,7 +11,33 @@
     "viewports": [
       1280
     ],
-    "measuredAt": "2026-10-08T10:44:29.588Z"
+    "measuredAt": "2026-10-10T13:27:40.410Z",
+    "settled": [
+      {
+        "url": "https://design-system.service.gov.uk/",
+        "viewport": 1280,
+        "ms": 514,
+        "elements": 512,
+        "changes": 0,
+        "settled": true
+      },
+      {
+        "url": "https://design-system.service.gov.uk/components/button/",
+        "viewport": 1280,
+        "ms": 511,
+        "elements": 1288,
+        "changes": 0,
+        "settled": true
+      },
+      {
+        "url": "https://design-system.service.gov.uk/styles/colour/",
+        "viewport": 1280,
+        "ms": 519,
+        "elements": 1231,
+        "changes": 0,
+        "settled": true
+      }
+    ]
   },
   "system": {
     "colour": {
@@ -20,7 +46,7 @@
           "value": "#FFFFFF",
           "weight": 0.95,
           "members": 1,
-          "share": 0.38,
+          "share": 0.3799,
           "roles": [
             "text",
             "ground",
@@ -62,7 +88,7 @@
           "value": "#F4F8FB",
           "weight": 0.09,
           "members": 3,
-          "share": 0.0368,
+          "share": 0.0369,
           "roles": [
             "ground"
           ]
@@ -104,13 +130,13 @@
       "nearMisses": [
         {
           "value": "#F3F9F9",
-          "weight": 0.00005206839482337511,
+          "weight": 0.00005213268641079135,
           "nearestToken": "#F4F8FB",
           "distance": 1.7
         },
         {
           "value": "#F6F5FA",
-          "weight": 0.00005206839482337511,
+          "weight": 0.00005213268641079135,
           "nearestToken": "#F4F8FB",
           "distance": 2.13
         }
@@ -361,9 +387,9 @@
     },
     "spacing": {
       "step": 5,
-      "coverage": 0.42,
+      "coverage": 0.4205,
       "onScale": false,
-      "residual": 0.705,
+      "residual": 0.704,
       "offScale": [
         {
           "value": 1,
@@ -423,24 +449,16 @@
       ],
       "considered": [
         {
-          "step": 2,
-          "coverage": 0.4147
-        },
-        {
-          "step": 3,
-          "coverage": 0.1451
-        },
-        {
           "step": 4,
-          "coverage": 0.1447
+          "coverage": 0.1446
         },
         {
           "step": 5,
-          "coverage": 0.42
+          "coverage": 0.4205
         },
         {
           "step": 6,
-          "coverage": 0.0928
+          "coverage": 0.0936
         },
         {
           "step": 7,
@@ -452,11 +470,11 @@
         },
         {
           "step": 9,
-          "coverage": 0.0141
+          "coverage": 0.0149
         },
         {
           "step": 10,
-          "coverage": 0.2656
+          "coverage": 0.2663
         },
         {
           "step": 11,
@@ -476,7 +494,7 @@
         },
         {
           "step": 15,
-          "coverage": 0.1047
+          "coverage": 0.1054
         },
         {
           "step": 16,
@@ -488,7 +506,7 @@
         },
         {
           "step": 18,
-          "coverage": 0.0141
+          "coverage": 0.0149
         },
         {
           "step": 19,
@@ -496,7 +514,7 @@
         },
         {
           "step": 20,
-          "coverage": 0.1095
+          "coverage": 0.1094
         },
         {
           "step": 21,
@@ -513,6 +531,16 @@
         {
           "step": 24,
           "coverage": 0.0004
+        }
+      ],
+      "fine": [
+        {
+          "step": 2,
+          "coverage": 0.4152
+        },
+        {
+          "step": 3,
+          "coverage": 0.1459
         }
       ]
     },
@@ -738,7 +766,7 @@
   "numbers": {
     "size": 18,
     "coverage": 99.4,
-    "spacingCoverage": 42,
+    "spacingCoverage": 42.1,
     "sprawl": 5.7,
     "wasteValues": 2,
     "wasteShare": 0
@@ -746,7 +774,7 @@
   "findings": [
     "70 distinct colours render across the pages surveyed. 8 of them account for 99.4% of the colour on the page.",
     "2 colours sit within a just-noticeable difference of a colour already in use and cannot be told apart by eye — together 0% of the colour on the page. The heaviest is #F3F9F9, which is 1.7 from #F4F8FB.",
-    "Spacing follows no consistent step. The closest candidate is 5px and it explains only 42%.",
+    "Spacing follows no consistent step. The closest candidate is 5px and it explains only 42.1%. A 2px step would explain 41.5%, which is not a spacing system.",
     "11 spacing values sit off that step, the most frequent being 1px, which is 1px from the nearest multiple.",
     "7 distinct font sizes are in use across 7 steps. The sizes sit on roughly a 1.188 ratio.",
     "3 of those sizes carry under 1% of the text each, which is the signature of a one-off rather than a step.",

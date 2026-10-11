@@ -356,3 +356,23 @@ test('the disclosed rate is per rendered element, and the loop ratio recovers a 
   const text = tables(rows.map((r) => ({ ...r, model: 'stub', usage: { input: 10, output: 10 }, drift: { palette: 1 } })));
   for (const heading of ['Held-out rate', 'Disclosed-rule violations', 'axe-core', 'Palette drift', 'Cost per page', 'Failures']) assert.match(text, new RegExp(heading));
 });
+
+test('the brief set is the registered full-study design: 36 briefs, three in every stratum', async () => {
+  // Protocol, "Novel briefs": 30 to 40, stratified by register, density and whether a chart is
+  // required. Twelve strata, three each; the pilot's twelve are b01-b12 and the rest fill the gaps.
+  const { readFileSync } = await import('node:fs');
+  const { briefs } = JSON.parse(readFileSync(new URL('../eval/briefs.json', import.meta.url), 'utf8'));
+  assert.equal(briefs.length, 36);
+  assert.deepEqual(briefs.map((b) => b.id), Array.from({ length: 36 }, (_, i) => `b${String(i + 1).padStart(2, '0')}`));
+  const strata = {};
+  for (const b of briefs) {
+    assert.ok(['i', 'ii'].includes(b.register) && ['sparse', 'medium', 'dense'].includes(b.density) && typeof b.chart === 'boolean', b.id);
+    assert.ok(b.brief.length > 80, `${b.id} says what the page is for`);
+    const k = `${b.register}|${b.density}|${b.chart}`;
+    strata[k] = (strata[k] ?? 0) + 1;
+  }
+  assert.equal(Object.keys(strata).length, 12, JSON.stringify(strata));
+  for (const [k, n] of Object.entries(strata)) assert.equal(n, 3, `${k} has ${n}`);
+  // A chart brief asks for a chart in words; a brief without one does not.
+  for (const b of briefs) assert.equal(/\bcharts?\b/i.test(b.brief), b.chart, `${b.id} chart flag matches its text`);
+});

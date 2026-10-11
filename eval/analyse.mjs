@@ -196,7 +196,7 @@ export function toText(s) {
     out.push('be produced must not be counted as a clean one:');
     for (const a of s.perArm.filter((x) => x.failed > 0)) out.push(`  ${a.arm.padEnd(13)} ${a.failed}/${a.attempted}  ${a.failures.join(', ')}`);
   }
-  out.push('', 'Rate ratios (<1 favours the first-named arm; 95% cluster-bootstrap CI over briefs):');
+  out.push('', 'Rate ratios, the arm after the arrow over the arm before it (<1: the arm after the arrow has the lower rate; 95% cluster-bootstrap CI over briefs):');
   for (const [label, rr] of Object.entries(s.primary)) {
     if (!rr) { out.push(`  ${label}: no data`); continue; }
     if (rr.ratio === null) { out.push(`  ${label.padEnd(26)} — (${rr.note})`); continue; }
