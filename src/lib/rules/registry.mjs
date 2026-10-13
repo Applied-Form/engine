@@ -121,6 +121,39 @@ export const RULES = [
   { id: 'spread-figure-voice', group: 'spread', severity: 'error', summary: "A spread's headline figure is set in its archetype's defined voice.", why: 'The figure\'s voice is part of what identifies the archetype.', wcag: [] , fix: "Set the headline figure in the archetype's voice." },
 ];
 
+/**
+ * Whose rule each one is, for judging a page under a system authored elsewhere (a Standards pack).
+ *
+ *   universal  holds for any page: accessibility a pack cannot opt out of.
+ *   system     a parameter a system declares; it applies to a pack only when the pack states that
+ *              parameter (`declares`, a path in the pack's own contract).
+ *   house      Applied Form's own: its registers, voices, floors, composition, spreads and mark.
+ *
+ * Registered in the readiness plan (2026-10-13) before any pack page was linted with it, so the
+ * table cannot drift to fit a result. Applied Form's own pages are judged by every rule, as before.
+ */
+const UNIVERSAL = ['contrast', 'horizontal-overflow', 'status-colour-only', 'focus-hidden', 'hidden-interactive',
+  'target-size', 'alt-missing', 'content-not-dom', 'series-contrast', 'heading-order', 'motion-not-reduced'];
+const SYSTEM = {
+  background: 'colour.ground', 'ground-off-palette': 'colour.ground',
+  'font-off-system': 'type.text', 'data-not-mono': 'type.data',
+  spacing: 'system_values.unit',
+  'radius-present': 'system_values.radius', 'radius-off-scale': 'system_values.radius',
+  'focus-restyled': 'colour.focus',
+  measure: 'system_values.measure',
+};
+for (const r of RULES) {
+  r.scope = UNIVERSAL.includes(r.id) ? 'universal' : SYSTEM[r.id] ? 'system' : 'house';
+  if (SYSTEM[r.id]) r.declares = SYSTEM[r.id];
+}
+
+/** Whether a rule applies to a page judged under a pack that states `declares` (a list of paths). */
+export function appliesToPack(id, declares = []) {
+  const r = RULES.find((x) => x.id === id);
+  if (!r) return true;
+  return r.scope === 'universal' || (r.scope === 'system' && declares.includes(r.declares));
+}
+
 export const RULE_IDS = new Set(RULES.map((r) => r.id));
 
 /** RULES filtered to one severity ('error' | 'advisory'). */

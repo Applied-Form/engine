@@ -13,7 +13,7 @@
  * elevations is held to its own scale exactly as strictly, instead of being told it is wrong
  * for having a design.
  */
-import { absent, radiusScale, elevationScale } from '../tokens.mjs';
+import { absent, radiusScale, elevationScale, pack } from '../tokens.mjs';
 
 const hasClass = (className, name) => (className || '').split(/\s+/).includes(name);
 
@@ -58,7 +58,8 @@ export function checkAbsences(ctx, spec, add) {
         if (!isRangeThumb && a.value !== 0 && !radiusScale.includes(a.value)) {
           add('radius-off-scale', `A corner radius must be one of the declared steps (${radiusScale.join(', ')}px), got ${a.value}px on a ${a.element}`, { absence: a });
         }
-      } else if (!isRangeThumb) {
+      } else if (!isRangeThumb && !(pack && a.circle)) {
+        // A pack that forbids rounded corners can still draw circles (Agitprop's dividers).
         add('radius-present', `No rounded corners anywhere except a range-input thumb, got ${a.value}px on a ${a.element}`, { absence: a });
       }
     }

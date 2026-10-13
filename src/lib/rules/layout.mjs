@@ -5,7 +5,7 @@ export function checkSpacing(ctx, spec, add) {
   for (const s of spec.spacing ?? []) {
     if (s === 0) continue;
     const onScale = spacingScale.includes(s) || (s > Math.max(...spacingScale) && s % spacingUnit === 0);
-    if (!onScale) add('spacing', `${s}px is off the 8px spacing scale`, { value: s });
+    if (!onScale) add('spacing', `${s}px is off the ${spacingUnit}px spacing scale`, { value: s });
   }
 }
 

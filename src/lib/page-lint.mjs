@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url';
 import { dirname, resolve, sep } from 'node:path';
 import { specFromPage } from './page-spec.mjs';
 import { lint, advise } from './rules.mjs';
-import { aspectRatios, registers, grid, layers, composition, recipes, motion, print, fonts, recipeColumns } from './tokens.mjs';
+import { aspectRatios, registers, grid, layers, composition, recipes, motion, print, fonts, recipeColumns, pack } from './tokens.mjs';
 
 /** The engine's own files: its stylesheets, fonts and modules, which a page it renders may load. */
 export const ENGINE_ROOT = fileURLToPath(new URL('../../', import.meta.url));
@@ -115,6 +115,8 @@ const assume = (register) => (register ? (page) => page.addInitScript((r) => {
 
 export async function lintPages(urls, { viewports = VIEWPORTS, browser, register = null, fileRoots = DEFAULT_FILE_ROOTS(), withIds = false } = {}) {
   if (register != null && !Object.hasOwn(registers, register)) throw new Error(`unknown register "${register}"; the tokens define ${Object.keys(registers).join(', ')}`);
+  // A page under a Standards pack needs no register of its own: the pack's is assumed for it.
+  register ??= pack ? 'pack' : null;
   const own = !browser;
   browser ||= await launchBrowser();
   const tag = assume(register);
@@ -123,7 +125,10 @@ export async function lintPages(urls, { viewports = VIEWPORTS, browser, register
   const permittedRatios = aspectRatios.map((r) => r.split(':').map(Number));
   const layersByRegister = Object.fromEntries(Object.entries(registers).map(([k, r]) => [k, [r.layer]]));
   const breakpoints = Object.values(grid.breakpoints);
-  const extractOpts = { register, families: FAMILIES, permittedRatios, layersByRegister, gutter: grid.gutter, breakpoints, layerValues: Object.values(layers), rotations: composition.rotation, recipes, recipeColumns, durations: Object.values(motion.duration) , withIds };
+  // A pack's data voice is for numerals, units, identifiers, headers and labels, never running text,
+  // so a caption is not data under a pack; Applied Form's own convention sets figcaption in it.
+  const dataSelector = pack ? '[data-voice="data"], code, kbd, samp, data, time, th, pre' : undefined;
+  const extractOpts = { register, dataSelector, families: FAMILIES, permittedRatios, layersByRegister, gutter: grid.gutter, breakpoints, layerValues: Object.values(layers), rotations: composition.rotation, recipes, recipeColumns, durations: Object.values(motion.duration) , withIds };
   const results = [];
   try {
     for (const url of urls) {

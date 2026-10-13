@@ -11,7 +11,7 @@ export function checkGrounds(ctx, spec, add) {
     } else if (isII) {
       add('ground-in-ii', 'Full-bleed colour grounds are forbidden in Register II', { color: g });
     } else if (!palette.grounds.some((p) => eq(p, g))) {
-      add('ground-off-palette', `Ground ${g} is not one of the Register I grounds`, { color: g });
+      add('ground-off-palette', `Ground ${g} is not one of ${ctx.reg === 'pack' ? "the pack's declared grounds" : 'the Register I grounds'}`, { color: g });
     }
   }
 }
