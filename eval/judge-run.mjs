@@ -89,9 +89,13 @@ export function parseChoice(text) {
 
 /** Where a record's page is now: as recorded, or beside the JSONL if the run moved as an artifact. */
 function locate(record, jsonl) {
-  if (record.file && existsSync(record.file)) return record.file;
-  const beside = resolve(dirname(jsonl), 'pages', basename(record.file ?? ''));
-  return existsSync(beside) ? beside : null;
+  if (!record.file) return null;
+  // The copy beside the record first: it belongs to this round. The recorded path is the generating
+  // runner's, and where runners share a machine it can exist at the start of a round and be cleaned
+  // by another job before the round reaches it.
+  const beside = resolve(dirname(jsonl), 'pages', basename(record.file));
+  if (existsSync(beside)) return beside;
+  return existsSync(record.file) ? record.file : null;
 }
 
 const keyOf = (r) => `${r.brief}|${r.model}|${r.arm}|${r.sample ?? 0}`;

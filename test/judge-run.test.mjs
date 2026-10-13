@@ -165,3 +165,21 @@ test('an attention check is cut where the judge can see it', async () => {
     rmSync(dir, { recursive: true });
   } finally { await browser.close(); }
 });
+
+test('a page is judged from the copy beside its record, not from a path another job may clean', async () => {
+  // Three runners share one machine. A record names its page by the absolute path of the runner that
+  // generated it; when the round runs on another runner, that path can still exist when the round
+  // starts and be gone seconds later, cleaned by the next job there (run 38129043148). The copy
+  // restored beside the record belongs to this round, so it is the one used.
+  const { cpSync } = await import('node:fs');
+  const { jsonl, dir } = tinyRun();
+  const moved = mkdtempSync(join(tmpdir(), 'af-judge-moved-'));
+  cpSync(join(dir, 'pages'), join(moved, 'pages'), { recursive: true });
+  cpSync(jsonl, join(moved, 'tiny.jsonl'));
+  const { files, missing } = prepare(join(moved, 'tiny.jsonl'));
+  assert.equal(missing, 0);
+  const pages = [...files.values()].filter((f) => f.includes(`${'/'}pages${'/'}`));
+  assert.ok(pages.length > 0);
+  for (const f of pages) assert.ok(f.startsWith(moved), `${f} is outside the round's own copy`);
+  rmSync(dir, { recursive: true }); rmSync(moved, { recursive: true });
+});

@@ -18,8 +18,18 @@ import { load, rateRatio, scoreable } from './analyse.mjs';
 
 export const ARMS = ['none', 'prose', 'tokens', 'components', 'rules-read', 'rules-compiled', 'rules-run', 'rules-run-primed'];
 
-/** List prices per million tokens (input, output), as of the pilot. Cost is reported, never scored. */
-export const PRICE = { 'haiku-4-5': [1, 5], 'sonnet-5': [2, 10], 'opus-5': [5, 25] };
+/**
+ * List prices per million tokens (input, output). Cost is reported, never scored.
+ *
+ * The GPT rows are the published OpenAI list prices, not the rate Azure bills this subscription,
+ * and are marked as assumed wherever they are quoted. Until they were added, every report of a GPT
+ * model fell back to [1, 1] — a flat token count presented as a cost ratio against a bar that reads
+ * "cost per page".
+ */
+export const PRICE = {
+  'haiku-4-5': [1, 5], 'sonnet-5': [2, 10], 'opus-5': [5, 25],
+  'gpt-5': [1.25, 10], 'gpt-5-mini': [0.25, 2],
+};
 
 const mulberry = (seed) => () => {
   seed |= 0; seed = (seed + 0x6D2B79F5) | 0;

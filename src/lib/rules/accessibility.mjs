@@ -24,8 +24,14 @@ export function checkAltMissing(ctx, spec, add) {
     // beside a heading. It is not an acceptable answer for a figure whose content is words: an
     // SVG full of text is read by the eye and by nothing else, and hiding it hides the content
     // rather than describing it. The research report proposed this as an attack; it landed.
+    // This read `img.kind`, i.e. `data-figure`, until 2026-10-12. That attribute is named in the
+    // engine's markup contract, which its own arms are shown and the study's arms never are — so a
+    // disclosed instruction decided whether this scored, held-out rule could fire at all, which the
+    // held-out design forbids. An svg is judged on what it is: unnamed and unhidden is a graphic
+    // only the eye can read, declared or not, and `aria-hidden` remains the answer for one that
+    // carries no information. Measured over the 288 engine6 pages, dropping the gate moves one page.
     const carriesWords = (img.textLength ?? 0) > 24;
-    if (img.tag === 'svg' && ['plot', 'form'].includes(img.kind) && img.hasAriaLabel === false && img.hasTitle === false
+    if (img.tag === 'svg' && img.hasAriaLabel === false && img.hasTitle === false
         && (img.ariaHidden !== true || carriesWords)) {
       add('alt-missing', carriesWords
         ? `A figure svg carrying ${img.textLength} characters of text needs aria-label or a <title>; aria-hidden hides the content rather than describing it`

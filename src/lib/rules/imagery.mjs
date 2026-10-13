@@ -29,6 +29,11 @@ export function checkImagery(ctx, spec, add) {
     if (isII && !['form', 'plot'].includes(img.kind)) {
       add('decorative-imagery', 'Register II permits only a generative Form or a data plot as a figure', { imagery: img });
     }
+    // A declaration is not a plot. An SVG that draws no geometry is decorative whatever it says it
+    // is, the way a form must actually be an SVG (mark-not-svg).
+    if (isII && img.kind === 'plot' && img.tag === 'svg' && img.hasGeometry === false) {
+      add('decorative-imagery', 'A figure declared data-figure="plot" draws no data; a plot contains geometry', { imagery: img });
+    }
     if (img.kind === 'plot' && !img.generated) add('figure-hand-drawn', 'A plot is produced by a generator and carries data-generated', { imagery: img });
     if (img.kind === 'form') {
       forms++;

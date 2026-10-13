@@ -113,7 +113,7 @@ const assume = (register) => (register ? (page) => page.addInitScript((r) => {
   }, { once: true, capture: true });
 }, register) : async () => {});
 
-export async function lintPages(urls, { viewports = VIEWPORTS, browser, register = null, fileRoots = DEFAULT_FILE_ROOTS() } = {}) {
+export async function lintPages(urls, { viewports = VIEWPORTS, browser, register = null, fileRoots = DEFAULT_FILE_ROOTS(), withIds = false } = {}) {
   if (register != null && !Object.hasOwn(registers, register)) throw new Error(`unknown register "${register}"; the tokens define ${Object.keys(registers).join(', ')}`);
   const own = !browser;
   browser ||= await launchBrowser();
@@ -123,7 +123,7 @@ export async function lintPages(urls, { viewports = VIEWPORTS, browser, register
   const permittedRatios = aspectRatios.map((r) => r.split(':').map(Number));
   const layersByRegister = Object.fromEntries(Object.entries(registers).map(([k, r]) => [k, [r.layer]]));
   const breakpoints = Object.values(grid.breakpoints);
-  const extractOpts = { register, families: FAMILIES, permittedRatios, layersByRegister, gutter: grid.gutter, breakpoints, layerValues: Object.values(layers), rotations: composition.rotation, recipes, recipeColumns, durations: Object.values(motion.duration) };
+  const extractOpts = { register, families: FAMILIES, permittedRatios, layersByRegister, gutter: grid.gutter, breakpoints, layerValues: Object.values(layers), rotations: composition.rotation, recipes, recipeColumns, durations: Object.values(motion.duration) , withIds };
   const results = [];
   try {
     for (const url of urls) {

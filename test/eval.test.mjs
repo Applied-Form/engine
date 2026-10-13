@@ -376,3 +376,16 @@ test('the brief set is the registered full-study design: 36 briefs, three in eve
   // A chart brief asks for a chart in words; a brief without one does not.
   for (const b of briefs) assert.equal(/\bcharts?\b/i.test(b.brief), b.chart, `${b.id} chart flag matches its text`);
 });
+
+test('the development briefs cover every stratum once and share nothing with the benchmark', async () => {
+  const { readFileSync } = await import('node:fs');
+  const read = (f) => JSON.parse(readFileSync(new URL(`../eval/${f}`, import.meta.url), 'utf8')).briefs;
+  const dev = read('dev-briefs.json'), bench = read('briefs.json');
+  assert.equal(dev.length, 12);
+  assert.deepEqual(dev.map((b) => b.id), Array.from({ length: 12 }, (_, i) => `d${String(i + 1).padStart(2, '0')}`));
+  const strata = new Set(dev.map((b) => `${b.register}|${b.density}|${b.chart}`));
+  assert.equal(strata.size, 12);
+  for (const b of dev) assert.equal(/\bcharts?\b/i.test(b.brief), b.chart, b.id);
+  const benchText = new Set(bench.map((b) => b.brief));
+  for (const b of dev) assert.ok(!benchText.has(b.brief), `${b.id} is not a benchmark brief`);
+});

@@ -114,6 +114,7 @@ export function routeIdentity(keys, env = process.env) {
     openrouter: env.OPENROUTER_BASE_URL ?? 'https://openrouter.ai/api/v1',
     azure: env.AZURE_OPENAI_ENDPOINT ?? '',
     google: 'https://generativelanguage.googleapis.com/v1beta',
+    native: 'native-cli',
   })[route] ?? '';
   const lines = [...new Set(keys)].sort().map((k) => { const m = resolveModel(k); return `${k}|${m.route}|${m.id}|${endpoint(m.route).replace(/\/$/, '')}`; });
   return createHash('sha256').update(lines.join('\n')).digest('hex').slice(0, 16);
@@ -236,6 +237,47 @@ async function google(messages, model, { system, fetchImpl = fetch }) {
 }
 
 /** Deterministic fake output, varied enough that the scorer and the analysis have something to do. */
+/**
+ * A native subscription client driven from the command line (Claude Code, Codex, Antigravity).
+ * For building and development runs only: a client adds its own system prompt and agent behaviour,
+ * so its output is labelled `native` and never stands in for an API result.
+ */
+const NATIVE_DEFAULTS = { 'claude-code': ['claude', '-p', '--output-format', 'json'] };
+export function nativeCommand(client, env = process.env) {
+  const custom = env[`AF_NATIVE_${client.replace(/[^A-Za-z0-9]/g, '_').toUpperCase()}`];
+  return custom ? JSON.parse(custom) : NATIVE_DEFAULTS[client] ?? null;
+}
+async function native(messages, model, { system }) {
+  const { spawn } = await import('node:child_process');
+  const cmd = nativeCommand(model.id);
+  if (!cmd) throw new Error(`no native client "${model.id}"; set AF_NATIVE_${model.id.replace(/[^A-Za-z0-9]/g, '_').toUpperCase()} to a JSON argv`);
+  const prompt = [system, ...messages.map((m) => `${m.role.toUpperCase()}:\n${m.content}`)].filter(Boolean).join('\n\n---\n\n');
+  // Asynchronous: other cells share this process and its browser, and a blocking call stalls their page loads.
+  const r = await new Promise((done) => {
+    const child = spawn(cmd[0], cmd.slice(1), { stdio: ['pipe', 'pipe', 'pipe'] });
+    let stdout = '', stderr = '', error = null;
+    const timer = setTimeout(() => { error = new Error('timed out after 15 minutes'); child.kill('SIGKILL'); }, 15 * 60 * 1000);
+    child.stdout.on('data', (d) => { stdout += d; });
+    child.stderr.on('data', (d) => { stderr += d; });
+    child.on('error', (e) => { error = e; });
+    child.on('close', (status) => { clearTimeout(timer); done({ status, stdout, stderr, error }); });
+    child.stdin.end(prompt);
+  });
+  if (r.error || r.status !== 0) throw new Error(`native ${model.id} ${r.error ? `failed: ${r.error.message}` : `exited ${r.status}`}: ${(r.stderr || r.stdout || '').slice(0, 300)}`);
+  let text = r.stdout, usage = { input: 0, output: 0 };
+  try {
+    // Claude Code prints an array of messages whose last is { type: 'result' }; other clients print one object.
+    const parsed = JSON.parse(r.stdout);
+    const j = Array.isArray(parsed) ? parsed.findLast((m) => m.type === 'result') ?? {} : parsed;
+    if (j.is_error) throw new Error(`native ${model.id}: ${String(j.result ?? 'error').slice(0, 300)}`);
+    text = j.result ?? j.text ?? r.stdout;
+    usage = { input: j.usage?.input_tokens ?? 0, output: j.usage?.output_tokens ?? 0 };
+  } catch (e) {
+    if (String(e.message).startsWith(`native ${model.id}`)) throw e;
+  }
+  return { text, usage, stop: 'end_turn' };
+}
+
 async function stub(messages, model) {
   const seed = messages[0].content.length % 3;
   const sloppy = seed !== 0;
@@ -273,6 +315,7 @@ export const ROUTES = {
   openrouter: chatCompletions('openrouter'),
   azure: chatCompletions('azure'),
   google,
+  native,
   stub,
 };
 
@@ -353,6 +396,7 @@ export function credentialled(route, env = process.env) {
     case 'azure': return !!(env.AZURE_OPENAI_API_KEY && env.AZURE_OPENAI_ENDPOINT);
     case 'google': return !!(env.GOOGLE_API_KEY || env.GEMINI_API_KEY);
     case 'stub': return true;
+    case 'native': return true;
     default: return false;
   }
 }
