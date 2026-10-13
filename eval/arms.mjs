@@ -22,7 +22,9 @@
  */
 import { readFileSync } from 'node:fs';
 import { RULES } from '../src/lib/rules/registry.mjs';
-import { split, disclosedRuleText, WITHHELD_GROUPS } from './split.mjs';
+import { split, disclosedRuleText, WITHHELD_GROUPS, UNIVERSAL_WITHHELD, partition } from './split.mjs';
+import { SCORE_VIEWPORTS } from './score.mjs';
+import { FIXABLE } from '../src/lib/fix/plan.mjs';
 
 export const ARMS = ['none', 'prose', 'tokens', 'components', 'rules-read', 'rules-compiled', 'rules-run', 'rules-run-primed'];
 
@@ -150,6 +152,43 @@ export function compiledRuleContext(withheld = WITHHELD_GROUPS, budget = CONSTRA
 }
 
 /** Assemble the context for an arm. `assets` carries the file paths the arms read from. */
+/**
+ * The attributes the checker reads, stated to the engine's own arms.
+ *
+ * The study arms never see this: it is a product decision, not a study one. It is meant to name only
+ * attributes that gate *disclosed* rules. `data-status`/`data-shape` gate `status-colour-only`
+ * (interaction) and `data-grid` gates `grid-off-column` (layout); both groups are withheld, so
+ * naming them would hand the model a trigger for a rule it is scored on.
+ *
+ * KNOWN BREACH of that rule, found 2026-10-12 and registered rather than quietly changed.
+ * `data-figure` gates `alt-missing`, which IS scored and held out: it fires only on an svg whose
+ * `kind` is `plot` or `form` (src/lib/rules/accessibility.mjs:28), and `kind` is read from this
+ * attribute (src/lib/page-spec.mjs). So naming it below decides whether a held-out rule can fire at
+ * all — on engine5 nothing declared `plot`/`form` on the svg and the rule could never fire; on
+ * engine6, after this contract moved the attribute onto the svg, 124 of 134 figures became eligible.
+ * The channel pushes the held-out ratio UP (alt-missing is 0/126 in rules-read, so eligibility can
+ * only add blind violations), which means it masked rather than caused engine6's 0.88 — but it is a
+ * disclosed instruction reaching a scored rule, which is the thing this comment claims cannot happen.
+ * `test/contract-discloses-nothing-withheld.test.mjs` holds the invariant and is `todo` until fixed.
+ *
+ * Declaring an attribute is not the same as earning it: `data-figure="plot"` is honoured only on a
+ * figure that actually draws geometry (src/lib/rules/imagery.mjs), so this discloses a contract
+ * rather than a way past the checker.
+ */
+export function markupContract() {
+  return [
+    '# The markup contract',
+    '',
+    'The checker reads these attributes. They describe what a thing *is*; it still has to be that thing.',
+    '',
+    '- `data-register="i"|"ii"` on the root, above `body`. One per document.',
+    '- `data-masthead` on the ink masthead, the one coloured surface Register II permits.',
+    '- `data-voice="data"` on a numeral, unit, label, ID or status (also `code`, `th`, `figcaption`). Set in the data voice; exempt from the body minimum and the measure.',
+    '- `data-figure="form"|"plot"` on the `<svg>` itself, not on a wrapping `<figure>`. Any other figure is decorative, which Register II does not permit. A `plot` is an SVG that draws its data and carries `data-generated` naming what generated it (for example `data-generated="line-chart"`); an empty or hand-drawn one is still decorative.',
+    '- `data-chart` with `data-labelled="direct"` on a chart whose series are labelled directly rather than by a legend.',
+  ].join('\n');
+}
+
 export function contextFor(arm, assets) {
   switch (arm) {
     case 'none': return '';
@@ -160,6 +199,9 @@ export function contextFor(arm, assets) {
     case 'rules-run':
     case 'rules-run-primed': return `${tokenContext(assets.tokenFile)}\n\n${ruleContext()}`;
     case 'rules-compiled': return `${tokenContext(assets.tokenFile)}\n\n${compiledRuleContext()}`;
+    // The engine's own arms: the study context plus the markup contract the product ships.
+    case 'pipeline':
+    case 'pipeline-blind': return `${tokenContext(assets.tokenFile)}\n\n${ruleContext()}\n\n${markupContract()}`;
     default: throw new Error(`unknown arm: ${arm}`);
   }
 }
@@ -175,6 +217,45 @@ export function promptFor(brief, arm, assets) {
 /** What arm F is told after a failing lint. Richness of this text is itself an ablation. */
 /** The arms that run the linter and repair. Everything else is one shot. */
 export const REPAIR_ARMS = new Set(['rules-run', 'rules-run-primed']);
+
+/** The engine's pipeline, measured under the study's conditions. Opt-in: not part of ARMS. */
+export const PIPELINE_ARMS = new Set(['pipeline', 'pipeline-blind']);
+
+/**
+ * What the blind arm's fixer may touch, derived by *group* rather than by the ten scored rules.
+ *
+ * Excluding only `UNIVERSAL_WITHHELD` left a back door: a disclosed rule in a withheld group can
+ * carry a scored rule with it. `outline: none` makes the extractor report one focus style as both
+ * invisible (`focus-hidden`, scored) and off-colour (`focus-restyled`, disclosed), and the shared
+ * patch cured both — which is how a blind run reached a `focus-hidden` rate of 0.0075 against a
+ * 0.80 baseline. The split is by group everywhere else for the same reason (eval/split.mjs).
+ */
+const WITHHELD_RULES = new Set(split().withheld);
+
+/**
+ * Disclosed rules the blind arm still may not fix, because fixing them moves a rule it is scored
+ * on. Capping a block at the measure is a layout change, and layout is withheld.
+ */
+export const BLIND_EXCLUDED = ['measure'];
+export const BLIND_FIXABLE = FIXABLE.filter((r) => !WITHHELD_RULES.has(r) && !BLIND_EXCLUDED.includes(r));
+
+/** What the blind arm's fixer may judge itself on: the rules it is allowed to see at all. */
+export const blindJudge = (rule) => !WITHHELD_RULES.has(rule);
+
+/**
+ * How the eval runs the pipeline for an arm: the fixer's rules, what it judges itself on, what the
+ * model is shown, and the widths the gate checks — the scorer's, so a gate pass means what the
+ * score means.
+ */
+export function pipelineOptions(arm) {
+  const blind = arm === 'pipeline-blind';
+  return {
+    allow: blind ? BLIND_FIXABLE : FIXABLE,
+    judge: blind ? blindJudge : () => true,
+    visible: blind ? (vs) => partition(vs).disclosed : (vs) => vs,
+    viewports: SCORE_VIEWPORTS,
+  };
+}
 
 export function repairPrompt(violations, richness = 'full', intent = null) {
   if (!violations.length) return null;

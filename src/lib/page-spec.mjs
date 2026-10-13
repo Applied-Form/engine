@@ -12,6 +12,12 @@
  */
 
 /** Runs inside the page. Must stay self-contained: no imports, no closures. */
+/** Number every element in document order, so a violation can name the element it came from. Deterministic: the same document gives the same ids on every load. */
+export function stampIds() {
+  let i = 0;
+  for (const el of document.querySelectorAll('*')) el.setAttribute('data-af-id', String(i++));
+}
+
 export function extract(opts) {
   const { permittedRatios = [], families = {}, layersByRegister = {}, gutter = 32, breakpoints = [], layerValues = [], rotations = [0], recipes = {}, recipeColumns = null, durations = [], register: explicitRegister = null } = opts || {};
   const roots = [...document.querySelectorAll('[data-register]')];
@@ -51,7 +57,14 @@ export function extract(opts) {
   const toHex = (rgb) => { const c = parse(rgb); return c ? hexOf(c) : null; };
   const gradientStops = (bgImage) => (bgImage && /gradient\(/.test(bgImage) ? [...bgImage.matchAll(/rgba?\([^)]*\)/g)].map((m) => toHex(m[0])).filter(Boolean) : []);
   const effectiveOpacity = (el) => { let o = 1; for (let e = el; e; e = e.parentElement) o *= Number(cs(e).opacity); return o; };
-  const rootBg = toHex(cs(root).backgroundColor);
+  // CSS propagates <body>'s background to the canvas when the element above it declares none, so
+  // `body{background:X}` paints the same pixels as `html,body{background:X}`. Reading the register
+  // root alone saw transparent here and then reported <body> as a full-bleed ground of an
+  // unexpected colour — failing a page for its selector list rather than its design, and in
+  // Register II, where any ground is forbidden, failing it outright.
+  const rootBg = toHex(cs(root).backgroundColor)
+    ?? toHex(cs(document.body).backgroundColor)
+    ?? toHex(cs(document.documentElement).backgroundColor);
 
   // ---------------------------------------------------------------- type
   const firstFamily = (ff) => ff.split(',')[0].trim().replace(/^["']|["']$/g, '');
@@ -131,6 +144,44 @@ export function extract(opts) {
     for (let e = el; e; e = e.parentElement) { const c = parse(cs(e).backgroundColor); if (c && c.a >= 1) return hexOf(c); }
     return null;
   };
+  // Whether the ground bgOf reports is the one the reader sees behind the text. It is not when it was
+  // taken from something painted over the text (a sticky bar), when the text is missing from its own hit
+  // stack (clipped or off the viewport), when an image or an SVG shape lies between them, when nothing
+  // opaque does and the ancestor fallback is not the canvas colour, when an ancestor paints its ground with
+  // ::before/::after, which hit-testing cannot see, or when an ancestor is translucent (mid-fade). A fix aimed
+  // at such a ground makes the page worse, so the fixer leaves it to the model. Reuses bgOf's cached stack;
+  // pseudo-elements are read only here.
+  const canvasCol = parse(cs(document.documentElement).backgroundColor) ?? (document.body && parse(cs(document.body).backgroundColor));
+  const canvasBg = canvasCol && canvasCol.a >= 1 ? hexOf(canvasCol) : null;
+  const pseudoCache = new Map();
+  const paintsPseudo = (e) => {
+    if (!pseudoCache.has(e)) {
+      pseudoCache.set(e, ['::before', '::after'].some((p) => {
+        const ps = getComputedStyle(e, p);
+        return ps.content !== 'none' && ps.content !== 'normal' && (!!parse(ps.backgroundColor) || gradientStops(ps.backgroundImage).length > 0);
+      }));
+    }
+    return pseudoCache.get(e);
+  };
+  const groundTrusted = (el, ground) => {
+    if (effectiveOpacity(el) < Number(cs(el).opacity)) return false;
+    if (parse(cs(el).backgroundColor)?.a >= 1 || gradientStops(cs(el).backgroundImage).length) return true;
+    const stack = stackAt(el);
+    const i = stack.indexOf(el);
+    if (i < 0) return false;
+    let beneath = false;
+    for (const [j, e] of stack.entries()) {
+      if (e === el || el.contains(e)) continue;
+      if (j > i && (e instanceof SVGGeometryElement || /^(img|video|canvas|picture)$/i.test(e.tagName) || /url\(/.test(cs(e).backgroundImage))) return false;
+      if (!(parse(cs(e).backgroundColor)?.a >= 1 || gradientStops(cs(e).backgroundImage).length)) continue;
+      if (j < i) return false;
+      beneath = true;
+      break;
+    }
+    if (!beneath && ground !== canvasBg) return false;
+    for (let a = el; a; a = a.parentElement) if (paintsPseudo(a)) return false;
+    return true;
+  };
 
   // ---------------------------------------------------------------- grid geometry
   const breakpoint = [...breakpoints].reverse().find((b) => vw >= b.minWidth) ?? breakpoints[0];
@@ -171,7 +222,21 @@ export function extract(opts) {
   const text = [], grounds = [], ratios = [], imagery = [], statuses = [], links = [], charts = [], offGrid = [], targets = [], absences = [];
   const spacing = new Set();
   const composition = { zIndex: [], rotation: [], offsets: [], bleeds: [], panels: [], formOverType: [], recipe: [], motion: [] };
-  const item = (el, extra) => ({ element: el.tagName.toLowerCase(), className: typeof el.className === 'string' ? el.className : '', ...extra });
+  const withIds = !!opts.withIds;
+  // A structural selector for the element, computed in the same load that stamped its id, so a fix
+  // addresses exactly what the checker measured without opening the page again.
+  const selOf = (el) => {
+    const parts = [];
+    for (let n = el; n && n.nodeType === 1 && n !== document.documentElement; n = n.parentElement) {
+      let i = 1;
+      for (let s = n.previousElementSibling; s; s = s.previousElementSibling) if (s.tagName === n.tagName) i++;
+      parts.unshift(`${n.tagName.toLowerCase()}:nth-of-type(${i})`);
+    }
+    return ['html', ...parts].join(' > ');
+  };
+  const tagged = (el, extra = {}) => (withIds ? { afId: el.getAttribute('data-af-id'), sel: selOf(el), ...extra } : {});
+  const item = (el, extra) => ({ element: el.tagName.toLowerCase(), className: typeof el.className === 'string' ? el.className : '', ...tagged(el), ...extra });
+  const spacingSources = [], ratioSources = [];
 
   for (const el of elements) {
     const s = cs(el);
@@ -188,15 +253,23 @@ export function extract(opts) {
     for (const prop of ['marginTop', 'marginRight', 'marginBottom', 'marginLeft', 'paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft', 'rowGap', 'columnGap']) {
       if ((centred || inFlexOrGrid) && (prop === 'marginLeft' || prop === 'marginRight')) continue;
       const v = parseFloat(s[prop]);
-      if (Number.isFinite(v) && v !== 0) spacing.add(Math.round(Math.abs(v)));
+      if (Number.isFinite(v) && v !== 0) {
+        spacing.add(Math.round(Math.abs(v)));
+        if (withIds) spacingSources.push({ value: Math.round(Math.abs(v)), raw: Math.round(v), prop, ...tagged(el) });
+      }
     }
 
-    // Grounds: opaque surfaces spanning the viewport, other than the register's background and layer. The masthead is exempt.
-    const bg = toHex(s.backgroundColor);
-    const wide = rect.width >= vw * 0.9 && rect.height >= 48 && !isMasthead(el);
-    if (wide) {
-      if (bg && bg !== rootBg && !layerColors.includes(bg)) grounds.push(bg);
-      for (const stop of gradientStops(s.backgroundImage)) if (stop !== rootBg && !layerColors.includes(stop)) grounds.push(stop);
+    // Grounds: surfaces that bleed to both edges of the viewport, other than the register's background and layer.
+    // The masthead is exempt. "Wide" was 90% of the viewport, which at 320px is exactly a card inside the ordinary
+    // 16px margin, so cards that are cards at 1280px became grounds at 320px. Translucent paint is judged by what it
+    // renders as, composited over the nearest opaque surface beneath it, not by its raw rgb.
+    const bleeds = rect.left <= 1 && rect.right >= vw - 1 && rect.height >= 48 && !isMasthead(el);
+    if (bleeds) {
+      let beneath = rootBg ?? '#FFFFFF'; // an unpainted canvas is white
+      for (let e = parent; e; e = e.parentElement) { const c = parse(cs(e).backgroundColor); if (c && c.a >= 1) { beneath = hexOf(c); break; } }
+      const fill = composite(parse(s.backgroundColor), beneath);
+      const stops = /gradient\(/.test(s.backgroundImage) ? [...s.backgroundImage.matchAll(/rgba?\([^)]*\)/g)].map((m) => composite(parse(m[0]), fill ?? beneath)) : [];
+      for (const g of [fill, ...stops]) if (g && g !== rootBg && !layerColors.includes(g)) grounds.push(g);
     }
 
     // Text: elements with their own text nodes, HTML and SVG alike.
@@ -220,6 +293,13 @@ export function extract(opts) {
         isDisabled: !!el.closest('[disabled], [aria-disabled="true"], .af-disabled, fieldset[disabled]'),
         isInteractive: !!el.closest('a[href], button, [role="button"], input, select, textarea, summary'),
         sample: own.trim().slice(0, 40),
+        ...tagged(el, { cssPx: parseFloat(s.fontSize) }),
+        // What a contrast fix needs: SVG paints text with fill, the element's own opacity dims its colour,
+        // and a ground the checker cannot vouch for is not one to recolour against.
+        ...(withIds ? { isSvgText, opacitySelf: Number(s.opacity), groundTrusted: groundTrusted(el, ground) } : {}),
+        // The block is what sets the line length, so a measure fix has to address it rather than
+        // the run inside it; its display and contents say whether capping its width is safe.
+        ...(withIds ? { block: { ...tagged(block), display: cs(block).display, hasLayoutChild: !!block.querySelector('img, svg, video, canvas, table, iframe, figure') } } : {}),
       });
       // Type is always above Form: if a mark comes before this run in the hit stack, the run is behind it.
       if (!el.closest('.af-mark')) {
@@ -256,12 +336,16 @@ export function extract(opts) {
         const r = rect.width / rect.height;
         const snapped = permittedRatios.find(([w, h]) => Math.abs(r - w / h) / (w / h) < 0.01);
         ratios.push(snapped ? `${snapped[0]}:${snapped[1]}` : `${Math.round(rect.width)}:${Math.round(rect.height)}`);
+        if (withIds) ratioSources.push({ value: ratios[ratios.length - 1], w: Math.round(rect.width), h: Math.round(rect.height), ...tagged(el) });
         const inMark = !!el.closest('.af-mark');
         imagery.push({
           kind: el.getAttribute('data-figure') ?? (inMark ? 'form' : 'decorative'), tag, sizePx: Math.round(Math.min(rect.width, rect.height)),
           generated: generated ?? (inMark ? 'form' : null), sample: el.getAttribute('aria-label') ?? el.getAttribute('alt') ?? '',
+          // Whether an SVG actually draws anything, so a declared plot can be required to be one.
+          hasGeometry: tag === 'svg' ? !!el.querySelector('path, rect, circle, ellipse, line, polyline, polygon, use, image') : undefined,
           hasAlt: tag === 'img' ? el.hasAttribute('alt') : undefined,
-          hasAriaLabel: tag === 'svg' ? el.hasAttribute('aria-label') : undefined,
+          // An ARIA name: aria-label, or aria-labelledby that resolves to text (a chart's printed title).
+          hasAriaLabel: tag === 'svg' ? el.hasAttribute('aria-label') || (el.getAttribute('aria-labelledby') ?? '').split(/\s+/).some((id) => id && document.getElementById(id)?.textContent.trim()) : undefined,
           hasTitle: tag === 'svg' ? !!el.querySelector(':scope > title') : undefined,
           ariaHidden: el.getAttribute('aria-hidden') === 'true',
           areaFraction,
@@ -292,7 +376,7 @@ export function extract(opts) {
         }
         return false;
       });
-      links.push({ color: toHex(s.color), background: bgOf(el), underlined, sample: el.textContent.trim().slice(0, 40) });
+      links.push({ color: toHex(s.color), background: bgOf(el), underlined, sample: el.textContent.trim().slice(0, 40), ...tagged(el) });
     }
 
     // Charts.
@@ -313,21 +397,22 @@ export function extract(opts) {
         // An interactive element inside an aria-hidden subtree is reachable by keyboard and
         // absent from the accessibility tree, which is worse than either alone.
         ariaHidden: !!el.closest('[aria-hidden="true"]'),
+        ...tagged(el, { display: s.display }),
       });
     }
 
     // Absences: no box-shadow, no gradient fill, no radius, save for the named exemptions the rule applies.
     const className = typeof el.className === 'string' ? el.className : '';
     if (s.boxShadow && s.boxShadow !== 'none') {
-      absences.push({ kind: 'shadow', element: tag, className, value: s.boxShadow, ariaCurrent: el.getAttribute('aria-current') });
+      absences.push({ kind: 'shadow', element: tag, className, value: s.boxShadow, ariaCurrent: el.getAttribute('aria-current'), ...tagged(el) });
     }
     if (/gradient\(/.test(s.backgroundImage)) {
       const clip = s.webkitBackgroundClip || s.backgroundClip || '';
-      absences.push({ kind: 'gradient', element: tag, className, textClip: /text/.test(clip), wide: rect.width >= vw * 0.9 });
+      absences.push({ kind: 'gradient', element: tag, className, textClip: /text/.test(clip), wide: rect.width >= vw * 0.9, ...tagged(el) });
     }
     const radius = parseFloat(s.borderTopLeftRadius) || 0;
     if (radius > 0) {
-      absences.push({ kind: 'radius', element: tag, className, value: Math.round(radius), inputType: tag === 'input' ? el.type : null });
+      absences.push({ kind: 'radius', element: tag, className, value: Math.round(radius), inputType: tag === 'input' ? el.type : null, ...tagged(el) });
     }
 
     // Composition: motion durations, layers, rotation, offsets, bleeds, panels.
@@ -437,6 +522,33 @@ export function extract(opts) {
     spreads.push(entry);
   }
 
+  // Overflow clipped at the root is still overflow: content past the edge is cut off rather than
+  // scrolled to, a worse reflow failure than a scrollbar. `html,body{overflow-x:hidden}` made
+  // scrollWidth equal clientWidth and hid it, so measure with root clipping lifted, then put it back.
+  // The boxes that stick out are recorded too: "the page scrolls at 320px" alone sent whole-page
+  // repairs after the wrong elements, and gpt-5-mini's still overflowed 52% of the time (engine5).
+  // A culprit overflows while its parent fits; a box inside its own scroller is not one.
+  const [overflowX, overflowCulprits] = (() => {
+    const de = document.documentElement;
+    const measure = () => Math.max(0, de.scrollWidth - de.clientWidth);
+    const culprits = () => {
+      const edge = de.clientWidth + 0.5;
+      const over = (e) => e.getBoundingClientRect().right > edge;
+      const scrolls = (e) => { for (let a = e.parentElement; a && a !== document.body; a = a.parentElement) if (cs(a).overflowX !== 'visible' && !over(a)) return true; return false; };
+      return [...document.body.querySelectorAll('*')]
+        .filter((e) => !(e instanceof SVGElement && e.localName !== 'svg') && over(e) && (!e.parentElement || !over(e.parentElement) || e.parentElement === document.body) && !scrolls(e))
+        .map((e) => { const r = e.getBoundingClientRect(); return { tag: e.localName, cls: (e.getAttribute('class') ?? '').trim().split(/\s+/)[0], width: Math.round(r.width), right: Math.round(r.right), sample: (e.textContent ?? '').trim().replace(/\s+/g, ' ').slice(0, 40), ...tagged(e) }; })
+        .sort((a, b) => b.right - a.right).slice(0, 3);
+    };
+    const clipped = [de, document.body].filter((e) => e && /hidden|clip/.test(getComputedStyle(e).overflowX + getComputedStyle(e).overflowY));
+    const saved = clipped.map((e) => [e, e.getAttribute('style')]);
+    for (const e of clipped) e.style.setProperty('overflow', 'visible', 'important');
+    const n = measure();
+    const found = n > 0 ? culprits() : [];
+    for (const [e, style] of saved) (style == null ? e.removeAttribute('style') : e.setAttribute('style', style));
+    return [n, found];
+  })();
+
   return {
     register, theme, spreads, offGrid, composition,
     headings: [...root.querySelectorAll('h1, h2, h3, h4, h5, h6')].filter((h) => cs(h).display !== 'none').map((h) => ({ level: Number(h.tagName[1]), sample: h.textContent.trim().slice(0, 40) })),
@@ -444,13 +556,19 @@ export function extract(opts) {
     hasProvenance: !!root.querySelector('.af-provenance'),
     animations: document.getAnimations().length,
     mixedRegisters,
-    overflowX: Math.max(0, document.documentElement.scrollWidth - document.documentElement.clientWidth),
+    overflowX, overflowCulprits,
     viewport: vw,
     background: rootBg,
     grounds: [...new Set(grounds)],
     text,
     spacing: [...spacing].sort((a, b) => a - b),
-    aspectRatios: [...new Set(ratios)],
+    ...(withIds ? { spacingSources, ratioSources } : {}),
+    // One entry per figure, not per distinct ratio. The scorer's denominator for `aspect-ratio` is
+    // the imagery count, so deduplicating here made three figures sharing one off-system ratio read
+    // as one violation against three opportunities — drawing more figures lowered the rate whether
+    // or not any of them conformed. `grounds` above is deduplicated on purpose: its rule is about
+    // which colours appear, not how many surfaces carry them.
+    aspectRatios: ratios,
     imagery, statuses, links, charts, targets, absences,
   };
 }
@@ -461,6 +579,7 @@ export function extract(opts) {
 export async function specFromPage(page, url, opts) {
   await page.goto(url, { waitUntil: 'load' });
   await page.evaluate(() => document.fonts.ready);
+  if (opts?.withIds) await page.evaluate(stampIds);
   const spec = await page.evaluate(extract, opts);
   // Whether the register was assumed is read from the load the spec came from, before the reload
   // for focus: a page that changes between loads must not report the second load's answer.
@@ -468,11 +587,12 @@ export async function specFromPage(page, url, opts) {
   if (spec.register == null) return spec;
 
   await page.reload({ waitUntil: 'load' });
+  if (opts?.withIds) await page.evaluate(stampIds);
   const seen = new Set();
   spec.focusStyles = [];
   for (let i = 0; i < 60; i++) {
     await page.keyboard.press('Tab');
-    const f = await page.evaluate(() => {
+    const f = await page.evaluate((withIds) => {
       const el = document.activeElement;
       if (!el || el === document.body) return null;
       const s = getComputedStyle(el);
@@ -480,8 +600,17 @@ export async function specFromPage(page, url, opts) {
       const m = s.outlineColor.match(/\d+/g);
       const color = m ? '#' + m.slice(0, 3).map((v) => Number(v).toString(16).padStart(2, '0').toUpperCase()).join('') : null;
       const key = el.tagName.toLowerCase() + '#' + (el.id || '') + '.' + el.className + ':' + (el.getAttribute('href') || '') + (el.textContent || '').slice(0, 20);
-      return { visible, color, element: el.tagName.toLowerCase(), key };
-    });
+      const selOf = (e) => {
+        const parts = [];
+        for (let n = e; n && n.nodeType === 1 && n !== document.documentElement; n = n.parentElement) {
+          let i = 1;
+          for (let s = n.previousElementSibling; s; s = s.previousElementSibling) if (s.tagName === n.tagName) i++;
+          parts.unshift(`${n.tagName.toLowerCase()}:nth-of-type(${i})`);
+        }
+        return ['html', ...parts].join(' > ');
+      };
+      return { visible, color, element: el.tagName.toLowerCase(), key, ...(withIds ? { afId: el.getAttribute('data-af-id'), sel: selOf(el) } : {}) };
+    }, !!opts?.withIds);
     if (!f || seen.has(f.key)) break;
     seen.add(f.key);
     spec.focusStyles.push(f);

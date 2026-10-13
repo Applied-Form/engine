@@ -20,7 +20,8 @@ import { pathToFileURL, fileURLToPath } from 'node:url';
 import { spawnSync, execFileSync } from 'node:child_process';
 import { resolve, dirname, join } from 'node:path';
 import { launchBrowser, lintPages } from '../src/lib/page-lint.mjs';
-import { ARMS, REPAIR_ARMS, promptFor, repairPrompt } from './arms.mjs';
+import { ARMS, REPAIR_ARMS, PIPELINE_ARMS, pipelineOptions, promptFor, repairPrompt } from './arms.mjs';
+import { generateConformant } from '../src/lib/pipeline.mjs';
 import { generate, resolveModel, available, extractHtml, routeIdentity } from './providers.mjs';
 import { score, paletteFrom, normalise } from './score.mjs';
 import { partition } from './split.mjs';
@@ -100,6 +101,20 @@ export function harnessFingerprint(root = '.', paths = GENERATION, { outputs = [
 }
 
 async function generatePage(brief, arm, model, sample, browser, pageDir) {
+  if (PIPELINE_ARMS.has(arm)) {
+    const { route, id } = resolveModel(model);
+    const r = await generateConformant({
+      prompt: promptFor(brief, arm, ASSETS),
+      brief: brief.brief,
+      generate: (messages) => generate(messages, model),
+      toHtml: (text) => normalise(extractHtml(text).html, brief.register).html,
+      browser, register: brief.register, workDir: pageDir,
+      ...pipelineOptions(arm),
+    });
+    const file = resolve(pageDir, `${brief.id}-${arm}-${fileSafe(model)}-s${sample}-r${r.rounds}.html`);
+    writeFileSync(file, r.html);
+    return { file, html: r.html, usage: r.usage, rounds: r.rounds, stop: r.stop, fenced: extractHtml(r.text).fenced, failure: classifyFailure({ stop: r.stop, html: r.html }), route, id, fixes: r.fixes, fixStats: r.fixStats, repairKind: r.repairKind, patchStats: r.patchStats, gate: r.gate };
+  }
   const messages = [{ role: 'user', content: promptFor(brief, arm, ASSETS) }];
   const usage = { input: 0, output: 0 };
   let rounds = 0, out, html, file;
@@ -151,7 +166,7 @@ async function main() {
   const samples = Number(opt('samples', 2));
   const arms = [...new Set((opt('arms', ARMS.join(',')) ?? '').split(',').filter(Boolean))];
   const only = [...new Set((opt('briefs', '') ?? '').split(',').filter(Boolean))];
-  const all = JSON.parse(readFileSync('eval/briefs.json', 'utf8')).briefs;
+  const all = JSON.parse(readFileSync(opt('briefs-file', 'eval/briefs.json'), 'utf8')).briefs;
   const briefs = only.length ? all.filter((b) => only.includes(b.id)) : all;
   if (!briefs.length) { console.error(`no briefs matched: ${only.join(',')}`); return 2; }
   // Checked here, not clamped. NaN concurrency starts no worker and NaN samples make no cells, and
@@ -230,7 +245,9 @@ async function main() {
                 brief: brief.id, register: brief.register, density: brief.density, chart: brief.chart,
                 arm, model, route: gen.route, id: gen.id, sample, treatment, rounds: gen.rounds, fenced: gen.fenced, stop: gen.stop,
                 failed: !!gen.failure, failure: gen.failure,
-                file: gen.file, ...s, usage: gen.usage, at: new Date().toISOString(),
+                file: gen.file, ...s, usage: gen.usage,
+                ...(gen.fixes ? { fixes: gen.fixes.length, fixedRules: [...new Set(gen.fixes.flatMap((f) => f.rules))].sort(), fixStats: gen.fixStats, repairKind: gen.repairKind, patchStats: gen.patchStats, gate: gen.gate } : {}),
+                at: new Date().toISOString(),
               };
               appendFileSync(outFile, JSON.stringify(record) + '\n');
               n += 1;

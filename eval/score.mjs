@@ -169,7 +169,10 @@ export async function score(url, { register, palette, browser: given = null, vie
       universal: universal.length,
       gated: gated.length,
       disclosed: disclosed.length,
-      rules: { universal: universal.map((v) => v.rule), gated: gated.map((v) => v.rule) },
+      // Disclosed violations are NAMED, not just counted: a re-score that reads only the first two
+      // bands calls a page clean while it still fails disclosed rules, which made the re-scored pass
+      // rate disagree with the run’s own gate on identical pages at the same commit.
+      rules: { universal: universal.map((v) => v.rule), gated: gated.map((v) => v.rule), disclosed: disclosed.map((v) => v.rule) },
       opportunity, perRule, rates,
       styling: usage.styling,
       axe: { count: axe.count, serious: axe.serious, ids: axe.violations.map((v) => v.id) },

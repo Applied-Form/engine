@@ -1,0 +1,17 @@
+{
+  "note": "Development briefs: every iteration of the engine runs on these, never on eval/briefs.json, which stays frozen for measurement. One per stratum of register, density and chart.",
+  "briefs": [
+    { "id": "d01", "register": "i", "density": "sparse", "chart": false, "brief": "A single page announcing that a neighbourhood bakery is opening a second shop. The news in one headline, a short paragraph on why this street, the opening date, and a way to sign up for the launch morning." },
+    { "id": "d02", "register": "i", "density": "sparse", "chart": true, "brief": "A one-screen page from a cycling club marking its hundredth group ride. One headline, a sentence of thanks, one chart of riders per month over the club's first year, and a link to join." },
+    { "id": "d03", "register": "i", "density": "medium", "chart": false, "brief": "A page introducing an independent bookshop's translation prize. What the prize is for, how books are chosen, the three judges with a line about each, and how publishers enter." },
+    { "id": "d04", "register": "i", "density": "medium", "chart": true, "brief": "A public page from a water utility explaining a summer hosepipe ban. Why it was needed, one chart of reservoir levels against the usual range, what is and is not allowed, and when it will be reviewed." },
+    { "id": "d05", "register": "i", "density": "dense", "chart": false, "brief": "A long-form page from an architecture practice on how it retrofits old schools. An opening argument, four sections on structure, light, heat and people, a short case study, and a closing note on cost." },
+    { "id": "d06", "register": "i", "density": "dense", "chart": true, "brief": "A community food bank's annual report page. A letter from the chair, sections on volunteers, donors and partners, a chart of parcels given out by month, a chart of where donations came from, and plans for next year." },
+    { "id": "d07", "register": "ii", "density": "sparse", "chart": false, "brief": "A password reset page: a field for the email address, one action to send the reset link, a note on how long the link lasts, and a link back to sign in." },
+    { "id": "d08", "register": "ii", "density": "sparse", "chart": true, "brief": "A single queue view in a support tool: the number of open tickets, the median wait, one chart of tickets opened per hour today, and an action to take the next ticket." },
+    { "id": "d09", "register": "ii", "density": "medium", "chart": false, "brief": "An API key management page: a list of keys with name, created date, last used and scope, an action to create a key with a scope choice, and a revoke action that asks for confirmation." },
+    { "id": "d10", "register": "ii", "density": "medium", "chart": true, "brief": "A monthly cost summary for a cloud account: total spend against budget, one chart of daily spend this month, the five most expensive services in a short list, and a link to set alerts." },
+    { "id": "d11", "register": "ii", "density": "dense", "chart": false, "brief": "A release checklist page for an engineering team: twenty items grouped into build, test, security and launch, each with an owner, a status and a due date, plus filters by owner and status." },
+    { "id": "d12", "register": "ii", "density": "dense", "chart": true, "brief": "A delivery fleet dashboard: vans on the road, on-time rate and fuel used today, a chart of deliveries completed by hour, a chart of late deliveries by depot, and a table of vans needing maintenance." }
+  ]
+}

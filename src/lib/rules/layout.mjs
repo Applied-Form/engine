@@ -16,7 +16,9 @@ export function checkAspectRatios(ctx, spec, add) {
 }
 
 export function checkOverflow(ctx, spec, add) {
-  if (spec.overflowX) add('horizontal-overflow', `The page scrolls horizontally at ${spec.viewport ?? 'this'}px`, { overflow: spec.overflowX });
+  if (!spec.overflowX) return;
+  const named = (spec.overflowCulprits ?? []).map((c) => `<${c.tag}${c.cls ? `.${c.cls}` : ''}> ${c.width}px wide, ending at ${c.right}px${c.sample ? ` ("${c.sample}")` : ''}`);
+  add('horizontal-overflow', `The page scrolls horizontally at ${spec.viewport ?? 'this'}px${named.length ? `; what sticks out: ${named.join('; ')}` : ''}`, { overflow: spec.overflowX, culprits: spec.overflowCulprits ?? [] });
 }
 
 export function checkGrid(ctx, spec, add) {

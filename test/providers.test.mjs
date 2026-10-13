@@ -156,3 +156,37 @@ test('a route identity moves with the endpoint and never carries the credential 
   assert.doesNotMatch(a, /one|azure/);
   assert.equal(routeIdentity(['stub', 'opus-5'], {}), routeIdentity(['opus-5', 'stub'], {}), 'order of keys does not matter');
 });
+
+test('a native client is called on the command line and its JSON result is the page', async () => {
+  const { writeFileSync, mkdtempSync, chmodSync } = await import('node:fs');
+  const { join } = await import('node:path');
+  const { tmpdir } = await import('node:os');
+  const dir = mkdtempSync(join(tmpdir(), 'af-native-'));
+  const fake = join(dir, 'fake.mjs');
+  // The shape `claude -p --output-format json` prints: an array of messages, the last of type "result".
+  writeFileSync(fake, "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>console.log(JSON.stringify([{type:'system',subtype:'init'},{type:'result',subtype:'success',is_error:false,result:'<html>'+s.length+'</html>',usage:{input_tokens:7,output_tokens:3}}])))");
+  chmodSync(fake, 0o755);
+  process.env.AF_NATIVE_FAKE = JSON.stringify([process.execPath, fake]);
+  const out = await generate([{ role: 'user', content: 'hi' }], 'native:fake');
+  delete process.env.AF_NATIVE_FAKE;
+  assert.equal(out.route, 'native');
+  assert.match(out.text, /^<html>\d+<\/html>$/);
+  assert.deepEqual(out.usage, { input: 7, output: 3 });
+});
+
+test('a native call does not block the process while the client runs', async () => {
+  const { writeFileSync, mkdtempSync } = await import('node:fs');
+  const { join } = await import('node:path');
+  const { tmpdir } = await import('node:os');
+  const dir = mkdtempSync(join(tmpdir(), 'af-native-'));
+  const slow = join(dir, 'slow.mjs');
+  // Other cells share the process and its browser: a blocking call stalls their page loads.
+  writeFileSync(slow, "setTimeout(()=>console.log(JSON.stringify({result:'<html></html>',usage:{input_tokens:1,output_tokens:1}})),600)");
+  process.env.AF_NATIVE_SLOW = JSON.stringify([process.execPath, slow]);
+  let ticks = 0;
+  const timer = setInterval(() => { ticks += 1; }, 50);
+  await generate([{ role: 'user', content: 'hi' }], 'native:slow');
+  clearInterval(timer);
+  delete process.env.AF_NATIVE_SLOW;
+  assert.ok(ticks >= 5, `the event loop ran ${ticks} times during a 600ms call`);
+});
