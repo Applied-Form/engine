@@ -5,9 +5,9 @@
  * set the register-specific tokens. Apply the attribute at a document
  * boundary, never mid-page.
  */
-import { writeFileSync, readdirSync } from 'node:fs';
+import { readdirSync } from 'node:fs';
 import { brandInfo, version, colors, registers, chartSeries, chartSeriesOnLight, chartSeriesOnDark, fonts, typeScale, spacingScale, grid, display, floors, motion, rules, opacity, focus, states, radiusTokens, elevationTokens, tokens as rawTokens, deprecations } from '../src/lib/tokens.mjs';
-import { ROOT, outDir , DIST} from '../src/lib/build-utils.mjs';
+import { ROOT, outDir , DIST, writeAtomic } from '../src/lib/build-utils.mjs';
 
 const OUT_DIR = outDir(DIST);
 const FONT_DIR = `${ROOT}${brandInfo?.fontsDir ?? 'fonts/'}`;
@@ -222,5 +222,5 @@ lines.push(`[data-register] * { border-radius: var(--af-rule-radius); }`);
 lines.push(`@media (prefers-reduced-motion: reduce) { [data-register] *, [data-register] *::before, [data-register] *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }`);
 lines.push('');
 
-writeFileSync(`${OUT_DIR}tokens.css`, lines.join('\n'));
+writeAtomic(`${OUT_DIR}tokens.css`, lines.join('\n'));
 console.log(`wrote dist/tokens.css (${lines.length} lines, ${fontFiles.length} font faces)`);

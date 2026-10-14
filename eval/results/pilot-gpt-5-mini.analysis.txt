@@ -1,0 +1,33 @@
+192 records · 8 arms · 1 models
+
+arm           pages    failed  viol/pg     rate   clean    axe  palette  spacing  cssdecl   tokens  rounds
+prose           24         0    42.38    0.229      0%    5.5    15.38     2.27      324     8624     0.0
+none            24         0    84.25    0.255      0%    6.0    13.70     2.08      422     7117     0.0
+tokens          24         0    70.54    0.287      0%    4.0     1.70     0.88      385    13279     0.0
+rules-read      24         0    47.50    0.234      0%    2.0     1.89     1.01      311    15796     0.0
+components      24         0    11.75    0.100     17%    5.2     1.26     0.29     1376    25063     0.0
+rules-compiled   24         0    50.63    0.313      0%    4.1     1.80     0.94      344    14531     0.0
+rules-run       24         0    39.96    0.250      0%    3.0     2.48     1.13      332    73107     2.2
+rules-run-primed   24         0    36.92    0.253      0%    2.6     2.84     1.14      306    77865     2.2
+
+rate = mean over scoreable rules of (violations / opportunities). cssdecl = CSS declarations per page: a
+low rate with near-zero cssdecl is an unstyled page, which passes most rules by default and designed nothing.
+
+Rate ratios (<1 favours the first-named arm; 95% cluster-bootstrap CI over briefs):
+  prose → rules-run          1.09  [0.87, 1.45]  CI includes 1 — not distinguishable
+  rules-read → rules-run     1.07  [0.92, 1.21]  CI includes 1 — not distinguishable
+  none → rules-run           0.98  [0.80, 1.26]  CI includes 1 — not distinguishable
+  none → prose               0.90  [0.73, 1.04]  CI includes 1 — not distinguishable
+
+Consistency — within-cell SD of palette drift across repeat generations (lower is more consistent):
+  prose         1.93  (12 cells)
+  none          2.43  (12 cells)
+  tokens        0.44  (12 cells)
+  rules-read    1.15  (12 cells)
+  components    0.62  (12 cells)
+  rules-compiled 1.16  (12 cells)
+  rules-run     1.55  (12 cells)
+  rules-run-primed 2.61  (12 cells)
+
+Rate by model tier:
+  azure:gpt-5-miniprose=0.23  none=0.25  tokens=0.29  rules-read=0.23  components=0.10  rules-compiled=0.31  rules-run=0.25  rules-run-primed=0.25

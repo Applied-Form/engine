@@ -43,8 +43,17 @@ jobs:
       - run: npm run check
         env:
           CI: 'true'
+      # The first version is published by hand (RELEASING.md), so its tag run must not try again:
+      # a version already on npm is skipped and the run goes on to the MCP registry.
       - name: Publish to npm
-        run: npm publish --access public
+        run: |
+          name=$(node -p "require('./package.json').name")
+          version=$(node -p "require('./package.json').version")
+          if npm view "$name@$version" version >/dev/null 2>&1; then
+            echo "$name@$version is already on npm; skipping the npm publish"
+          else
+            npm publish --access public
+          fi
       - name: Install the MCP registry publisher, pinned and checked
         run: |
           curl -fsSL -o mcp-publisher.tar.gz https://github.com/modelcontextprotocol/registry/releases/download/v1.8.1/mcp-publisher_linux_amd64.tar.gz

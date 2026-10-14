@@ -3,7 +3,7 @@
  * the CSS type shorthand, and a logging writer. The wordmark and mark helpers, which read the
  * brand's own assets, are in identity.mjs, so this module carries nothing the open engine lacks.
  */
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync, renameSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 /** Absolute path to the repo root, trailing slash included. */
@@ -27,8 +27,20 @@ export function typeShorthand(name) {
   return `var(--af-type-${name}-weight) var(--af-type-${name}-size)/var(--af-type-${name}-leading)`;
 }
 
-/** Write `content` to `path` (absolute) and log a relative confirmation. */
+/**
+ * Write `content` to `path` beside it and rename it into place, so a reader sees the old file or the
+ * new one and never an empty or partial one: the test runner rebuilds dist/ in one process while
+ * another loads pages that link to it, and a truncate-then-fill write once left the playground with
+ * no stylesheet.
+ */
+export function writeAtomic(path, content) {
+  const tmp = `${path}.${process.pid}.tmp`;
+  writeFileSync(tmp, content);
+  renameSync(tmp, path);
+}
+
+/** Write `content` to `path` (absolute), atomically, and log a relative confirmation. */
 export function writeGenerated(path, content) {
-  writeFileSync(path, content);
+  writeAtomic(path, content);
   console.log(`wrote ${path.startsWith(ROOT) ? path.slice(ROOT.length) : path}`);
 }

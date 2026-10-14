@@ -15,12 +15,40 @@ export const FIXABLE = [
 const kebab = (p) => p.replace(/[A-Z]/g, (c) => '-' + c.toLowerCase());
 const stack = (voice) => [].concat(fonts[voice] ?? []).map((f) => (/\s/.test(f) ? `"${f}"` : f)).join(', ');
 
-/** A font size that renders at `floor` px: text drawn smaller than its own size (a scaled SVG chart) is scaled up to match. */
-const sizeFor = (t, floor) => `${t?.cssPx && t?.sizePx ? Math.ceil((floor * t.cssPx / t.sizePx) * 100) / 100 : floor}px`;
+/**
+ * A font size that renders at `floor` px: text drawn smaller than its own size (a scaled SVG chart)
+ * is scaled up to match, with 2% of headroom, since the checker reads the rendered size to two
+ * decimals and the other fixes in the same pass reflow the page by a pixel or two.
+ */
+const scaled = (t) => t?.cssPx && t?.sizePx && Math.abs(t.cssPx / t.sizePx - 1) > 0.001;
+const sizeFor = (t, floor) => `${scaled(t) ? Math.ceil((floor * 1.02 * t.cssPx / t.sizePx) * 100) / 100 : floor}px`;
 
-/** The permitted ratio nearest to w:h, compared on a log scale so 2:1 and 1:2 are equally far from 1:1. */
-const nearestRatio = (w, h) => aspectRatios.map((r) => r.split(':').map(Number))
-  .reduce((best, r) => (Math.abs(Math.log((r[0] / r[1]) / (w / h))) < Math.abs(Math.log((best[0] / best[1]) / (w / h))) ? r : best));
+/**
+ * The permitted ratio nearest to w:h, compared on a log scale so 2:1 and 1:2 are equally far from
+ * 1:1. With `max`, only ratios at or below it are considered, falling back to all of them when
+ * none qualifies.
+ */
+const nearestRatio = (w, h, { max = null } = {}) => {
+  const all = aspectRatios.map((r) => r.split(':').map(Number));
+  const pool = max != null ? all.filter(([rw, rh]) => rw / rh <= max + 1e-9) : [];
+  return (pool.length ? pool : all)
+    .reduce((best, r) => (Math.abs(Math.log((r[0] / r[1]) / (w / h))) < Math.abs(Math.log((best[0] / best[1]) / (w / h))) ? r : best));
+};
+const ratioOf = (s) => { const [a, b] = String(s).split('/').map(Number); return a / b; };
+
+/**
+ * Declarations measured at two widths into one patch. The same element is fixed once, for every
+ * width, so where the widths disagree the patch takes the value that satisfies both: the larger
+ * size, the taller box.
+ */
+const merge = (into, decl) => {
+  for (const [k, v] of Object.entries(decl)) {
+    const old = into[k];
+    if (old != null && k === 'font-size') into[k] = parseFloat(v) > parseFloat(old) ? v : old;
+    else if (old != null && k === 'aspect-ratio') into[k] = ratioOf(v) < ratioOf(old) ? v : old;
+    else into[k] = v;
+  }
+};
 
 /**
  * The register's own colour for text on this element's ground, used when the fallback lists have none:
@@ -48,13 +76,14 @@ export function snap(px) {
 export function planFixes(results, { allow = FIXABLE } = {}) {
   const allowed = new Set(allow.filter((r) => FIXABLE.includes(r)));
   const patches = new Map();
-  const add = (item, rule, decl, pseudo = '') => {
+  // A run drawn by ::before or ::after carries its host's id and names its pseudo-element.
+  const add = (item, rule, decl, { pseudo = item?.pseudo ?? '', subtree = false } = {}) => {
     const afId = item?.afId;
     if (afId == null || afId === '') return;
-    // One patch per element, pseudo-class and rule: rolling back one rule never takes another's fix.
+    // One patch per element, pseudo-element or -class, and rule: rolling back one rule never takes another's fix.
     const key = `${afId}|${pseudo}|${rule}`;
-    const p = patches.get(key) ?? { afId: String(afId), sel: item.sel, pseudo, decl: {}, rules: new Set() };
-    Object.assign(p.decl, decl);
+    const p = patches.get(key) ?? { afId: String(afId), sel: item.sel, pseudo, decl: {}, rules: new Set(), ...(subtree ? { subtree } : {}) };
+    merge(p.decl, decl);
     p.rules.add(rule);
     patches.set(key, p);
   };
@@ -64,7 +93,10 @@ export function planFixes(results, { allow = FIXABLE } = {}) {
       switch (v.rule) {
         case 'radius-present': add(v.absence, v.rule, { 'border-radius': '0' }); break;
         case 'shadow-present': add(v.absence, v.rule, { 'box-shadow': 'none' }); break;
-        case 'link-not-underlined': add(v.link, v.rule, { 'text-decoration-line': 'underline' }); break;
+        // The checker wants the underline on every text-bearing run inside the link, and a run that
+        // is not inline (a flex item, a block, an svg's title) does not inherit the link's own, so
+        // the patch reaches the link's whole subtree.
+        case 'link-not-underlined': add(v.link, v.rule, { 'text-decoration-line': 'underline' }, { subtree: true }); break;
         case 'target-size':
           add(v.target, v.rule, { 'min-width': '24px', 'min-height': '24px', ...(v.target?.display === 'inline' ? { display: 'inline-block' } : {}) });
           break;
@@ -72,10 +104,10 @@ export function planFixes(results, { allow = FIXABLE } = {}) {
         // focus style, and one of them is held out, so a single case lets a disclosed fix clear a
         // scored rule. Keep them separate even though the declaration is identical.
         case 'focus-hidden':
-          add(v.focus, v.rule, { outline: `3px solid ${colors.focus}`, 'outline-offset': '2px' }, ':focus-visible');
+          add(v.focus, v.rule, { outline: `3px solid ${colors.focus}`, 'outline-offset': '2px' }, { pseudo: ':focus-visible' });
           break;
         case 'focus-restyled':
-          add(v.focus, v.rule, { outline: `3px solid ${colors.focus}`, 'outline-offset': '2px' }, ':focus-visible');
+          add(v.focus, v.rule, { outline: `3px solid ${colors.focus}`, 'outline-offset': '2px' }, { pseudo: ':focus-visible' });
           break;
         case 'spacing':
           for (const s of (r.spec?.spacingSources ?? []).filter((x) => x.value === v.value)) {
@@ -103,14 +135,32 @@ export function planFixes(results, { allow = FIXABLE } = {}) {
           }
           break;
         }
-        case 'accent-non-interactive-ii': add(v.text, v.rule, { color: registers.ii.text }); break;
+        // SVG paints text with fill, which a colour declaration does not touch.
+        case 'accent-non-interactive-ii': add(v.text, v.rule, { color: registers.ii.text, ...(v.text?.isSvgText ? { fill: registers.ii.text } : {}) }); break;
         case 'aspect-ratio':
           for (const s of (r.spec?.ratioSources ?? []).filter((x) => x.value === v.value)) {
-            const [rw, rh] = nearestRatio(s.w, s.h);
-            add(s, v.rule, { 'aspect-ratio': `${rw} / ${rh}`, 'object-fit': 'cover', height: 'auto' });
+            // An inline svg scales its drawing to fit its box, so a box shorter than the drawing
+            // needs shrinks every label inside it and the fix is rolled back for the text rules it
+            // breaks. The drawing keeps its size in any box no wider than the wider of its own ratio
+            // and the box's: bound by the width, it has room down to its own ratio; bound by the
+            // height, down to the box's. An image crops, so it takes the nearest ratio.
+            const [rw, rh] = nearestRatio(s.w, s.h, { max: s.element === 'svg' ? Math.max(s.intrinsic ?? 0, s.w / s.h) : null });
+            // The box follows its width, so what would hold its height is lifted: a max-height, the
+            // stretch a flex or grid parent gives a child whose height is auto, and a flex basis
+            // along a column. What would hold its width past its row is lifted too: a flex item's
+            // automatic minimum, which a box with an aspect ratio takes from its content.
+            add(s, v.rule, { 'aspect-ratio': `${rw} / ${rh}`, 'object-fit': 'cover', height: 'auto', 'max-height': 'none', 'min-height': '0', 'min-width': '0', 'align-self': 'start', 'flex-basis': 'auto' });
           }
           break;
-        case 'font-off-system': add(v.text, v.rule, { 'font-family': stack(v.text?.isData ? 'data' : 'text') }); break;
+        case 'font-off-system': {
+          const t = v.text;
+          // In Register II, text set in the text voice is body text and held to the body floor. A
+          // font fix that exposes that is rolled back for the rule it breaks, so the floor travels
+          // with the voice.
+          const toBody = String(r.spec?.register ?? '').startsWith('ii') && !t?.isData && t?.role !== 'heading' && t?.sizePx != null && t.sizePx < floors.bodyMinPxRegisterII;
+          add(t, v.rule, { 'font-family': stack(t?.isData ? 'data' : 'text'), ...(toBody ? { 'font-size': sizeFor(t, floors.bodyMinPxRegisterII) } : {}) });
+          break;
+        }
         case 'data-not-mono': add(v.text, v.rule, { 'font-family': stack('data') }); break;
       }
     }

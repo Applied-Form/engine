@@ -61,8 +61,12 @@ const register = opt('register');
 if (opts.register === true) fail(new Error('--register needs a value: i or ii'));
 let results;
 try {
-  results = await lintPages(files.map((f) => (/^https?:\/\//.test(f) ? f : pathToFileURL(resolvePath(f)).href)), { viewports, register });
+  results = await lintPages(files.map((f) => (/^https?:\/\//.test(f) ? f : pathToFileURL(resolvePath(f)).href)), { viewports, register, unregistered: !process.env.AF_BRAND && register == null ? 'universal' : 'house' });
 } catch (e) { if (/unknown register/.test(e.message)) fail(e); throw e; }
+
+if (!json && results.some((r) => r.scope === 'universal')) {
+  console.log('No system loaded: pages without a register are checked against the universal accessibility rules only. Load a system with: af init --pack <pack tokens.json | instrument>');
+}
 
 if (writing) {
   const fresh = buildBaseline(results, { cwd: keyBase, stamp: new Date().toISOString() });

@@ -5,9 +5,8 @@
  * bar labels, figure). Everything references the custom properties in
  * dist/tokens.css; load that first.
  */
-import { writeFileSync } from 'node:fs';
 import { version, grid, floors, layers, bleeds, composition, aspectRatios, print, registers, spacingScale, radiusTokens, elevationTokens } from '../src/lib/tokens.mjs';
-import { outDir, typeShorthand as type , DIST} from '../src/lib/build-utils.mjs';
+import { outDir, typeShorthand as type , DIST, writeAtomic } from '../src/lib/build-utils.mjs';
 
 const OUT = outDir(DIST);
 const cols = grid.breakpoints;
@@ -187,5 +186,5 @@ if (Object.keys(elevationTokens).length) {
 }
 L.push('/* ---- end UI state ---- */');
 L.push('');
-writeFileSync(`${OUT}components.css`, L.join('\n'));
+writeAtomic(`${OUT}components.css`, L.join('\n'));
 console.log(`wrote dist/components.css (${L.length} lines)`);

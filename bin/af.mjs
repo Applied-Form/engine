@@ -17,6 +17,8 @@
  *   af brand --hue 210 --paper "#F4F7FA"  derive a brand palette that satisfies every floor, or refuse
  *   af drift <page.html> [...]         what a site's design system actually is, and how far it has drifted
  *   af check                           build, unit tests, page lint
+ *   af init --pack <tokens.json|instrument>  import a Standards pack and name it in af.config.json
+ *   af mcp-config [--client claude-code|cursor]  the MCP server block for an agent's config
  */
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
@@ -25,6 +27,14 @@ import { resolve as resolvePath } from 'node:path';
 
 const ROOT = fileURLToPath(new URL('../', import.meta.url));
 const [cmd, ...rest] = process.argv.slice(2);
+// The system `af init` named in af.config.json is the one every command here judges against, unless
+// AF_BRAND already says otherwise.
+if (!process.env.AF_BRAND && existsSync('af.config.json')) {
+  try {
+    const { system } = JSON.parse(readFileSync('af.config.json', 'utf8'));
+    if (system) process.env.AF_BRAND = resolvePath(process.cwd(), system);
+  } catch { /* a malformed file is reported by the command that reads it */ }
+}
 // The open distribution carries the engine and not the system's identity tooling (decision 0023),
 // so a command whose script is absent says so rather than failing with a module error.
 const run = (script, args = []) => {
@@ -59,10 +69,12 @@ switch (cmd) {
   case 'system': run('system.mjs', rest); break;
   case 'drift': run('drift.mjs', rest); break;
   case 'mcp': run('mcp.mjs', rest); break;
+  case 'init': run('init.mjs', rest); break;
+  case 'mcp-config': run('mcp-config.mjs', rest); break;
   case 'build': npm('build'); break;
   case 'site': npm('build:site'); break;
   case 'check': npm('check'); break;
   default:
-    console.error(`usage: af <lint|baseline|rules|report|form|mark|move|build|site|pdf|golden|figma-diff|brand|check|system|mcp|drift> ...`);
+    console.error(`usage: af <init|lint|baseline|rules|report|form|mark|move|build|site|pdf|golden|figma-diff|brand|check|system|mcp|mcp-config|drift> ...`);
     process.exit(cmd ? 2 : 0);
 }

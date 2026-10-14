@@ -323,6 +323,9 @@ export function extract(opts) {
         voice: voiceOf(ps.fontFamily), family: firstFamily(ps.fontFamily), sizePx: parseFloat(ps.fontSize), weight: Number(ps.fontWeight),
         color: fill ? composite({ ...fill, a: fill.a * effectiveOpacity(el) }, ground) : null, background: ground, role: 'other', measureCh: null,
         isData: !!el.closest(dataSelector), isWordmark: !!el.closest('.af-wordmark'), isInteractive: !!el.closest('a[href], button'), isDisabled: !!el.closest('[disabled], [aria-disabled="true"], .af-disabled, fieldset[disabled]'), pseudo, sample: txt.slice(0, 40),
+        // Located by its host, so a fix can address `host::before`; a run nothing can name goes unfixed.
+        ...tagged(el, { cssPx: parseFloat(ps.fontSize) }),
+        ...(withIds ? { isSvgText: false, opacitySelf: Number(ps.opacity), groundTrusted: groundTrusted(el, ground) } : {}),
       });
     }
 
@@ -338,7 +341,12 @@ export function extract(opts) {
         const r = rect.width / rect.height;
         const snapped = permittedRatios.find(([w, h]) => Math.abs(r - w / h) / (w / h) < 0.01);
         ratios.push(snapped ? `${snapped[0]}:${snapped[1]}` : `${Math.round(rect.width)}:${Math.round(rect.height)}`);
-        if (withIds) ratioSources.push({ value: ratios[ratios.length - 1], w: Math.round(rect.width), h: Math.round(rect.height), ...tagged(el) });
+        if (withIds) {
+          // The drawing's own ratio, from the viewBox an svg scales its content to fit; null where nothing scales.
+          const vb = tag === 'svg' ? el.viewBox?.baseVal : null;
+          const intrinsic = vb && vb.width > 0 && vb.height > 0 ? vb.width / vb.height : null;
+          ratioSources.push({ value: ratios[ratios.length - 1], w: Math.round(rect.width), h: Math.round(rect.height), element: tag, intrinsic, ...tagged(el) });
+        }
         const inMark = !!el.closest('.af-mark');
         imagery.push({
           kind: el.getAttribute('data-figure') ?? (inMark ? 'form' : 'decorative'), tag, sizePx: Math.round(Math.min(rect.width, rect.height)),

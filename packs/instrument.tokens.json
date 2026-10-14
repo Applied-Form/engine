@@ -1,0 +1,51 @@
+{
+  "$schema": "https://standards.appliedform.co/token-contract-v1.json",
+  "system": "Instrument",
+  "version": "1.0.0",
+  "note": "Compiled from assets/tokens.css. Do not edit directly.",
+  "colour": {
+    "ground": {
+      "value": "#FFFFFF",
+      "role": "The only permitted page ground"
+    },
+    "ink": {
+      "value": "#111111",
+      "role": "Body text, display type, primary fills"
+    },
+    "rule": {
+      "value": "#D8D8D8",
+      "role": "Hairlines and table rules"
+    },
+    "muted": {
+      "value": "#6B6B6B",
+      "role": "Labels, secondary data, captions"
+    },
+    "signal": {
+      "value": "#C8102E",
+      "role": "Identification and single-point emphasis. Never a data series"
+    },
+    "focus": {
+      "value": "#C8102E",
+      "role": "Focus ring. Always visible, never removed"
+    }
+  },
+  "type": {
+    "text": "\"Public Sans\", system-ui, sans-serif",
+    "data": "\"DM Mono\", ui-monospace, monospace"
+  },
+  "system_values": {
+    "unit": "8px",
+    "gutter": "24px",
+    "cols": "12",
+    "measure": "66ch",
+    "band": "32px",
+    "radius": "0",
+    "s1": "8px",
+    "s2": "16px",
+    "s3": "24px",
+    "s4": "32px",
+    "s5": "48px",
+    "s6": "64px",
+    "s7": "96px"
+  }
+}
