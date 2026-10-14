@@ -107,7 +107,7 @@ export function extract(opts) {
     host.remove();
   };
   const chOf = (el) => chCache.get(chKey(cs(el))) ?? 1;
-  const dataSelector = '[data-voice="data"], code, kbd, samp, data, time, th, pre, figcaption, .af-label, .af-data-01, .af-data-02, .af-footnotes, .af-toc, .af-pagination, .af-nav, .af-hint, .af-spine, .af-figures, .af-bar-labels';
+  const dataSelector = opts?.dataSelector ?? '[data-voice="data"], code, kbd, samp, data, time, th, pre, figcaption, .af-label, .af-data-01, .af-data-02, .af-footnotes, .af-toc, .af-pagination, .af-nav, .af-hint, .af-spine, .af-figures, .af-bar-labels';
   const ownText = (el) => [...el.childNodes].filter((n) => n.nodeType === 3 && n.textContent.trim()).map((n) => n.textContent).join('');
 
   // ---------------------------------------------------------------- hit-testing
@@ -286,7 +286,9 @@ export function extract(opts) {
         voice: voiceOf(s.fontFamily), family: firstFamily(s.fontFamily),
         sizePx: Math.round(parseFloat(s.fontSize) * ctmScale * 100) / 100, weight: Number(s.fontWeight),
         color: fill ? composite({ ...fill, a: fill.a * effectiveOpacity(el) }, ground) : null, background: ground, role,
-        measureCh: role === 'other' && words < 8 ? null : Math.round(block.getBoundingClientRect().width / chOf(block)),
+        // The box sets how long a line can be; the text sets how long it is. A three-word heading in a
+        // wide column is a short line, not a long measure.
+        measureCh: role === 'other' && words < 8 ? null : Math.min(Math.round(block.getBoundingClientRect().width / chOf(block)), (block.textContent ?? '').trim().length),
         isData: !!el.closest(dataSelector), isWordmark: !!el.closest('.af-wordmark'),
         // An inactive control is exempt from the contrast floor by WCAG 1.4.3 itself, and this
         // system dims one with an opacity token, so it would otherwise fail its own rule.
@@ -412,7 +414,9 @@ export function extract(opts) {
     }
     const radius = parseFloat(s.borderTopLeftRadius) || 0;
     if (radius > 0) {
-      absences.push({ kind: 'radius', element: tag, className, value: Math.round(radius), inputType: tag === 'input' ? el.type : null, ...tagged(el) });
+      // A circle has no corners to round: equal sides, and a radius of half of them.
+      const circle = Math.abs(rect.width - rect.height) <= 1 && radius >= Math.min(rect.width, rect.height) / 2 - 0.5;
+      absences.push({ kind: 'radius', element: tag, className, value: Math.round(radius), circle, inputType: tag === 'input' ? el.type : null, ...tagged(el) });
     }
 
     // Composition: motion durations, layers, rotation, offsets, bleeds, panels.

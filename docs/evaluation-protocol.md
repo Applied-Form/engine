@@ -934,6 +934,17 @@ scorer both sides, interval excluding 1, and still excluding 1 under leave-one-o
 re-scored at the same commit on the same runner; the generate and re-score jobs are separate
 dispatches of the same workflow at that commit, which is what "same code" requires.
 
+### Amendment, 2026-10-13 (eleventh) — measure is the length of a line, not of its box
+
+An instrument correction, found while judging Standards packs' own fixtures under each pack
+(readiness milestone M1). `measure` reported the width of a text's block in characters, so a
+three-word heading in a 1,100px column read as 150ch. A line is never longer than its text: the
+reported measure is now the lesser of the two. Every golden spec was regenerated and checked: of
+5,170 changed values in 124 files, all are `measureCh` — 5,109 lower, 61 higher by exactly the
+existing tolerance of 1 (decision 0014), none otherwise. `measure` is disclosed and outside `UNIVERSAL_WITHHELD`, so the
+held-out ratio cannot move; pass rates can only rise. Under the staging rule earlier pipeline records
+are superseded for `measure`; `engine8` is the first run scored with it.
+
 ## Measures
 
 Primary:

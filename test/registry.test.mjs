@@ -63,3 +63,10 @@ test('every entry has a non-empty summary and why, a valid group, and a valid se
 test('no duplicate ids in the registry', () => {
   assert.equal(RULES.length, RULE_IDS.size);
 });
+
+test('every rule states its scope, and a system rule names the pack parameter that enables it', () => {
+  for (const r of RULES) {
+    assert.ok(['universal', 'system', 'house'].includes(r.scope), `${r.id} has scope ${r.scope}`);
+    if (r.scope === 'system') assert.match(r.declares ?? '', /^(colour|type|system_values)\./, r.id);
+  }
+});

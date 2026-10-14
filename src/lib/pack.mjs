@@ -41,9 +41,9 @@ export function hueOf(hex) {
 }
 
 /**
- * Which pack role fills which of this system's colour tokens.
+ * Which job fills which of this system's colour tokens.
  *
- * The mapping is by job rather than by name: a pack's `signal` is whatever it uses for
+ * The mapping is by job rather than by name: a pack's signal is whatever it uses for
  * identification and one point of emphasis, which is what this system calls the accent. Anything
  * not listed here has no counterpart in the pack contract and is derived.
  */
@@ -55,6 +55,32 @@ export const PACK_ROLE_TO_TOKEN = {
   signal: 'terracotta',
   focus: 'focus',
 };
+
+/**
+ * A pack colour's job: stated outright, implied by a contract key, or read from its author's sentence.
+ *
+ * Instrument keys its accent `signal`; the five paid packs call theirs `accent`, `link`, `red`,
+ * `cyan` and `jade`, and say what each is for in a `role` sentence. Matching the key alone refused
+ * all five (readiness baseline B1, 2026-10-13). The sentence is the author's own statement, so it is
+ * read and quoted back, never guessed past: a sentence that names no job leaves the colour unmapped.
+ * A sentence that forbids interaction is read before one that mentions it, and an ornament before
+ * either, since ornament is usually also forbidden from interaction.
+ */
+const KEYED = { ground: 'ground', ink: 'ink', muted: 'muted', rule: 'rule', signal: 'signal', focus: 'focus' };
+const SENTENCES = [
+  [/\bornament\b/i, 'ornament'],
+  [/\bnever (?:clickable|interactive)\b|\bexpression only\b/i, 'expression'],
+  [/\bvisited\b/i, 'visited'],
+  [/\bsecondary ground\b/i, 'ground-alt'],
+  [/\bhighlight\b|\btext stays ink\b/i, 'highlight'],
+  [/\bsingle accent\b|\bemphasis\b|\binteraction\b|\bidentification\b/i, 'signal'],
+];
+export function jobOf(name, entry = {}) {
+  if (entry.job) return { job: entry.job, why: 'stated as its job' };
+  if (KEYED[name]) return { job: KEYED[name], why: 'named for its job' };
+  for (const [re, job] of SENTENCES) if (re.test(entry.role ?? '')) return { job, why: `"${entry.role}"` };
+  return { job: null, why: entry.role ? `"${entry.role}" names no job this system knows` : 'no role sentence' };
+}
 
 /** The floors an imported palette is measured against before it is allowed out. */
 function floorChecks(color) {
@@ -77,16 +103,24 @@ function floorChecks(color) {
 export function fromPack(pack, { key, name } = {}) {
   const report = { system: pack.system, version: pack.version, stated: [], derived: [], carried: [], refused: [], notes: [] };
 
-  if (!pack.colour || !pack.colour.signal || !pack.colour.ground) {
+  const roles = Object.entries(pack.colour ?? {})
+    .filter(([, entry]) => HEX.test(entry?.value ?? ''))
+    .map(([name, entry]) => ({ name, hex: entry.value.toUpperCase(), role: entry.role, ...jobOf(name, entry) }));
+  const withJob = (job) => roles.filter((r) => r.job === job);
+  if (!withJob('signal').length || !withJob('ground').length) {
     report.refused.push('the pack states no signal or no ground, and both anchor the derivation');
     return { overlay: null, report };
   }
-  const stated = Object.fromEntries(
-    Object.entries(PACK_ROLE_TO_TOKEN)
-      .filter(([role]) => pack.colour[role] && HEX.test(pack.colour[role].value ?? ''))
-      .map(([role, token]) => [token, pack.colour[role].value.toUpperCase()]),
-  );
-  report.stated = Object.entries(stated).map(([token, hex]) => `${token} ← ${hex}, the pack's own value`);
+  for (const job of ['ground', 'signal']) {
+    const many = withJob(job);
+    if (many.length > 1) {
+      report.refused.push(`${many.length} colours read as the ${job}: ${many.map((r) => `${r.name} "${r.role ?? ''}"`).join(', ')}. State one with "job": "${job}"`);
+    }
+  }
+  if (report.refused.length) return { overlay: null, report };
+  const mapped = roles.filter((r) => PACK_ROLE_TO_TOKEN[r.job]);
+  const stated = Object.fromEntries(mapped.map((r) => [PACK_ROLE_TO_TOKEN[r.job], r.hex]));
+  report.stated = mapped.map((r) => `${r.name} → ${r.job} (${PACK_ROLE_TO_TOKEN[r.job]} ← ${r.hex}): ${r.why}`);
 
   // Everything the pack never names, derived from its own accent and paper rather than borrowed
   // from ours. A pack of six colours cannot state a chart support colour or a caution.
@@ -102,6 +136,12 @@ export function fromPack(pack, { key, name } = {}) {
   const before = Object.fromEntries(Object.entries(overlay.color).map(([k, v]) => [k, v.$value.hex ?? v.$value]));
   for (const [token, hex] of Object.entries(stated)) {
     overlay.color[token] = { $value: { colorSpace: 'srgb', components: [1, 3, 5].map((i) => Math.round((parseInt(hex.slice(i, i + 2), 16) / 255) * 10000) / 10000), hex } };
+  }
+  // Jobs this system has no token for keep the pack's colour under its own name, so a page using it
+  // is using a declared colour, and the report says what each one is for.
+  for (const r of roles.filter((x) => !PACK_ROLE_TO_TOKEN[x.job])) {
+    overlay.color[`pack-${r.name}`] = { $value: { colorSpace: 'srgb', components: [1, 3, 5].map((i) => Math.round((parseInt(r.hex.slice(i, i + 2), 16) / 255) * 10000) / 10000), hex: r.hex } };
+    report.stated.push(r.job ? `${r.name} → ${r.job} (pack-${r.name} ← ${r.hex}): ${r.why}` : `${r.name} (pack-${r.name} ← ${r.hex}) kept under its own name: ${r.why}`);
   }
   report.derived = Object.keys(before)
     .filter((token) => !(token in stated))
@@ -123,6 +163,12 @@ export function fromPack(pack, { key, name } = {}) {
   if (pack.type?.data) font.data = { $value: splitStack(pack.type.data) };
   if (pack.type?.display) font.display = { $value: splitStack(pack.type.display) };
   else report.carried.push('no display voice: this pack has none, so Register I keeps this system\'s display family and a Register I page under it is not the pack\'s design');
+  // Any further voice the pack states (Broadsheet's `util`) is one of its families too.
+  for (const [voice, stack] of Object.entries(pack.type ?? {})) {
+    if (['text', 'data', 'display'].includes(voice) || typeof stack !== 'string') continue;
+    font[voice] = { $value: splitStack(stack) };
+    report.stated.push(`voice ${voice} ← ${splitStack(stack)[0]}, the pack's own`);
+  }
   if (Object.keys(font).length) overlay.font = font;
 
   // System values that this system already has a home for, and the ones it does not.
@@ -135,15 +181,54 @@ export function fromPack(pack, { key, name } = {}) {
     overlay.$extensions['form.applied'] = { ...overlay.$extensions['form.applied'], absent: { $value: ['shadow', 'gradient-fill'] } };
     report.carried.push(`radius ${sv.radius}: permitted, on a one-step scale`);
   }
-  if (num(sv.measure) && num(sv.measure) !== floors.maxMeasureCh) {
-    report.carried.push(`measure ${sv.measure}: this system's ceiling is ${floors.maxMeasureCh}ch and floors do not move, so the stricter of the two applies`);
-  }
+
   if (num(sv.cols) && num(sv.cols) !== 16) {
     report.carried.push(`grid ${sv.cols} columns: not carried, because the grid is not yet a parameter (decision 0016). The overlay uses this system's 16`);
   }
   if (num(sv.unit) && num(sv.unit) !== 8) {
     report.carried.push(`base unit ${sv.unit}: not carried; this system's spacing scale is 8px and every spacing rule reads it`);
   }
+
+  // What the pack itself declares decides which system rules judge a page under it
+  // (`scope: 'system'` in the rule registry); universal rules always apply, house rules never do.
+  const declares = ['colour.ground'];
+  if (pack.type?.text) declares.push('type.text');
+  if (pack.type?.data) declares.push('type.data');
+  if (roles.some((r) => r.job === 'focus')) declares.push('colour.focus');
+  // A pack's spacing is its steps, or, when it states only a unit (the five paid packs: "8px"), every
+  // multiple of that unit: a scale of one step, above which the rule accepts multiples of the unit.
+  const unit = num(sv.unit) > 0 ? num(sv.unit) : null;
+  const steps = [...new Set(Object.entries(sv).filter(([k]) => /^s\d+$/.test(k)).map(([, v]) => num(v)).filter((v) => v > 0))].sort((a, b) => a - b);
+  const spacing = unit ? (steps.length ? steps : [unit]) : [];
+  if (unit) declares.push('system_values.unit');
+  if (sv.radius != null) declares.push('system_values.radius');
+  if (/ch$/.test(String(sv.measure ?? '')) && num(sv.measure) > 0) {
+    declares.push('system_values.measure');
+    overlay.floors = { 'max-measure-ch': { $value: num(sv.measure) } };
+  }
+  const undeclared = [['system_values.unit', 'spacing unit and scale'], ['system_values.radius', 'radius'], ['system_values.measure', 'measure'], ['type.data', 'data voice'], ['colour.focus', 'focus colour']]
+    .filter(([path]) => !declares.includes(path)).map(([, what]) => what);
+  if (undeclared.length) report.carried.push(`not declared by the pack, so the rules that read them do not apply: ${undeclared.join(', ')}`);
+
+  // The pack's own register: its ground as the background, its colours in the roles this system's
+  // rules read. A page under a pack is judged in it whatever register the page declares.
+  // A second ground, and any colour whose author says it fills (Instrument's ink: "primary fills";
+  // its ink band is its mark), may cover a full-bleed surface under this pack.
+  const refOf = (r) => (PACK_ROLE_TO_TOKEN[r.job] ? `{color.${PACK_ROLE_TO_TOKEN[r.job]}}` : `{color.pack-${r.name}}`);
+  const grounds = roles.filter((r) => r.job === 'ground-alt' || (r.job !== 'ground' && /\bfills?\b|\bthe band\b/i.test(r.role ?? ''))).map(refOf);
+  overlay.register = {
+    pack: {
+      $description: `${pack.system} ${pack.version ?? ''}, imported: the pack's own register.`.replace(/ ,/, ','),
+      $extensions: { 'form.applied': { grounds } },
+      background: { $value: '{color.paper}' }, layer: { $value: '{color.paper}' }, text: { $value: '{color.ink}' },
+      accent: { $value: '{color.terracotta}' }, link: { $value: '{color.terracotta}' }, support: { $value: '{color.teal}' },
+      focus: { $value: '{color.focus}' }, muted: { $value: '{color.muted}' }, rule: { $value: '{color.sand}' },
+      positive: { $value: '{color.positive}' }, caution: { $value: '{color.caution-deep}' }, critical: { $value: '{color.critical}' },
+      'on-accent': { $value: '{color.paper}' },
+    },
+  };
+  overlay.$extensions = { ...overlay.$extensions };
+  overlay.$extensions['form.applied'] = { ...overlay.$extensions['form.applied'], pack: { system: pack.system, version: pack.version ?? null, declares, ...(unit ? { unit, spacing } : {}) } };
 
   return { overlay: report.refused.length ? null : overlay, report };
 }

@@ -147,8 +147,12 @@ export const display = {
   weightMax: value('display.weight-max'),
 };
 
-export const spacingUnit = ext('spacing').unit;
-export const spacingScale = leafEntries(tokens.spacing).sort(([a], [b]) => Number(a) - Number(b)).map(([, t]) => px(t.$value));
+
+/** The Standards pack this system was imported from, if it was: { system, version, declares, spacing? }. */
+export const pack = ext().pack ?? null;
+// A pack's own spacing scale replaces this one's outright; a merged overlay could only add steps.
+export const spacingUnit = pack?.unit ?? ext('spacing').unit;
+export const spacingScale = pack?.spacing?.length ? pack.spacing : leafEntries(tokens.spacing).sort(([a], [b]) => Number(a) - Number(b)).map(([, t]) => px(t.$value));
 
 export const grid = {
   gutter: px(tokens.grid.gutter.$value),

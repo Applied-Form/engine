@@ -27,7 +27,8 @@
  * every text entry that fall under the advisory thresholds. They never fail
  * a build; the WCAG 2 floors are the gate.
  */
-import { registers, typeScale, floors } from './tokens.mjs';
+import { registers, typeScale, floors, pack } from './tokens.mjs';
+import { appliesToPack } from './rules/registry.mjs';
 import { apca, isLargeText } from './contrast.mjs';
 import { eq } from './rules/util.mjs';
 import { checkGrounds } from './rules/grounds.mjs';
@@ -45,8 +46,10 @@ import { checkCharts } from './rules/charts.mjs';
 
 export function lint(spec) {
   const out = [];
-  const add = (rule, message, detail = {}) => out.push({ rule, message, ...detail });
-  const reg = spec.register;
+  // Under a Standards pack, a page is judged in the pack's register whatever it declares, and only by
+  // the rules that hold for any page or that read something the pack itself states.
+  const add = (rule, message, detail = {}) => { if (!pack || appliesToPack(rule, pack.declares)) out.push({ rule, message, ...detail }); };
+  const reg = pack ? 'pack' : spec.register;
   if (!registers[reg]) {
     add('register', `register must be one of ${Object.keys(registers).join(', ')}, got ${JSON.stringify(reg)}`);
     return out;

@@ -6,7 +6,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { fromPack, hueOf, PACK_ROLE_TO_TOKEN } from '../src/lib/pack.mjs';
+import { fromPack, hueOf, jobOf, PACK_ROLE_TO_TOKEN } from '../src/lib/pack.mjs';
 import { contrast } from '../src/lib/contrast.mjs';
 import { colorHex } from '../src/lib/tokens.mjs';
 
@@ -80,4 +80,56 @@ test('a pack missing the two anchors is refused before anything is derived', () 
   const { overlay, report } = fromPack({ system: 'Nameless', colour: { ink: { value: '#000000' } } });
   assert.equal(overlay, null);
   assert.match(report.refused[0], /no signal or no ground/);
+});
+
+/**
+ * Five of the six Standards packs name their accent something other than `signal`, and the importer
+ * refused all five for it (readiness baseline B1, 2026-10-13). Each pack states a colour's job in a
+ * sentence of its own, so the job is read from that sentence, quoted back in the report.
+ */
+test("a colour's job comes from an explicit job, then its contract key, then its author's sentence", () => {
+  assert.equal(jobOf('accent', { value: '#1B3A6B', job: 'signal' }).job, 'signal');
+  assert.equal(jobOf('signal', { value: '#C8102E', role: 'anything at all' }).job, 'signal');
+  // The paid packs' own sentences, verbatim from their tokens.json.
+  const cases = [
+    ['accent', 'Single accent. Never a field or background', 'signal'],
+    ['link', 'Interaction. Default browser blue, honoured, not restyled', 'signal'],
+    ['visited', 'Visited links, honoured', 'visited'],
+    ['yellow', 'Highlight and primary action fill. Text stays ink', 'highlight'],
+    ['red', 'The axis bar, one emphasis, interaction', 'signal'],
+    ['ground-alt', 'Secondary ground, posters only', 'ground-alt'],
+    ['cyan', 'Interaction only. Links, buttons, controls', 'signal'],
+    ['pink', 'Expression only. Never clickable', 'expression'],
+    ['brass', 'Ornament and rule only. Never type, never interactive', 'ornament'],
+    ['jade', 'Single accent, once per artefact. Interaction', 'signal'],
+  ];
+  for (const [name, role, job] of cases) assert.equal(jobOf(name, { value: '#000000', role }).job, job, `${name}: "${role}"`);
+  assert.equal(jobOf('mystery', { value: '#000000', role: 'Something else entirely' }).job, null);
+});
+
+test('two colours that both read as the signal are refused, naming both and quoting both', () => {
+  const pack = { system: 'Twin', version: '1', colour: {
+    ground: { value: '#FFFFFF', role: 'The only permitted page ground' }, ink: { value: '#111111', role: 'Body text' },
+    muted: { value: '#5C574F', role: 'Labels' },
+    a: { value: '#1B3A6B', role: 'Single accent' }, b: { value: '#2E5E52', role: 'Interaction' } } };
+  const { overlay, report } = fromPack(pack);
+  assert.equal(overlay, null);
+  const refused = report.refused.join('\n');
+  assert.match(refused, /\ba "Single accent"/);
+  assert.match(refused, /\bb "Interaction"/);
+});
+
+test("a paid pack's shape imports, and the report quotes the sentence each job came from", () => {
+  const cornice = { system: 'Cornice', version: '1.0.0',
+    colour: { ground: { value: '#F6F2EA', role: 'The only permitted page ground' }, ink: { value: '#14171A', role: 'Body text, display type, primary fills' },
+      brass: { value: '#A9853F', role: 'Ornament and rule only. Never type, never interactive' },
+      jade: { value: '#2E5E52', role: 'Single accent, once per artefact. Interaction' }, muted: { value: '#6A6560', role: 'Labels, secondary data, captions' } },
+    type: { text: '"Cormorant Garamond", serif' }, system_values: { radius: '0' } };
+  const { overlay, report } = fromPack(cornice, { key: 'cornice' });
+  assert.ok(overlay, report.refused.join('; '));
+  assert.equal(hexes(overlay).terracotta, '#2E5E52', "the pack's signal is its jade");
+  const stated = report.stated.join('\n');
+  assert.match(stated, /jade → signal.*"Single accent, once per artefact\. Interaction"/);
+  assert.match(stated, /brass → ornament \(pack-brass ← #A9853F\)/);
+  assert.equal(hexes(overlay)['pack-brass'], '#A9853F', 'a job this system has no token for is kept under its own name');
 });

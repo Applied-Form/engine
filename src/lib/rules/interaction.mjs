@@ -1,10 +1,13 @@
 /** Statuses, focus rings, links. */
-import { colors } from '../tokens.mjs';
+import { colors, pack } from '../tokens.mjs';
 import { eq } from './util.mjs';
 
 export function checkStatuses(ctx, spec, add) {
   for (const st of spec.statuses ?? []) {
-    if (!st.label || !st.shape) add('status-colour-only', 'Every status carries a label and a shape as well as a colour', { status: st });
+    // Applied Form asks for a label and a shape; the universal rule (WCAG 1.4.1) is not colour alone.
+    if (pack ? !st.label && !st.shape : !st.label || !st.shape) {
+      add('status-colour-only', pack ? 'A status carries a label or a shape, never colour alone' : 'Every status carries a label and a shape as well as a colour', { status: st });
+    }
   }
 }
 
