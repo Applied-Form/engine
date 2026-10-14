@@ -167,10 +167,12 @@ test('under a pack a labelled status passes; a status carried by colour alone do
  * A long sentence on one line in the same column is still over the measure.
  */
 test('a short line in a wide box is within the measure; a long one is not', { skip }, () => {
-  const wide = (text) => page('', 'main { max-width: none; } main > p, .box { max-width: 60ch; } .wide { width: 1100px; max-width: 100%; }').replace('<div class="box">', `<h2 class="wide">${text}</h2><div class="box">`);
+  // The long line is body text at 16px: in a 1,100px box it runs past 66ch in any font a machine falls
+  // back to. A 24px heading wraps at a width that depends on the font, which is not what is under test.
+  const wide = (text, tag) => page('', 'main { max-width: none; } main > p, .box { max-width: 60ch; } .wide { width: 1100px; max-width: 100%; font-size: 16px; }').replace('<div class="box">', `<${tag} class="wide">${text}</${tag}><div class="box">`);
   const { fired } = lintUnder(instrument, {
-    'short.html': wide('Field note 01'),
-    'long.html': wide('A bounded workflow makes the evidence, the decision and the next action available to every reviewer.'),
+    'short.html': wide('Field note 01', 'h2'),
+    'long.html': wide('A bounded workflow makes the evidence, the decision and the next action available to every reviewer.', 'p'),
   });
   assert.ok(!fired['short.html'].includes('measure'), `a three-word heading: ${fired['short.html'].join(', ')}`);
   assert.ok(fired['long.html'].includes('measure'), `a 100-character line: ${fired['long.html'].join(', ')}`);
