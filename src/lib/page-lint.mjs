@@ -3,6 +3,7 @@ import { fileURLToPath } from 'node:url';
 import { dirname, resolve, sep } from 'node:path';
 import { specFromPage } from './page-spec.mjs';
 import { lint, advise } from './rules.mjs';
+import { appliesToPack } from './rules/registry.mjs';
 import { aspectRatios, registers, grid, layers, composition, recipes, motion, print, fonts, recipeColumns, pack } from './tokens.mjs';
 
 /** The engine's own files: its stylesheets, fonts and modules, which a page it renders may load. */
@@ -113,10 +114,15 @@ const assume = (register) => (register ? (page) => page.addInitScript((r) => {
   }, { once: true, capture: true });
 }, register) : async () => {});
 
-export async function lintPages(urls, { viewports = VIEWPORTS, browser, register = null, fileRoots = DEFAULT_FILE_ROOTS(), withIds = false } = {}) {
+export async function lintPages(urls, { viewports = VIEWPORTS, browser, register = null, fileRoots = DEFAULT_FILE_ROOTS(), withIds = false, unregistered = 'house' } = {}) {
   if (register != null && !Object.hasOwn(registers, register)) throw new Error(`unknown register "${register}"; the tokens define ${Object.keys(registers).join(', ')}`);
   // A page under a Standards pack needs no register of its own: the pack's is assumed for it.
   register ??= pack ? 'pack' : null;
+  // With no system loaded and no register given, a page that declares none is judged by the rules that
+  // hold for any page (`unregistered: 'universal'`, what `af lint` asks for), instead of stopping at
+  // "no register". A page that declares a register keeps every rule. The default is unchanged.
+  const universalIfUndeclared = unregistered === 'universal' && register == null;
+  if (universalIfUndeclared) register = 'ii';
   const own = !browser;
   browser ||= await launchBrowser();
   const tag = assume(register);
@@ -173,7 +179,8 @@ export async function lintPages(urls, { viewports = VIEWPORTS, browser, register
         }
         if (printSpec) spec.print = printSpec;
         const violations = [...lint(spec), ...spec.charts.flatMap((chart) => lint({ register: spec.register, theme: spec.theme, background: spec.background, chart }))];
-        results.push({ url, viewport: width, spec, violations, advisories: advise(spec) });
+        const universal = universalIfUndeclared && spec.assumedRegister;
+        results.push({ url, viewport: width, spec, violations: universal ? violations.filter((v) => appliesToPack(v.rule, [])) : violations, advisories: advise(spec), ...(universal ? { scope: 'universal' } : {}) });
       }
     }
   } finally {

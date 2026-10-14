@@ -9,12 +9,17 @@ The engine is open so the evidence about it can be checked. Every comparison it 
 rerun from this repository: the gate beside axe-core and stylelint, the drift survey of public
 design systems, and the model study and its judging rounds, with every record they were scored from.
 
-## Install
+## Start
 
 ```sh
-npm install github:Applied-Form/engine   # the npm package is not published yet
-npx playwright install chromium
+npm install github:Applied-Form/engine && npx playwright install chromium   # npm package not yet published
+npx af init --pack instrument     # load a system: the free Standards pack, or your pack's tokens.json
+npx af lint page.html             # your page, judged by that system's rules, at every width
 ```
+
+With no system loaded, `af lint` judges a page by the rules that hold for any page (contrast, focus,
+target size, overflow, alt text, heading order, motion) and says how to load one. For an agent,
+`npx af mcp-config` prints the server block for Claude Code or Cursor.
 
 ## Use
 

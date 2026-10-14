@@ -1,0 +1,74 @@
+{
+  "judges": {
+    "kept": [
+      "azure:gpt-5-mini",
+      "sonnet-5-5"
+    ],
+    "excluded": [],
+    "attentionFloor": 0.8,
+    "routes": [
+      "azure",
+      "anthropic"
+    ],
+    "generatorRoutes": [
+      "azure"
+    ],
+    "sameFamilyOnly": false
+  },
+  "arms": [
+    {
+      "arm": "rules-run",
+      "wins": 769.5,
+      "share": 0.537
+    },
+    {
+      "arm": "none",
+      "wins": 164,
+      "share": 0.1144
+    },
+    {
+      "arm": "rules-read",
+      "wins": 154.5,
+      "share": 0.1078
+    },
+    {
+      "arm": "rules-run-primed",
+      "wins": 145,
+      "share": 0.1012
+    },
+    {
+      "arm": "prose",
+      "wins": 113,
+      "share": 0.0789
+    },
+    {
+      "arm": "components",
+      "wins": 87,
+      "share": 0.0607
+    }
+  ],
+  "anchors": [
+    {
+      "pair": "floor vs rules-run",
+      "anchorWins": 4,
+      "armWins": 284
+    }
+  ],
+  "floorAnchorLost": true,
+  "conformanceVsPreference": {
+    "spearman": 0.9429,
+    "arms": 6,
+    "reading": "conformance tracks preference here, so the rate is a usable proxy",
+    "caveat": "Descriptive, not a test. Eight arms give a correlation with an interval too wide to reject anything; the decision-relevant output of this round is the floor-anchor check and the sign."
+  },
+  "valid": true,
+  "items": 880,
+  "judgements": 1760,
+  "unparsed": 3,
+  "screenshot": {
+    "width": 1280,
+    "height": 1600,
+    "fullPage": false
+  },
+  "ceilingAnchor": "absent: no human-designed page exists for these briefs, so the ceiling check did not run"
+}

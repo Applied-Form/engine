@@ -17,3 +17,7 @@ appliedform/standards (examples/workflow/reference-catalogue-r3), unmodified, us
 Creative Commons Attribution 4.0 International Licence: Instrument, a Standards pack, from
 Applied Form. They embed Public Sans and DM Mono, each under the SIL Open Font License 1.1, with
 its licence text carried in the page's own font-license metadata.
+
+packs/instrument.tokens.json is Instrument's token contract from appliedform/standards, unmodified,
+used under the Creative Commons Attribution 4.0 International Licence: Instrument, a Standards pack,
+from Applied Form.

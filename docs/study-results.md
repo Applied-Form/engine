@@ -84,7 +84,7 @@ The sensitivity fit is per rule per page with a random intercept for the rule. T
 
 **The gate enforces, on every generator.** On the rules it is shown, the loop's rate is 0.22 of reading's pooled (0.14 to 0.30 by generator), 3.3 disclosed violations per hundred elements against 15.1, and 38% of its pages are clean against 2%. It is the only arm with a serious axe-core rate below one per page (0.8).
 
-**Components generalise best.** Shipping the system as components gives the lowest held-out rate on every generator (0.44 of the control pooled) and beats the loop outright on four of five (0.53 pooled; level on Opus). It costs half to two thirds of the loop per page. On Haiku 11% of component pages are truncated at the token cap and excluded, which is a real limit on sending components to a small model.
+**Components generalise best.** Shipping the system as components gives the lowest held-out rate on four of five generators (0.44 of the control pooled); on Opus, components, prose and the rules are level (0.47 to 0.51) and beats the loop outright on four of five (0.53 pooled; level on Opus). It costs half to two thirds of the loop per page. On Haiku 11% of component pages are truncated at the token cap and excluded, which is a real limit on sending components to a small model.
 
 **The token file brings the palette.** Every arm with the token file holds palette drift to 1.5 to 1.8 ΔE against 12 without it, and repeat generations agree about three times more closely.
 

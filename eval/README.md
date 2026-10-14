@@ -39,6 +39,18 @@ pre-registered pairs, the disclosed-rule rate the loop is shown, axe-core, palet
 failures, each interval a seeded cluster bootstrap over briefs. The pilot's tables in
 `docs/pilot-results.md` are its output over `eval/results/pilot-*.jsonl`.
 
+`node eval/heldout.mjs --out heldout.json rescore/` computes Goal A as the protocol registers it:
+the `pipeline-blind` held-out rate over `rules-read`, read from the per-page files
+`eval/rescore.mjs` writes when given a run's records, paired by model from the page names, pooled
+over the models, with the seeded cluster-bootstrap interval and a leave-one-out over the ten scored
+rules. The pooled interval resamples the 72 brief×model cells by default (`--cluster cell`), because
+that is the unit the ninth amendment's registered engine6 figures were worked out on; `--cluster
+brief` resamples the 36 briefs with both models' pages in each, the more conservative unit, and the
+table header and the JSON say which was used. The Evaluation workflow runs it at the end of a
+`rescore` dispatch, so one dispatch with `rescore_arms=pipeline,pipeline-blind,rules-read` over an
+engine run and the study baseline puts the verdict in `rescore/summary.txt` and
+`rescore/heldout.json`. When no model has both arms it says so and exits 0.
+
 ## The two stub providers
 
 `stub` always succeeds, and proves the plumbing. `stub-flaky` emits what real models actually do —

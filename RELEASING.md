@@ -15,13 +15,17 @@ commit and workflow run that built it.
    exist on npm and the person setting up must be able to publish to it.
 2. **The first publish.** npm configures a trusted publisher from a package's settings page, so a
    package that has never been published has no page to configure. Publish the first version by
-   hand, from a clean checkout of its tag, with two-factor authentication:
+   hand, from a clean checkout of the commit that will carry its tag, with two-factor
+   authentication, before the tag exists:
 
    ```sh
-   git checkout v3.2.0
+   git checkout <the export commit for 3.2.0>
    npm install && npx playwright install chromium && npm run check
    npm publish --access public
    ```
+
+   Then push the tag as in "Cutting a version". Its Release run finds that version already on
+   npm, skips the npm step, and publishes `server.json` to the MCP registry.
 
 3. **The trusted publisher.** On npmjs.com, in the package's settings, add a trusted publisher:
    GitHub Actions, organisation `Applied-Form`, repository `engine`, workflow `release.yml`,
@@ -44,4 +48,5 @@ git tag v3.2.0 && git push origin v3.2.0
 ```
 
 Watch the Release run. If it fails before publishing, fix the cause, delete the tag, and tag the
-fixed commit. A version that has been published to npm cannot be published again; cut the next one.
+fixed commit. A version that has been published to npm cannot be published again; the run skips
+the npm step for it, so a failed MCP registry step can be retried by re-running the job.

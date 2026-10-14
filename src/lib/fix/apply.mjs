@@ -3,12 +3,13 @@
  * computed in the load it measured, so the fixes live in one appended stylesheet, the page's own markup
  * is untouched, and the page is never opened outside the checker's sandbox.
  */
-/** One CSS rule per patch, aligned with `patches`; null where the checker gave no selector. */
+/** One CSS rule per patch, aligned with `patches`; null where the checker gave no selector. A `subtree` patch reaches the element's descendants too. */
 export function cssOf(patches) {
   return patches.map((p) => {
     if (!p.sel) return null;
     const body = Object.entries(p.decl).map(([k, v]) => `${k}: ${v} !important`).join('; ');
-    return `${p.sel}${p.pseudo} { ${body}; }`;
+    const sel = p.subtree ? `${p.sel}${p.pseudo}, ${p.sel} *${p.pseudo}` : `${p.sel}${p.pseudo}`;
+    return `${sel} { ${body}; }`;
   });
 }
 
