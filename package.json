@@ -1,9 +1,9 @@
 {
   "name": "@appliedform/engine",
-  "version": "3.2.0",
+  "version": "3.2.1",
   "description": "A design-system conformance gate measured in a real browser: DTCG tokens in, every rendered page checked at four fixed and two sampled widths, with drift surveys, an MCP server and an evaluation harness anyone can rerun.",
   "type": "module",
-  "mcpName": "io.github.applied-form/engine",
+  "mcpName": "io.github.Applied-Form/engine",
   "license": "Apache-2.0",
   "author": "Applied Form Ltd",
   "engines": {

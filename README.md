@@ -12,7 +12,7 @@ design systems, and the model study and its judging rounds, with every record th
 ## Start
 
 ```sh
-npm install github:Applied-Form/engine && npx playwright install chromium   # npm package not yet published
+npm install @appliedform/engine && npx playwright install chromium
 npx af init --pack instrument     # load a system: the free Standards pack, or your pack's tokens.json
 npx af lint page.html             # your page, judged by that system's rules, at every width
 ```

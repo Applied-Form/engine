@@ -34,9 +34,10 @@ commit and workflow run that built it.
 4. **The release environment.** In this repository's settings, the `release` environment can
    require a reviewer before a tag publishes, and can be limited to tags matching `v*`.
 5. **The MCP registry.** Nothing to set up. `mcp-publisher login github-oidc` proves the workflow
-   runs in the `Applied-Form` organisation, which owns the `io.github.applied-form` namespace that
-   `server.json` names. The registry checks that the npm package's `mcpName` matches the server
-   name, so npm is published first.
+   runs in the `Applied-Form` organisation, which owns the `io.github.Applied-Form` namespace that
+   `server.json` names. The registry namespace follows the GitHub organisation's exact
+   capitalisation, so a lowercase `io.github.applied-form` is refused. The registry checks that
+   the npm package's `mcpName` matches the server name, so npm is published first.
 
 ## Cutting a version
 

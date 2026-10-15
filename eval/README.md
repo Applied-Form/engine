@@ -51,6 +51,11 @@ table header and the JSON say which was used. The Evaluation workflow runs it at
 engine run and the study baseline puts the verdict in `rescore/summary.txt` and
 `rescore/heldout.json`. When no model has both arms it says so and exits 0.
 
+`node eval/tiers.mjs <records.jsonl | per-page.json> …` reports the seventh amendment's bars on the
+`pipeline` arm, per model: the pass rate, the share of pages clean on every tier 2 rule, and how many of
+the thirteen tier 1 rules no page breaks, naming the pages that break each one. The same `rescore`
+dispatch runs it over every re-scored `pipeline` arm.
+
 ## The two stub providers
 
 `stub` always succeeds, and proves the plumbing. `stub-flaky` emits what real models actually do —

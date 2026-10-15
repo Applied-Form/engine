@@ -1,6 +1,6 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
-  "name": "io.github.applied-form/engine",
+  "name": "io.github.Applied-Form/engine",
   "title": "Applied Form engine",
   "description": "Lint rendered pages against a design system in a real browser, across six widths, with the fix.",
   "websiteUrl": "https://github.com/Applied-Form/engine",
@@ -8,13 +8,13 @@
     "url": "https://github.com/Applied-Form/engine",
     "source": "github"
   },
-  "version": "3.2.0",
+  "version": "3.2.1",
   "packages": [
     {
       "registryType": "npm",
       "registryBaseUrl": "https://registry.npmjs.org",
       "identifier": "@appliedform/engine",
-      "version": "3.2.0",
+      "version": "3.2.1",
       "transport": {
         "type": "stdio"
       }
