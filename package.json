@@ -14,6 +14,14 @@
     "af-mcp": "scripts/mcp.mjs",
     "engine": "scripts/mcp.mjs"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Applied-Form/engine.git"
+  },
+  "homepage": "https://github.com/Applied-Form/engine#readme",
+  "bugs": {
+    "url": "https://github.com/Applied-Form/engine/issues"
+  },
   "files": [
     "bin",
     "src",
