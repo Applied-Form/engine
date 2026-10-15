@@ -26,7 +26,7 @@ import { colors, floors, registers, spacingScale, fonts, typeScale, aspectRatios
 import { derivePalette } from './palette.mjs';
 import { fromPack } from './pack.mjs';
 
-export const SERVER = { name: 'applied-form', version: '3.2.0' };
+export const SERVER = { name: 'applied-form', version: '3.2.1' };
 
 export const TOOLS = [
   {

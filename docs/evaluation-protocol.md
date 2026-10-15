@@ -945,6 +945,83 @@ existing tolerance of 1 (decision 0014), none otherwise. `measure` is disclosed 
 held-out ratio cannot move; pass rates can only rise. Under the staging rule earlier pipeline records
 are superseded for `measure`; `engine8` is the first run scored with it.
 
+### Amendment, 2026-10-14 (twelfth) — `engine8`: the tier 1 fixer defects, a centred-margin correction, the bootstrap's cluster pinned; registered before it runs
+
+**What is in it: two changes and a pin.** `engine8` exists to test whether the seventh amendment's
+tier 1 guarantee holds once the defects `engine7` exposed are closed. Nothing aimed at a tier 2 rule
+goes in, so the open leads (`contrast`; `offset-off-grid`, GPT-5's most frequent failure on `engine7`
+at 14 of 72 pipeline pages; mini's `horizontal-overflow` at 20 of 72) are **held back again, for
+`engine9`**.
+
+1. **The fixer** (`src/lib/fix/`, PR #50). On `engine7` every failing element had been located
+   except text drawn by `::before` and `::after`. The main cause was whole-group rollback: one patch
+   that made a rule worse dropped every patch in its group, the harmless ones included. Rollback now
+   bisects a dropped group, bounded at 24 trials a pass, and keeps what does not make a rule worse.
+   Six remedies changed: an svg takes the nearest permitted ratio no wider than its drawing's own and
+   is released from `max-height`, stretch, flex basis and automatic min-width; an underline covers
+   the link's subtree; font sizes merge to the larger of the two widths, with 2% headroom; runs drawn
+   by pseudo-elements are located and patched there; a Register II font fix carries the body floor;
+   svg accent text is recoloured through `fill`. All of it is model-free. An adversarial review found
+   the scorer identical on 24 `engine7` pages under both trees and no page, of the 29 whose gate failed
+   a tier 1 rule, ending worse on any rule than the page the fixer started from.
+2. **A scorer correction.** The extractor recognised a block centred by `margin: 0 auto` by exact
+   equality of its two margins. Layout works in 1/64px units, so when the free space is an odd number
+   of them one margin gets the extra unit (286.625px against 286.641px on `engine7` GPT-5 b03-s0) and
+   the auto margin was counted as 287px of spacing. A block is now centred when its margins differ by
+   less than half a pixel (`src/lib/page-spec.mjs`; `test/centred-margin.test.mjs` fails on the old
+   test with those exact margins). Re-scoring the 144 `engine7` pipeline pages locally with the scorer
+   before and after: `spacing` leaves four GPT-5 pages and one mini page, three of them become clean,
+   and no other rule moves on any page. `spacing` is disclosed and outside `UNIVERSAL_WITHHELD`, so the
+   held-out ratio cannot move and pass rates can only rise. Under the staging rule earlier pipeline
+   records are superseded for `spacing`, as they are for `measure` (eleventh amendment). Together with
+   the fixer, local replay of every `engine7` page whose gate failed `spacing` clears all five on
+   GPT-5 and three of four on mini; b11-s0 remains, where snapping an 18px wrapper margin to 16px
+   trips `print-overflow` and the fixer refuses it.
+3. **The pooled interval's cluster is pinned.** Goal A's pooled bootstrap resamples the 72
+   brief×model cells (`eval/heldout.mjs --cluster cell`, the default), the unit the ninth amendment's
+   figures used. The 36-brief clustering is reported beside it and decides nothing. `engine7`'s
+   verdict is the same under both.
+
+**Baseline.** `engine7` re-scored on the runner with `engine8`'s scorer: both models' pipeline and
+pipeline-blind arms, and the rules-read arm of `full-gpt-5` and `full-gpt-5-mini`, in one rescore
+dispatch at the `engine8` commit before `engine8` generates. The `engine7` figures quoted below are
+the recorded ones; the re-score may move them by the few pages the two corrections clear, and the
+predictions are judged against the re-score.
+
+**Predictions, bounded both ways, registered before any `engine8` record exists.**
+
+1. **Tier 1 holds on 11–13 of 13 rules on GPT-5, expected 12, and on 7–10 of 13 on mini, expected
+   9** (`engine7`: 11 and 6). Local replay holds all 13 on GPT-5; on mini it leaves `body-too-small`
+   (three pages) and `font-off-system` (three) broken by one conflict the fixer refuses by design,
+   15px controls in rows or tables that cannot hold 19px at 320px, plus `text-too-small` (one page,
+   chart labels at a scale near 0.1) and `spacing` (b11-s0). The expected values are one below the
+   replay because 72 fresh pages bring failure modes 144 replayed ones did not, and the runner fails
+   pages local replay clears.
+2. **Pass rate rises: 52–65% on GPT-5 and 36–51% on mini** (`engine7`: 55.6% and 34.7%). On the
+   records, four GPT-5 pages failed only tier 1 rules, and eleven mini pages failed only tier 1 rules
+   and one only `measure`; replay clears all four and about seven of the twelve. Below a band means
+   something else moved and must be found before the run is read; above it means run-to-run variance
+   or the corrections did more than they should.
+3. **Tier 2 stays above its bars**: page-clean on every tier 2 rule at 53–69% on GPT-5 and 42–58% on
+   mini (`engine7`: 61.1% and 50.0%; bars 50% and 35%). No change aims at a tier 2 rule; the bisected
+   rollback keeps more patches but never leaves a rule worse than the fixer's start.
+4. **Cost is unchanged within ±0.15×**: 1.54–1.84× (GPT-5) and 1.72–2.02× (mini). The fixer calls no
+   model; its extra lints cost wall-clock time, not tokens.
+5. **The held-out ratio replicates within ±0.08 of `engine7`'s 0.911 pooled**, i.e. 0.83–0.99. The
+   blind arm's fixer applies disclosed rules only; the new remedies can reach a held-out rule only by
+   a side effect of the kind the eighth amendment measured (a font-size fix growing a control past
+   24px, 1 in 732). **Goal A is predicted not met**: it is judged exactly as the ninth amendment
+   registered it, with the cell clustering above, and the leave-one-out condition failed on nine of
+   ten rules on `engine7`; nothing here changes why.
+6. **The eighth amendment's two-run bound** — the held-out ratio within 0.10 of 1.00, judged on
+   `engine7` and `engine8` pooled — **holds on mini and breaks on GPT-5, below the bound** (0.827 on
+   `engine7`, outside it a second run running). A breach below 1 is the engine's arms doing better
+   than reading the rules on rules no arm was told; it is reported as a breach of a no-harm bound,
+   not as Goal A.
+
+**The run.** As `engine7`: `azure:gpt-5` and `azure:gpt-5-mini`, arms `pipeline` and
+`pipeline-blind`, the thirty-six frozen briefs, two samples each, about $31 of Azure credit for both.
+
 ## Measures
 
 Primary:

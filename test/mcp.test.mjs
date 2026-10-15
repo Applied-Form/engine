@@ -213,7 +213,8 @@ test('the registry manifest cannot drift from the package or the server', async 
   assert.equal(SERVER.version, pkg.version, 'the server ships inside the package, so it cannot be versioned apart from it');
   assert.equal(manifest.packages[0].identifier, pkg.name, 'the manifest points at a package that is not this one');
   assert.ok(pkg.bin['af-mcp'], 'the manifest runs af-mcp, so the package has to install it');
-  assert.match(manifest.name, /^[a-z]+\.[a-z0-9-]+(\.[a-z0-9-]+)*\/[a-z0-9-]+$/, 'reverse-DNS namespace');
+  // The last namespace segment can be a GitHub organisation, whose capitals the registry keeps.
+  assert.match(manifest.name, /^[a-z]+\.[a-z0-9-]+(\.[A-Za-z0-9-]+)*\/[a-z0-9-]+$/, 'reverse-DNS namespace');
   // The registry validates against its schema, which caps both at 100 characters, and checks npm
   // ownership by the package's mcpName matching the server's name.
   assert.ok(manifest.description.length <= 100, `description is ${manifest.description.length} characters; the schema allows 100`);

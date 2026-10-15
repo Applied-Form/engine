@@ -247,8 +247,10 @@ export function extract(opts) {
     const parent = el.parentElement;
 
     // Spacing. Horizontal auto margins resolve to arbitrary px; centred blocks and flex/grid items use them for
-    // alignment, not spacing, so their horizontal margins are skipped.
-    const centred = s.marginLeft === s.marginRight && parent && rect.width < rectOf(parent).width - 1;
+    // alignment, not spacing, so their horizontal margins are skipped. Layout works in 1/64px units, so when the
+    // free space is an odd number of them one auto margin gets the extra unit (286.625px against 286.641px): a
+    // block is centred when its margins differ by less than half a pixel, a difference no author writes.
+    const centred = Math.abs(parseFloat(s.marginLeft) - parseFloat(s.marginRight)) < 0.5 && parent && rect.width < rectOf(parent).width - 1;
     const inFlexOrGrid = parent && /flex|grid/.test(cs(parent).display);
     for (const prop of ['marginTop', 'marginRight', 'marginBottom', 'marginLeft', 'paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft', 'rowGap', 'columnGap']) {
       if ((centred || inFlexOrGrid) && (prop === 'marginLeft' || prop === 'marginRight')) continue;
