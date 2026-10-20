@@ -243,15 +243,21 @@ export const BLIND_FIXABLE = FIXABLE.filter((r) => !WITHHELD_RULES.has(r) && !BL
 export const blindJudge = (rule) => !WITHHELD_RULES.has(rule);
 
 /**
- * How the eval runs the pipeline for an arm: the fixer's rules, what it judges itself on, what the
- * model is shown, and the widths the gate checks — the scorer's, so a gate pass means what the
- * score means.
+ * How the eval runs the pipeline for an arm: the fixer's rules, what it judges itself on, whether it
+ * may try a refused fix's second answer, what the model is shown, and the widths the gate checks —
+ * the scorer's, so a gate pass means what the score means.
+ *
+ * The blind arm is offered no second answer. Each one is a layout change: a raised size with
+ * `overflow-wrap: anywhere` let a long address stop overflowing 320px, which moved
+ * horizontal-overflow on a constructed page and target-size on engine8 mini b32-s1, both scored
+ * and held out. Layout is withheld, which is why measure is kept from the blind fixer too.
  */
 export function pipelineOptions(arm) {
   const blind = arm === 'pipeline-blind';
   return {
     allow: blind ? BLIND_FIXABLE : FIXABLE,
     judge: blind ? blindJudge : () => true,
+    secondAnswers: !blind,
     visible: blind ? (vs) => partition(vs).disclosed : (vs) => vs,
     viewports: SCORE_VIEWPORTS,
   };

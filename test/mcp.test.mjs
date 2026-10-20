@@ -17,7 +17,7 @@ test('the server introduces itself and lists its tools', async () => {
   assert.ok(init.result.capabilities.tools);
   const list = await handle({ jsonrpc: '2.0', id: 2, method: 'tools/list' });
   assert.deepEqual(list.result.tools.map((t) => t.name).sort(),
-    ['af_brand', 'af_contrast', 'af_drift', 'af_lint', 'af_move', 'af_rules', 'af_system', 'af_tokens']);
+    ['af_brand', 'af_contrast', 'af_drift', 'af_fix', 'af_lint', 'af_move', 'af_rules', 'af_system', 'af_tokens']);
   for (const t of list.result.tools) {
     assert.ok(t.description.length > 40, `${t.name} explains itself`);
     assert.equal(t.inputSchema.type, 'object');
@@ -136,6 +136,44 @@ test('af_lint says which register it used when the page overrides the one asked 
   }
   assert.equal(result.register, 'ii', 'the page declares II and keeps it');
   assert.equal(result.assumedRegister, false);
+});
+
+test('af_fix returns the fixed draft and an account of it, and calls no model', { skip: process.env.AF_SKIP_BROWSER ? 'browser skipped' : false }, async () => {
+  // The same three mistakes af_lint finds above, plus a heading that skips levels, which needs a
+  // change to the markup and so must come back as still failing, named by its element.
+  const html = `<!doctype html><html lang="en" data-register="ii"><head><meta charset="utf-8"><title>Draft</title>
+    <style>.card{border-radius:9px;box-shadow:0 2px 8px rgba(0,0,0,.2)} p a.plain{text-decoration:none}</style></head>
+    <body><main><h1>Quarterly review</h1><p class="card">See the <a class="plain" href="#detail">detail</a>.</p>
+    <h4>Skipped</h4></main></body></html>`;
+  let result;
+  try {
+    result = JSON.parse((await HANDLERS.af_fix({ html, viewports: [1280] })).content[0].text);
+  } catch (e) {
+    if (/executable|browser|Chromium/i.test(e.message)) return;
+    throw e;
+  }
+  for (const rule of ['radius-present', 'shadow-present', 'link-not-underlined']) assert.ok(result.fixed.includes(rule), `${rule} fixed: ${result.fixed}`);
+  assert.match(result.html, /<style data-af-fixes>/);
+  assert.ok(result.html.includes('<h4>Skipped</h4>'), 'the markup is the draft\'s own');
+  assert.equal(result.passed, false);
+  const left = result.remaining.find((v) => v.rule === 'heading-order');
+  assert.ok(left?.selectors.some((s) => /h4:nth-of-type\(1\)$/.test(s)), JSON.stringify(result.remaining));
+  assert.ok(result.applied.every((a) => a.selector && a.declarations));
+  assert.equal(result.notChecked.doc, 'docs/accessibility-scope.md');
+  // Through the protocol, the same answer.
+  const viaRpc = payload(await call('af_fix', { html, viewports: [1280] }));
+  assert.deepEqual(viaRpc.fixed, result.fixed);
+});
+
+test('af_fix takes a draft, never a url, and says why', async () => {
+  for (const args of [{ url: 'file:///etc/hosts' }, { url: 'https://example.com/', html: '<p>x</p>' }]) {
+    const r = await call('af_fix', args);
+    assert.equal(r.result.isError, true);
+    assert.match(payload(r).error, /html only, never a url/);
+  }
+  const none = await call('af_fix', {});
+  assert.equal(none.result.isError, true);
+  assert.match(payload(none).error, /needs html/);
 });
 
 test('af_drift measures a system that is not this one', { skip: process.env.AF_SKIP_BROWSER ? 'browser skipped' : false }, async () => {

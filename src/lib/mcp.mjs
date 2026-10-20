@@ -26,7 +26,7 @@ import { colors, floors, registers, spacingScale, fonts, typeScale, aspectRatios
 import { derivePalette } from './palette.mjs';
 import { fromPack } from './pack.mjs';
 
-export const SERVER = { name: 'applied-form', version: '3.2.1' };
+export const SERVER = { name: 'applied-form', version: '3.3.0' };
 
 export const TOOLS = [
   {
@@ -39,6 +39,19 @@ export const TOOLS = [
         url: { type: 'string', description: 'A file:// or https:// page to measure instead.' },
         register: { type: 'string', enum: ['i', 'ii'], description: 'Which register the page is in, if the document does not declare it.' },
         viewports: { type: 'array', items: { type: 'number' }, description: 'Widths to measure. Defaults to the system\'s four plus two sampled from between them.' },
+      },
+    },
+  },
+  {
+    name: 'af_fix',
+    description: 'Apply the fixes the engine can make on its own to a draft, measured in a real browser, and return the fixed HTML with a report: rules fixed, patches applied and refused, and what still fails, by element. No model is called, and a fix that makes any rule worse is not applied. Pass html; what remains needs a change to the markup.',
+    inputSchema: {
+      type: 'object',
+      required: ['html'],
+      properties: {
+        html: { type: 'string', description: 'A complete HTML document to fix.' },
+        register: { type: 'string', enum: ['i', 'ii'], description: 'Which register the page is in, if the document does not declare it.' },
+        viewports: { type: 'array', items: { type: 'number' }, description: 'Widths to measure and fix at. Defaults to the system\'s four plus two sampled from between them.' },
       },
     },
   },
@@ -163,6 +176,27 @@ export const HANDLERS = {
         note: violations.length ? 'Apply every fix and lint again. Do not lower a floor to pass.' : 'Clean at every width measured.',
       });
     }
+  },
+
+  /**
+   * A draft only, as a string. af_lint also takes a url, and returns what it measured; this returns
+   * the page itself, so a url here would hand a model the full text of any local file the server can
+   * read. The draft gets a draft's roots: its own temporary directory and the engine's files.
+   */
+  async af_fix({ html, url, register, viewports } = {}) {
+    if (url != null) throw new Error('af_fix takes html only, never a url: it returns the page, and a url would let a draft read any file the server can. Read the page yourself and pass its html.');
+    if (typeof html !== 'string' || !html) throw new Error('af_fix needs html');
+    const { VIEWPORTS, sampledViewports, ENGINE_ROOT } = await import('./page-lint.mjs');
+    const { fixPage } = await import('./fix/page.mjs');
+    const widths = viewports?.length ? viewports : [...VIEWPORTS, ...sampledViewports(2)].sort((a, b) => a - b);
+    const { html: fixed, report } = await fixPage(html, { browser: await browser(), register: register ?? null, viewports: widths, fileRoots: [ENGINE_ROOT] });
+    return text({
+      ...report,
+      html: fixed,
+      note: report.passed
+        ? 'Every checked rule passes at every width measured. That is not a WCAG conformance claim; see notChecked.'
+        : 'What remains needs a change to the markup or a decision the fixer does not make. Make it, then lint again. Do not lower a floor to pass.',
+    });
   },
 
   async af_drift({ html, urls, declared, viewports } = {}) {

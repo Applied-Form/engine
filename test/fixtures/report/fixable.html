@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en" data-register="ii">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fixable · a report fixture the fixer cures</title>
+<link rel="stylesheet" href="../../../dist/tokens.css">
+<style>
+  /* Four faults the deterministic fixer cures: rounded corners and a shadow on .card, a link with its
+     underline removed, and a 12px target. Each fails on its own element at every width. */
+  body { margin: 0; background: var(--af-color-white); color: var(--af-color-text-ii); font: var(--af-type-body-weight) var(--af-type-body-size)/var(--af-type-body-leading) var(--af-font-text); }
+  main { max-width: 66ch; margin: 0 auto; padding: var(--af-space-04) var(--af-space-03); }
+  h1 { font: var(--af-type-heading-02-weight) var(--af-type-heading-02-size)/var(--af-type-heading-02-leading) var(--af-font-text); margin: 0 0 var(--af-space-02); }
+  p { margin: 0 0 var(--af-space-02); }
+  .card { border-radius: 6px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2); }
+  p a.plain { text-decoration: none; }
+  .tiny { display: inline-block; width: 12px; height: 12px; overflow: hidden; }
+</style>
+</head>
+<body>
+<main id="main">
+  <h1>A page with four faults the fixer can cure</h1>
+  <p class="card">This paragraph sits on a card with rounded corners and a shadow.</p>
+  <p>Read the <a class="plain" href="#main">notes</a> before you start.</p>
+  <div><a class="tiny" href="#main" aria-label="Back to the top"></a></div>
+</main>
+</body>
+</html>

@@ -28,12 +28,18 @@ npx af lint page.html https://example.com/page     # every rule, every width
 npx af lint https://example.com/ --register ii     # a page that has not declared a register
 npx af baseline https://example.com/a --out af-baseline.json
 npx af lint https://example.com/a --baseline af-baseline.json
+npx af fix page.html                               # apply the fixes the engine can make; writes page.fixed.html
+npx af audit pages/ --fix                          # every page in a folder, as found and as the fixer would leave it, as one report
 npx af drift https://example.com/ --out drift.json # what system a site actually renders
 npx af rules                                        # every rule, its severity and what it checks
 npx af-mcp                                          # the same tools for a model, over MCP
 ```
 
-Exit status is 1 on any error-severity violation not held in the baseline. `af.config.json` sets a
+`af fix` exits 0 when the fixed page passes every checked rule, 1 when violations remain, and lists
+what it could not fix by rule and element. `af audit` writes one self-contained HTML page (and `--json`)
+with the findings by rule and by page, the WCAG criteria the rules touch, what is not checked, and
+the command that repeats the run. `af lint` exits 1 on any error-severity violation not
+held in the baseline. `af.config.json` sets a
 rule to `error`, `warn` or `off`; `af.config.example.json` is a starting point.
 
 ## The token file

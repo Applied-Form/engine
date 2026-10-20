@@ -1022,6 +1022,466 @@ predictions are judged against the re-score.
 **The run.** As `engine7`: `azure:gpt-5` and `azure:gpt-5-mini`, arms `pipeline` and
 `pipeline-blind`, the thirty-six frozen briefs, two samples each, about $31 of Azure credit for both.
 
+### Amendment, 2026-10-15 (thirteenth) — `engine9`: five instrument corrections and the fixer's second answers; registered before it runs
+
+**What is in it.** Diagnosing what `engine8` left found that most of it was the instrument. `offset-off-grid`
+failed 21 of 72 GPT-5 pipeline pages, and 20 of them failed only on measurement artefacts. Four of the
+thirteen tier 1 rule-page breaks, on three mini pages, were artefacts too. Five corrections, each in its
+own commit, each test-first (a case reproducing the artefact on a minimal page, and a case showing a
+genuine violation is still caught), and one fixer change. Each was reviewed adversarially; the review's
+findings are folded in below. `contrast` and mini's `horizontal-overflow` are held back again.
+
+**Instrument corrections** (`src/lib/page-spec.mjs`, `eval/score.mjs`; `test/offset-placement.test.mjs`,
+`test/focus-transition.test.mjs`, `test/textless-link.test.mjs`).
+
+1. **A placed element that paints nothing is not judged by `offset-off-grid`.** Exempt are an element
+   parked off the page (a skip link at left:-9999px) and text hidden for screen readers by a `clip` rect
+   with no area or a clip-path inset of at least half on every side. Parked means off the page on one axis
+   both as painted and with no transform anywhere up its offset-parent chain, so a drawer parked by a
+   transform, its placed children, and an element a transform brings onto the page are judged where they
+   are placed. Content waiting to be revealed is judged where it waits, as content at opacity 0 is: a
+   one-sided clip (where a wipe starts), and any clip a transition names, `all` with a duration included,
+   or an animation changes. Known limits, not corrected: an element parked off the page and brought in by
+   a transition on `left` or `top`, or by a script, is exempt on both axes, because judging it would fail
+   skip links whose focus position is on the scale; and the scorer does not judge focus positions, which
+   are off the scale on two pages it now clears (rules-read GPT-5 b24-s1 at 32/25, blind GPT-5 b09-s0 at
+   0/-7).
+2. **Without `[data-grid]`, a placed element's left edge is read from its offset parent**, as its top
+   already was, so a toggle's track at left:0 inside a switch the flow put 165px in is no longer judged at
+   165px. This can fail a page as well as pass it: a child at left:3px in a parent at 5px used to land on
+   8px of viewport and pass. A right-anchored element's derived left edge changes reading the same way.
+   Inside a `[data-grid]` the left edge is still read in the viewport against the column lines.
+3. **A focus ring is read where its CSS transitions settle, if they settle within the longest motion
+   duration token (960ms).** The extractor read the ring on the first frame of a transition, so mini b30-s0
+   (`*{transition: all 200ms}`) reported a correct ring as `focus-hidden` and `focus-restyled`. A ring
+   that arrives later is read as it is when focus lands.
+4. **A link with no text and no generated text is not judged by `link-not-underlined`** (mini b03-s1 and
+   b20-s1: an outlined-wordmark home link that no declaration could underline). Generated text is any
+   `::before` or `::after` content other than none, normal, a blank string or a single `url()`.
+5. **Such a link is not an opportunity**: absence of opportunity is not compliance, so it leaves the rule's
+   denominator rather than counting as a pass.
+
+**Measured locally**, the scorer at `7712d7b` against the corrected one, on `engine8`'s pipeline and
+pipeline-blind pages and the study's rules-read pages for both models, 432 pages (rules-read GPT-5 b30-s0
+loads under neither): `offset-off-grid` pages fall on pipeline 21 → 1 (GPT-5; the one left, b11-s0, is a
+toggle thumb its author put at 4px) and 3 → 0 (mini), on rules-read 25 → 2 and 10 → 2, on pipeline-blind
+23 → 4 and 7 → 3; no page newly fails it. Corrections 1 and 2 move none of the ten scored held-out rules.
+Corrections 3 to 5 move only eight mini pages: `focus-hidden` and `focus-restyled` on pipeline b30-s0 and
+`focus-hidden` on blind b08-s0 and b16-s1; one textless link each on pipeline b03-s1 and b20-s1, blind
+b04-s1, and rules-read b11-s0 and b27-s0. Under the staging rule earlier records are superseded for those
+rules.
+
+**The fixer: a second answer for a refused patch** (`src/lib/fix/`; `test/fix-plan.test.mjs`,
+`test/fix-apply.test.mjs`). When the bisecting rollback isolates one patch that makes a rule worse, that
+patch is tried once more with its remedy's second answer, inside the same 24-trial budget and under the
+same never-worse rule. A spacing value's second answer is the scale step on the far side of it, or 0 when
+the value is below half the first step (so the browser's 1px cell padding can go, and 6px an author chose
+cannot). A raised font size keeps its size and adds `overflow-wrap: anywhere`; svg text has none. Every
+second answer changes layout, which is withheld, so the pipeline-blind arm is offered none: second answers
+are off by default and only the product arm opts in (`pipelineOptions`). The review reproduced the leak an
+earlier version had (the blind arm's wrap moved `horizontal-overflow` on a constructed page and
+`target-size` on blind mini b32-s1); the guard test fails on that version and passes on this one. No
+remedy is added for `offset-off-grid`: snapping a toggle thumb's 4px inset moves it off-centre and snapping
+a data position misplaces data, and the never-worse re-check can see neither.
+
+**Baseline.** `engine8` re-scored on the runner with `engine9`'s scorer, both models' pipeline and
+pipeline-blind arms and the rules-read arm of `full-gpt-5` and `full-gpt-5-mini`, in one rescore dispatch
+at the `engine9` commit before `engine9` generates. Projected from `engine8`'s runner re-score:
+
+| | GPT-5 | GPT-5-mini |
+|---|---|---|
+| `offset-off-grid` pages: pipeline / blind / rules-read | 1 (0–2) / 4 (2–5) / 2 (1–3) | 0 (0–1) / 3 (1–4) / 2 (1–3) |
+| Pass rate | 56/72 (55–57) | 42/72 (41–43) |
+| Tier-2 clean | 57 (56–58) | 44 (43–45) |
+| Tier 1 held | 12/13 | 10/13 |
+| Pooled held-out ratio | 0.980 (0.97–0.99), from 0.982 | |
+
+A baseline figure outside its band is explained before `engine9` is read.
+
+**Predictions for `engine9`, bounded both ways, registered before any `engine9` record exists.** 72 fresh
+pipeline pages per model unless stated.
+
+1. **Tier 1 holds on 11–13 of 13 on GPT-5, expected 12, and on 10–13 on mini, expected 12.** Each tier 1
+   rule breaks on 0–1 pages per model, except `text-too-small` on GPT-5 (0–2: the chart-label conflict on
+   b18 is refused by design) and `body-too-small` on mini (0–2: a control in a row or table may not hold
+   19px at 320px even when its word can break).
+2. **Pass rate: GPT-5 50–62 pages (69–86%), expected 56; mini 38–50 (53–69%), expected 44.** The bands are
+   ±6 pages, the largest move between two runs of one engine so far (`engine6` to `engine7`).
+3. **Tier-2 clean: GPT-5 51–63 pages, expected 57; mini 38–50, expected 44**; the seventh amendment's bars
+   (50% and 35%) met on both.
+4. **`offset-off-grid` on fresh pages: pipeline GPT-5 0–4 pages, mini 0–3; pipeline-blind GPT-5 1–7, mini
+   0–6.** Only genuine placements should remain. Above a band, the failing elements are classified before
+   the run is read; below it, the exemption is checked for reaching a genuine placement.
+5. **Second answers appear only where registered**: none on any pipeline-blind page; on the pipeline arm,
+   a 0px spacing value on 0–3 pages per model and `overflow-wrap: anywhere` on 0–8.
+6. **The pooled held-out ratio is 0.90–1.06; Goal A is predicted not met**, judged as the ninth amendment
+   registered it, with the cell clustering. The blind arm's fixer is `engine8`'s, so only the corrections
+   and generation move it. The eighth amendment's two-run figure, `engine8` and `engine9` pooled, is
+   reported: below the bound again on GPT-5, inside it on mini.
+7. **Cost within ±0.15× of `engine8`**: 1.45–1.75× on GPT-5, 1.68–1.98× on mini. The fixer calls no model.
+
+**The run.** As `engine8`: `azure:gpt-5` and `azure:gpt-5-mini`, arms `pipeline` and `pipeline-blind`, the
+thirty-six frozen briefs, two samples each, about $29 of Azure credit.
+
+### Amendment, 2026-10-15 (fourteenth) — Goal A closed as a null result; the blind arm leaves the routine run
+
+**Decided by Jordan on 2026-10-15, after `engine9` was read and before any `engine10` record exists.**
+Goal A asked whether the engine improves a page on rules it was never given: the pipeline-blind arm's
+held-out violation rate below the rules-read baseline's, pooled over both models, same scorer both
+sides, the 95% interval excluding 1 and still excluding it with any one scored rule left out (ninth
+amendment). It is closed here, **as not met**, and this amendment says what that does and does not
+establish.
+
+**The evidence.** Every same-scorer reading since the ninth amendment made one possible:
+
+| Run | GPT-5 | GPT-5-mini | Pooled | Goal A |
+|---|---|---|---|---|
+| `engine7` | 0.827 [0.706, 0.958] | 1.031 [0.933, 1.135] | 0.911 [0.825, 1.001] | not met; leave-one-out fails on 9 of 10 rules |
+| `engine8` | 0.919 [0.800, 1.066] | 1.044 [0.940, 1.160] | 0.982 [0.890, 1.076] | not met |
+| `engine8`, re-scored with `engine9`'s scorer | 0.919 [0.800, 1.066] | 1.039 [0.926, 1.158] | 0.980 [0.885, 1.075] | not met |
+| `engine9` | 1.032 [0.843, 1.232] | 0.989 [0.872, 1.120] | 1.015 [0.906, 1.141] | not met |
+| `engine8` + `engine9`, two-run (eighth amendment) | 0.975 [0.831, 1.138] | 1.016 [0.911, 1.132] | 0.997 [0.904, 1.095] | not met; both models inside the ±0.10 bound |
+
+Before the ninth amendment, against a baseline scored by an older instrument, the ratio read about
+1.00 on both models across four runs (`engine2` to `engine5`). The single sighting of the shape Goal A
+asks for (`engine6`, 0.899 pooled, exploratory) was withdrawn as registered when `engine7` did not
+replicate it.
+
+**What is concluded.** Across five runs and two models there is no evidence that the engine improves
+conformance on rules it is not given. The ratio's point estimate wanders between 0.83 and 1.03 on
+GPT-5 and 0.99 and 1.04 on mini, with no direction across engine versions, and every engine change in
+that series (fixer remedies, repair routing, second answers) was aimed at rules the engine runs. The
+engine's measured value is enforcement of the rules it runs: tier 1 held on 12 of 13 rules on both
+models on `engine9`, against a rules-read baseline that passes every rule on no page.
+
+**What is not concluded.**
+
+- **Not harm.** On the two-run row above, the eighth amendment's no-harm bound (±0.10 on two runs
+  pooled) holds on both models: 0.975 on GPT-5, 1.016 on mini. Closing Goal A neither relaxes nor
+  retires that bound for any figure already published, including `engine8`'s breach on GPT-5.
+- **Not that generalisation is impossible.** A single run's pooled interval is about ±0.12 wide. An
+  effect of 0.95 would need roughly six times the blind pages to resolve, about $75 of Azure credit at
+  `engine9`'s blind-arm cost, for an effect too small to sell. The question is closed as not worth
+  that, not as answered to zero.
+- **Nothing is relabelled.** Every verdict registered on the held-out ratio stands as recorded,
+  including `engine6`'s falsification and `engine8`'s breach of the two-run bound on GPT-5.
+
+**What changes, from `engine10`.**
+
+1. **The routine run is the `pipeline` arm only.** `pipeline-blind` cost $12.75 of `engine9`'s $27.36
+   (47%) and exists only to measure the held-out ratio. Dropping it roughly halves the cost of a round.
+2. **No held-out prediction is registered** and the ratio is not part of any verdict. The tools
+   (`eval/heldout.mjs`, the rescore job's Goal A step) stay, and so do the `pipeline-blind` and
+   rules-read records, so the question can be reopened.
+3. **Reopening takes its own amendment with a power calculation**, naming the effect size it can
+   resolve and the number of runs that needs, registered before the first of those runs.
+4. **The disclosure invariant stays enforced.** `test/contract-discloses-nothing-withheld.test.mjs`
+   still fails the suite if a disclosed instruction reaches a withheld rule. It costs nothing, and the
+   held-out split is what makes any reopened measurement mean something.
+5. **The bars stand.** Pass every checked rule on 99% of pages, cost at most 1.5× rules-read, and the
+   seventh amendment's two tiers. `engine9` reads 72% and 57% pass, 1.55× and 1.80× cost. What still
+   fails is almost wholly tier 2: `horizontal-overflow` (9 GPT-5 pages, 14 mini), `contrast` (7, 3),
+   `link-colour-ii` (3, 7), `decorative-imagery` (0, 7).
+
+**`engine10` is aimed at one rule, `horizontal-overflow`**, the commonest failure on both models, and
+is registered in its own amendment once the failing pages have been classified on the runner. If a
+deterministic remedy cannot be made safe under the never-worse rule, that amendment says so and
+registers the alternative instead: constraining layout while the page is generated rather than
+repairing it afterwards.
+
+### Amendment, 2026-10-15 (fifteenth) — `engine10`: a remedy for `horizontal-overflow`; registered before it runs
+
+**Approved by Jordan on 2026-10-16 and registered before any `engine10` record exists.** From the
+dispatch of its baseline re-score this section is frozen like every amendment before it.
+
+**What is in it: one fixer remedy, aimed at one rule.** `horizontal-overflow` failed 9 GPT-5 and 14
+GPT-5-mini pipeline pages on `engine9`, the commonest failure on both models (fourteenth amendment).
+Every one of the 23 had been sent back for a whole-page repair and still overflowed. The fixer had no
+remedy for the rule: it was not in `FIXABLE`, so only a model rewrite could cure it (third
+amendment), and it was held back from `engine7`, `engine8` and `engine9` as an open lead.
+
+**The diagnosis, on the runner.** The records name only the rule, and the pages are readable only on
+the runner, so the rescore job now diagnoses each failing page there (`eval/overflow-diag.mjs`, run
+38761509343). For each width at which a page overflows, it measures as the scorer does, with root
+clipping lifted. It reports the boxes and text past the edge and the declarations that set them: the
+page's, the model's patch and the fixer's. Then it tries each candidate remedy alone in the loaded
+page. Every one of the 23 pages was cleared by one declaration on the boxes past the edge:
+
+| Cause, and the remedy that cleared it alone | GPT-5 | GPT-5-mini |
+|---|---|---|
+| A long word with no break (an address, an identifier): `overflow-wrap: anywhere` | 2 | 6 |
+| A box wider than its container, often a one-column grid sized by its content: capped at `max-width: 100%`, automatic minimum lifted | 4 | 4 |
+| A run told never to wrap: `white-space: normal` | 1 | 0 |
+| A flex row that cannot shrink: `flex-wrap: wrap` | 0 | 2 |
+| A wide table or column: the box scrolls in its own container | 2 | 2 |
+
+Removing the fixer's own block cleared none of the 23, so the fixer caused none of them. It did widen
+several, mostly by raising text to the body floor (mini b25-s1 from 19 to 84px past the edge, b30-s0
+from 49 to 164px). The never-worse rule cannot see this, because the rule counts one violation per
+width however far the page overflows. Only mini b05-s1 overflowed at 1280px as well: a band made
+full-bleed with `margin: -50vw`.
+
+The first remedy that cleared a page made another rule worse on 8 of the 23 when the page was linted
+in full. Narrowing a chart took its labels under the text floor (mini b08-s0, b35-s0). A scroller
+moved the focus rules. Lifting a minimum width broke `target-size` (GPT-5 b11-s1). So the remedy is a
+ladder tried under the never-worse rule, not one declaration.
+
+**The change** (`src/lib/page-spec.mjs`, `src/lib/fix/`; `test/fix-overflow.test.mjs`).
+
+1. **The extractor tries the ladder, for the fixer only.** When the fixer lints a page it asks for
+   element ids. The extractor then tries each rung in the page it measured: wrap, nowrap, media cap,
+   width cap, flex-wrap, all of those at once, and scroller, least layout changed first. Each rung is
+   applied in a style element that is removed again, with transitions held, and the extractor reports
+   the rungs that made the page fit. The scorer never asks for ids, so it never runs this and its
+   output is unchanged.
+2. **The fixer tries those rungs after its passes**, each one whole and in ladder order. It keeps the
+   first rung that cleared every overflowing width, leaves no rule worse, and leaves fewer violations.
+   A rung refused for making a rule worse is tried once more with one pass of the fixer's own remedies
+   on the page as the rung left it, and judged with them. That is how a chart narrowed by a rung gets
+   its labels back above the floor. At most 8 lints a page.
+3. **The pipeline-blind arm is never offered it.** Layout is a withheld group. The arm is no longer in
+   the routine run (fourteenth amendment), but the rule still holds wherever it runs.
+4. **Instruments.** `eval/overflow-remedies.mjs` counts which rung each page kept, per run and model,
+   from the fixer's block; the rescore job prints it. `eval/second-answers.mjs` now counts a wrap as a
+   second answer only beside the font size it raised, because the wrap rung writes the same
+   declaration alone. `engine9`'s counts are unchanged by that: 1 page on GPT-5, 3 on mini.
+
+`horizontal-overflow` stays in `PAGE_ONLY`. An overflow now reaches the repair only when no rung
+cleared it safely, and that is an overflow a declaration could not fix.
+
+**The replay** (run 38764506830, confirmed by 38766000537). Each of the 23 failing pages was put
+through this tree's fixer again with the pipeline arm's options, once without the ladder as a control
+and once with it:
+
+- **The control reproduces `engine9`'s recorded gate on all 23 pages.**
+- **With the ladder, overflow is cleared on 9 of 9 GPT-5 pages and 14 of 14 mini pages, and no page
+  fails a rule it did not fail before.** The gate then passes 5 of the 9 GPT-5 pages; the other four
+  still fail `contrast` (3) or `print-overflow` (1). It passes 9 of the 14 mini pages; the other five
+  still fail `decorative-imagery` (4) or `contrast` (1).
+- **Rungs kept:** on GPT-5, width cap 4, wrap 2, scroller 2 (both wide tables), nowrap 1; on mini,
+  wrap 6, width cap 4, flex-wrap 2, all at once 2.
+- **Projected on `engine9`'s pages: 57 of 72 clean on GPT-5 (from 52), 50 of 72 on mini (from 41).**
+
+**Known risks, not measured by this run.**
+
+- **Readability.** The linter cannot see what the remedy costs a reader. On the replay, the width cap
+  reached up to 116 elements on a page and the wrap up to 93, so words in narrow columns may break
+  mid-word, and two GPT-5 tables now scroll in their own box. Only the judged preference round (H4)
+  can see this, and a clean page that reads worse is reported as that.
+- **Repair routing.** Overflow cleared in the first round no longer forces a whole-page repair. The
+  repair that follows asks for an edit list instead, or none is needed. A whole-page rewrite may have
+  been curing other rules as a side effect, so those rules may rise. The replay cannot measure this:
+  it starts from pages that were already rewritten. The records do not say which first-round failure
+  triggered each rewrite, so the repair and cost predictions below are the least supported.
+- **Fresh pages.** 72 new pages per model can bring causes the 23 did not: a box placed past the edge,
+  generated content, svg text. No rung moves any of these.
+
+**Baseline.** `engine9` re-scored with `engine10`'s scorer, pipeline arm, both models, in one rescore
+dispatch at the `engine10` commit before `engine10` generates. The scorer is unchanged. **Predicted:
+the re-score is identical to the record on every page and rule**: 52 of 72 clean on GPT-5 and 41 of 72
+on mini, tier 1 held on 12 of 13 on both. Three re-scores on this branch already give those totals.
+Any difference is a defect, found and fixed before `engine10` is read.
+
+**Predictions for `engine10`, bounded both ways, pipeline arm only.** 72 fresh pages per model. No
+pipeline-blind or held-out prediction is registered (fourteenth amendment).
+
+| | GPT-5 | GPT-5-mini |
+|---|---|---|
+| 1. `horizontal-overflow` pages | 0–3, expected 1 (`engine9`: 9) | 0–4, expected 2 (`engine9`: 14) |
+| 2. Pass rate (pages clean) | 51–63, expected 57 (`engine9`: 52) | 44–56, expected 50 (`engine9`: 41) |
+| 3. Tier-2 clean | 51–63, expected 57 | 44–56, expected 50 |
+| 4. Tier 1 held | 11–13 of 13, expected 12 | 10–13 of 13, expected 12 |
+| 5. Pages keeping an overflow rung | 10–36 | 35–66 |
+| 6. Pages keeping the scroller rung | 0–4 | 0–4 |
+| 7. Whole-page repairs | 10–30 (`engine9`: 34) | 20–46 (`engine9`: 52) |
+| 8. Cost against rules-read | 1.25–1.60× (`engine9`: 1.55×) | 1.40–1.85× (`engine9`: 1.80×) |
+
+1. **Overflow.** Every failing page in the replay was cleared. The bands allow for causes that fresh
+   pages bring and no rung reaches. Above a band, the failing pages are diagnosed with
+   `eval/overflow-diag.mjs --replay` before the run is read.
+2. **Pass rate.** The bands are the replay's projection ±6 pages, the largest move between two runs of
+   one engine so far. Below a band means the routing shift cost other rules more than the ladder
+   gained, and the rules that rose are named before the run is read.
+3. **Tier-2 clean** equalled the pass rate on `engine9` on both models. Nothing here touches tier 1,
+   so the bars (50% and 35%) are met on both.
+4. **Tier 1.** The ladder is judged on every rule, so it can only be kept where it leaves tier 1 as
+   it was. As on `engine9`, each tier 1 rule breaks on 0–1 pages per model.
+5. **Rungs kept.** The pipeline-blind arm, whose fixer never touches overflow, ended overflowing on
+   23–31 GPT-5 and 52–58 mini pages over `engine6` to `engine9`. That is the nearest measure of how
+   often a first draft overflows. Width cap and wrap together make up at least 60% of the pages that
+   keep a rung on each model, as they did on 16 of 23 in the replay.
+6. **Scroller.** The scroller rung is last on the ladder. It was kept on 2 of 9 GPT-5 pages in the
+   replay and on no mini page.
+7. **Whole-page repairs fall.** Overflow is the commonest rule that forces a whole-page repair. The
+   lower bounds allow for the other rules that still force one: `decorative-imagery`,
+   `print-overflow`, `content-not-dom` and the rest of `PAGE_ONLY`.
+8. **Cost does not rise beyond noise and is expected to fall** with the whole-page repairs: expected
+   1.45× and 1.62×. The fixer calls no model; its extra lints cost wall-clock time, not tokens. The
+   1.5× bar stands as registered and is reported met or missed per model.
+9. **No rule the ladder can move rises by more than 2 pages per model over `engine9`**: text-too-small,
+   body-too-small, `target-size`, `focus-hidden`, `focus-restyled`, `measure`, `print-overflow`. A
+   larger rise is traced to the ladder or to the repair routing before the run is read.
+10. **Second answers stay where the thirteenth amendment put them**: a 0px spacing value on 0–3 pages
+    per model and a wrap beside a raised size on 0–8.
+
+**The run, once approved.** `azure:gpt-5` and `azure:gpt-5-mini`, arm `pipeline` only, the thirty-six
+frozen briefs, two samples each, repairs as `engine9`, about $15 of Azure credit. `engine9`'s
+pipeline arm cost $14.61 of its $27.36.
+
+### Amendment, 2026-10-16 (sixteenth) — `engine11`: a remedy for links drawn as buttons, and a reflow rung before the scroller; registered before it runs
+
+**Approved by Jordan on 2026-10-16 and registered before any `engine11` record exists.** It runs on
+`engine11` with `main` merged in (the `af fix` front door and the standards packs; neither changes the
+fixer's remedies or the scorer). From the dispatch of its baseline re-score this section is frozen like
+every amendment before it.
+
+**What is in it: two fixer changes, pipeline arm only.** `engine10` left two follow-ups (results,
+`engine10` section). `link-colour-ii` on GPT-5 rose from 3 pages to 11, every one shipped after the
+model's repair patch was rejected (`repairKind: patch-rejected`). The scroller rung, last on the overflow
+ladder, was kept on 9 GPT-5 and 5 mini pages against a registered 0–4.
+
+**The diagnosis, on the runner** (run 38868024159, `eval/link-diag.mjs` and `eval/scroller-diag.mjs`,
+now steps of the rescore job). The pipeline does not keep a rejected patch, so the diagnosis judges the
+patch the repair prompt asks for (the link colour on each flagged link) exactly as the pipeline judges
+one. That is the nearest reading of what the model sent, not the patch itself.
+
+| `link-colour-ii`: pages with at least one flagged link of each kind | GPT-5 (11 pages) | GPT-5-mini (7 pages) |
+|---|---|---|
+| A link drawn as a filled button: white on the accent (#257E4F), where the link colour reads at 1.41:1 | 6 | 7 |
+| A link on the ink masthead (#222B26), where the link colour reads at 2.05:1 | 5 | 2 |
+| An outlined or ghost button on the layer (#F3F6F4), where the link colour reads at 6.53:1 | 1 | 3 |
+| The obvious patch, judged as the pipeline judges it | rejected on 11, all for `contrast` | rejected on 7, `contrast` on 7 and `gradient-fill` on 1 |
+
+Every flagged link on the 18 pages was one of those three. The link colour alone cannot be right on the
+first two: on the button it trades `link-colour-ii` for `contrast`, which is why the patch was rejected,
+and the plain remedy (the link colour on the link, built first) cleared none of the 18. On the masthead
+no declaration can satisfy both rules while the link stays there: Register II gives no link colour that
+reads on the one ink surface it permits. That is a gap in the system, not in the page, and it is reported
+here for the owner rather than changed by this amendment.
+
+| Scroller rung: what the box made to scroll held | GPT-5 (9 pages) | GPT-5-mini (5 pages) |
+|---|---|---|
+| A table, the box past the edge itself | 4 (b08-s0, b31-s0, b33-s1, b35-s0) | 2 (b34-s0, b34-s1) |
+| Two fixed-width svg charts and a table | 1 (b08-s1) | 0 |
+| A panel, provenance block, metadata rows, nav or masthead, with a table inside or beside it | 4 (b07-s0, b07-s1, b31-s1, b34-s1) | 3 (b09-s1, b32-s1, b35-s0) |
+
+On every one of the 14 the scroller was the only rung the extractor found to clear the page; no earlier
+rung was offered and refused. On the seven in the last row, a whole panel or row of metadata scrolled
+sideways when only a table needed to, or nothing did. Alternatives were tried alone on the page as the
+fixer had it before the ladder: letting every descendant reflow cleared 8 of 9 GPT-5 and 4 of 5 mini
+pages with no rule worse; letting table cells wrap, or stacking them, cleared the pages where the table
+is the box past the edge (3 and 4 of them on GPT-5, 2 on mini), by breaking words mid-cell or losing the
+header row's alignment. A data table that scrolls in its own box is the pattern WCAG 1.4.10 allows for
+content whose two-dimensional layout carries its meaning, so those tables are left to the scroller.
+
+**The change** (`src/lib/fix/plan.mjs`, `src/lib/page-spec.mjs`, `src/lib/fix/index.mjs`;
+`test/fix-plan.test.mjs`, `test/fix-apply.test.mjs`, `test/fix-overflow.test.mjs`).
+
+1. **`link-colour-ii` joins `FIXABLE`.** A Register II link takes the register's link colour on the link
+   itself, where that colour reads on the link's measured ground. A link that paints its own ground (a
+   link drawn as a filled button) loses its fill and takes the colour, where the colour reads on the
+   ground behind it and the checker can vouch for that ground: it becomes an underlined link, which is
+   what Register II asks a link to be. The extractor reports the link's own paint and the ground behind
+   it for the fixer only, so the scorer's output is unchanged. A masthead link paints no ground of its
+   own and is left alone.
+2. **A reflow rung before the scroller.** Each outermost box past the edge that is not itself a table,
+   svg or code block reflows all the way down (words may break, minimums lift, nowrap wraps), leaving
+   tables, svg and code their shape; a table or code block still past the edge then scrolls in a box of
+   its own. It is offered only when some outermost box is not a table, svg or code block, since otherwise
+   it is the scroller under another name. It is judged under the never-worse rule like every rung.
+3. **The pipeline-blind arm is offered neither.** `link-colour-ii` is in the interaction group and the
+   ladder is layout, both withheld, so `BLIND_FIXABLE` carries neither (tested).
+4. **Instruments.** `autoFix` takes `trace`, which records each overflow rung tried and what it made
+   worse, and `ladder`, so a replay can run `engine10`'s ladder as its control.
+   `eval/overflow-remedies.mjs` counts the reflow rung by its selector, apart from the scroller.
+
+**Rejected: a rejected patch falling back to a whole-page repair.** It would cost one whole-page call per
+rejection: from the records, about $0.124 a page on GPT-5 and $0.015 on mini, against a rules-read page
+of $0.111 and $0.018. On `engine10` that is 12 rejections on GPT-5, +0.19× (1.23× to about 1.42×), and 4
+on mini, +0.05×; after change 1, about 6 on GPT-5 (+0.09×). Nothing says it would work: the residue is
+the masthead links, and both mini masthead pages (b09-s1, b26-s0) had already been rewritten whole on
+`engine10` and still failed. Both options together (option 3) inherit that cost for the same residue.
+
+**The replay** (run 38870212573). Each page was put through this tree's fixer again with the pipeline
+arm's options, once as a control and once with the change.
+
+- **`link-colour-ii`, 18 pages.** The control (no link remedy) reproduces the recorded failure on 18 of
+  18. With the remedy it is cleared on 6 of 11 GPT-5 pages and 5 of 7 mini pages, and no page is worse
+  than the control on any rule. The gate then passes 6 of 11 GPT-5 pages (from 0) and 3 of 7 mini pages
+  (from 0; b26-s1 still fails `measure`, b29-s1 `gradient-fill`). What is left is the masthead links: 5
+  GPT-5 pages and 2 mini pages.
+- **Scroller, 14 pages.** The control (`engine10`'s ladder) keeps the scroller on 14 of 14. With the
+  reflow rung, it keeps reflow on 4 of 9 GPT-5 pages and 3 of 5 mini pages: exactly the pages in the
+  last row of the table above. The scroller stays on the pages where a table or chart is the box past
+  the edge. No page is worse than the control on any rule, and the gate is unchanged (8 of 9, 3 of 5).
+  On the reflow pages a table inside may still scroll in its own box; the panel around it no longer does.
+- **Projected on `engine10`'s pages:** 61 of 72 clean on GPT-5 (from 55) and 47 of 72 on mini (from 44).
+  Six GPT-5 pages and three mini pages no longer need a repair round, so cost falls by about 0.03× and
+  0.01× (1.21× and 1.57×, from the records).
+
+**Known risks, not measured by the replay.**
+
+- **Design.** A primary call to action drawn as a filled button becomes an underlined link in the link
+  colour: correct for Register II, plainer than the model drew it. Only the judged round can say whether
+  a reader minds.
+- **Readability of reflow.** Reflow lets words break anywhere in the boxes it reaches, which can split a
+  word in a narrow column. It replaces a sideways scroll of the whole panel, which the replay counts as
+  the larger cost, but the linter sees neither.
+- **Routing.** A page whose only failure after the first fix was `link-colour-ii` now skips the repair.
+  The replay starts from pages that were already repaired once, so it cannot see what a repair would have
+  changed on the way.
+- **Fresh pages.** 72 new pages per model may draw links on other grounds (a coloured band, a card in the
+  accent) where the link colour cannot read and the link paints no ground of its own; no remedy here
+  reaches those.
+
+**Baseline.** `engine10` re-scored with `engine11`'s scorer, pipeline arm, both models, in one rescore
+dispatch at the approved `engine11` commit before `engine11` generates. The scorer is unchanged: both
+extractor additions run only when the fixer asks for element ids. **Predicted: the re-score is identical
+to the record on every page and rule**: 55 of 72 clean on GPT-5, 44 on mini; tier-2 clean 57 and 45;
+tier 1 held on 11 and 12 of 13. Two re-scores on this branch already read exactly that (runs 38868024159,
+38870212573). Any difference is a defect, found and fixed before `engine11` is read.
+
+**Predictions for `engine11`, bounded both ways, pipeline arm only.** 72 fresh pages per model. No
+pipeline-blind or held-out prediction is registered (fourteenth amendment).
+
+| | GPT-5 | GPT-5-mini |
+|---|---|---|
+| 1. `link-colour-ii` pages | 0–8, expected 5 (`engine10`: 11) | 0–5, expected 2 (`engine10`: 7) |
+| 2. Pass rate (pages clean) | 55–67, expected 61 (`engine10`: 55) | 41–53, expected 47 (`engine10`: 44) |
+| 3. Tier-2 clean | 57–69, expected 63 (`engine10`: 57) | 42–54, expected 48 (`engine10`: 45) |
+| 4. Tier 1 held | 11–13 of 13, expected 12 | 10–13 of 13, expected 12 |
+| 5. `horizontal-overflow` pages | 0–3, expected 1 (`engine10`: 0) | 0–4, expected 2 (`engine10`: 3) |
+| 6. Pages keeping the scroller rung | 1–8, expected 5 (`engine10`: 9) | 0–5, expected 2 (`engine10`: 5) |
+| 7. Pages keeping the reflow rung | 1–8, expected 4 | 1–8, expected 3 |
+| 8. Whole-page repairs | 4–20, expected 9 (`engine10`: 9) | 18–40, expected 28 (`engine10`: 28) |
+| 9. Cost against rules-read | 1.05–1.45×, expected 1.21× (`engine10`: 1.23×) | 1.35–1.80×, expected 1.57× (`engine10`: 1.58×) |
+
+1. **Links.** The replay cleared every flagged link that was not on the masthead. The expected values
+   are the masthead pages left in the replay; the bands allow for fresh pages drawing more or fewer links
+   on the masthead, which nothing here reaches.
+2. **Pass rate.** The replay's projection ±6 pages, the largest move between two runs of one engine so
+   far. Below a band, the rules that rose are named before the run is read.
+3. **Tier-2 clean** moves with the pass rate: both changes act on tier 2 only.
+4. **Tier 1.** Both changes are judged on every rule, so they can only be kept where tier 1 is left as
+   it was. As on `engine9` and `engine10`, each tier 1 rule breaks on 0–1 pages per model.
+5. **Overflow.** The reflow rung is tried only where the ladder already reached the scroller, so it
+   cannot clear a page the scroller did not; overflow is predicted as `engine10` registered it.
+6. **Scroller.** In the replay it stayed on 5 of 9 GPT-5 and 2 of 5 mini pages, each a table or chart
+   that is itself the box past the edge. The lower bound on GPT-5 says such tables recur.
+7. **Reflow** was kept on 4 and 3 pages in the replay, every one a page whose scroller held a panel or a
+   row rather than only a table.
+8. **Whole-page repairs** are not moved by either change: `link-colour-ii` was never a reason for one.
+   The bands are `engine10`'s counts with the spread seen between runs.
+9. **Cost falls a little** with the repair rounds the link remedy saves (0.03× and 0.01× in the replay).
+   The 1.5× bar stands as registered and is reported met or missed per model.
+10. **No rule the ladder or the link remedy can move rises by more than 2 pages per model over
+    `engine10`**: `contrast`, text-too-small, body-too-small, `target-size`, `focus-hidden`,
+    `focus-restyled`, `measure`, `print-overflow`. A larger rise is traced to one of the two changes or
+    to the repair routing before the run is read.
+
+**The run, once approved.** `azure:gpt-5` and `azure:gpt-5-mini`, arm `pipeline` only, the thirty-six
+frozen briefs, two samples each, repairs as `engine10`, about $12 of Azure credit (`engine10`: $11.80).
+
 ## Measures
 
 Primary:

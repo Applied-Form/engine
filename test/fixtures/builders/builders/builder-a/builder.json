@@ -1,0 +1,11 @@
+{
+  "name": "Builder A",
+  "note": "A fake builder for test/builders.test.mjs. Every page in this directory was written by hand.",
+  "plan": "none (fixture)",
+  "export": "saved HTML",
+  "pages": {
+    "b01": { "date": "2026-10-18", "version": "fixture" },
+    "b07": { "date": "2026-10-18", "version": "fixture" },
+    "b09": { "date": "2026-10-18", "version": "fixture" }
+  }
+}

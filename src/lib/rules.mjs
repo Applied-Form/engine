@@ -13,7 +13,7 @@
  *   aspectRatios?: string[],         // 'w:h' strings used by images/tiles
  *   statuses?: [{ label, shape, color }],
  *   focusStyle?: { visible, color },
- *   links?: [{ color, background, underlined }],
+ *   links?: [{ color, background, underlined, paintsGround? }],
  *   imagery?: [{ kind: 'form' | 'plot' | 'photo' | 'illustration' | 'icon' }],
  *   chart?: { series: hex[], background?: hex, labelledDirectly?: boolean },
  *   spreads?: [{ name, ground, grounds?: hex[], joinOnColumn?: boolean, markOverBody?: boolean, figureVoice?: string }],

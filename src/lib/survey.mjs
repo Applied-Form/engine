@@ -122,12 +122,18 @@ function collect() {
     return n;
   };
 
+  // `typeRun`, `textOn`, `bleed` and `gateSpacing` pair values the other buckets keep apart, or
+  // keep the ones the gate judges: which family is set large (a display face), which text sits on
+  // which ground at what size, which grounds cross the whole viewport (the ones the gate judges as
+  // grounds), and the spacing the gate judges. `af drift` does not read them.
   const out = {
     textColor: [], ground: [], borderColor: [],
     spacing: [], fontSize: [], fontFamily: [], fontWeight: [], lineHeight: [],
     radius: [], borderWidth: [], shadow: [],
+    typeRun: [], textOn: [], bleed: [], gateSpacing: [],
     elements: 0, textElements: 0,
   };
+  const viewportWidth = document.documentElement.clientWidth;
   const push = (bucket, value, weight) => { if (value !== null && weight > 0) out[bucket].push({ value, weight }); };
 
   for (const el of document.querySelectorAll('body, body *')) {
@@ -141,18 +147,29 @@ function collect() {
       out.textElements += 1;
       const fg = parse(s.color);
       if (fg) push('textColor', hex(fg.a === 1 ? fg : over(fg, groundOf(el))), chars);
+      const family = s.fontFamily.split(',')[0].replace(/^["']|["']$/g, '').trim();
       push('fontSize', px(s.fontSize), chars);
-      push('fontFamily', s.fontFamily.split(',')[0].replace(/^["']|["']$/g, '').trim(), chars);
+      push('fontFamily', family, chars);
       push('fontWeight', px(s.fontWeight), chars);
       // Unitless line-height computes to a pixel value; as a ratio it is comparable across sizes.
       const [lh, fs] = [px(s.lineHeight), px(s.fontSize)];
       if (lh && fs) push('lineHeight', Math.round((lh / fs) * 100) / 100, chars);
+      push('typeRun', `${family}|${px(s.fontSize)}|${px(s.fontWeight)}`, chars);
+      if (fg) {
+        const ground = groundOf(el);
+        push('textOn', `${hex(fg.a === 1 ? fg : over(fg, ground))}|${hex(ground)}|${px(s.fontSize)}|${px(s.fontWeight)}`, chars);
+      }
     }
 
     // A ground is weighted by the area it covers, in hundreds of square pixels so a full-page
     // background does not arrive as a six-figure number beside a gap counted once.
     const bg = parse(s.backgroundColor);
-    if (bg && bg.a > 0) push('ground', hex(bg.a === 1 ? bg : over(bg, groundOf(el.parentElement ?? el))), (box.width * box.height) / 100);
+    if (bg && bg.a > 0) {
+      const ground = hex(bg.a === 1 ? bg : over(bg, groundOf(el.parentElement ?? el)));
+      push('ground', ground, (box.width * box.height) / 100);
+      // The gate's own test for a ground (page-spec.mjs): edge to edge and at least 48px tall.
+      if (box.left <= 1 && box.right >= viewportWidth - 1 && box.height >= 48) push('bleed', ground, (box.width * box.height) / 100);
+    }
 
     for (const side of ['Top', 'Right', 'Bottom', 'Left']) {
       const w = px(s[`border${side}Width`]);
@@ -163,9 +180,16 @@ function collect() {
       }
     }
 
+    // The gate's own spacing test (page-spec.mjs): the horizontal margins of a centred block or a
+    // flex or grid item are alignment, not spacing, so it skips them; it rounds, and reads a
+    // negative margin by its size.
+    const parent = el.parentElement;
+    const centred = parent && Math.abs(px(s.marginLeft) - px(s.marginRight)) < 0.5 && box.width < parent.getBoundingClientRect().width - 1;
+    const aligned = parent && /flex|grid/.test(getComputedStyle(parent).display);
     for (const prop of ['marginTop', 'marginBottom', 'marginLeft', 'marginRight', 'paddingTop', 'paddingBottom', 'paddingLeft', 'paddingRight', 'rowGap', 'columnGap']) {
       const v = px(s[prop]);
       if (v && v > 0) push('spacing', v, 1);
+      if (v && Math.round(Math.abs(v)) && !((centred || aligned) && (prop === 'marginLeft' || prop === 'marginRight'))) push('gateSpacing', Math.round(Math.abs(v)), 1);
     }
 
     for (const prop of ['borderTopLeftRadius', 'borderTopRightRadius', 'borderBottomLeftRadius', 'borderBottomRightRadius']) {

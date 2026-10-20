@@ -146,7 +146,9 @@ export async function score(url, { register, palette, browser: given = null, vie
       universal.push(...parts.universal); gated.push(...parts.gated); disclosed.push(...parts.disclosed);
       const spec = lint.spec;
       opportunity.page += 1;
-      opportunity.links += spec.links?.length ?? 0;
+      // A link with no text (underlined: null) has nothing to underline, so it is no chance to break
+      // the rule; counted, it would be a pass the page could not have failed.
+      opportunity.links += spec.links?.filter((l) => l.underlined !== null).length ?? 0;
       opportunity.imagery += spec.imagery?.length ?? 0;
       opportunity.targets += spec.targets?.length ?? 0;
       opportunity.focusable += spec.focusStyles?.length ?? 0;

@@ -19,8 +19,8 @@ named.
 The engine opens pages in a headless Chromium and reads what the browser rendered. That is its job,
 and it is also its main exposure.
 
-- **It renders a page it did not write, and that page's scripts run.** `af lint`, `af drift` and
-  the MCP server load whatever page they are given. Chromium runs without its operating-system
+- **It renders a page it did not write, and that page's scripts run.** `af lint`, `af fix`, `af drift`
+  and the MCP server load whatever page they are given. Chromium runs without its operating-system
   sandbox, which is Playwright's default. Do not run the engine as a privileged user, and do not
   point it at an untrusted page you would not open in a browser on the same machine.
 - **A page loaded from a file reads only its own directory and the engine's files.** The browser
@@ -31,8 +31,13 @@ and it is also its main exposure.
 - **The MCP server accepts HTML from a model.** `af_lint` and `af_drift` write a draft to a fresh
   temporary directory and render it from there. A draft may read that directory and the engine's
   files, and not the working directory, which is usually the person's project. A `url` the model
-  supplies is loaded as given.
+  supplies is loaded as given. `af_fix` returns the page it fixed, so it takes `html` only and
+  refuses a `url`: a url would let it return the full text of any file the server can read. Its
+  draft gets the same roots as an `af_lint` draft, and what it returns is the draft's own source
+  with one appended style block.
 - **Files it writes.** Reports, surveys and baselines are written only where a flag names them.
+  `af fix` writes `<name>.fixed.html` beside its input, or where `--out` names, and writes the
+  input only when `--out` names it.
 - **The evaluation harness calls model providers.** It reads API keys from the environment and
   never writes them to a record. It is a research tool, run from a clone, and is not part of the
   published package.

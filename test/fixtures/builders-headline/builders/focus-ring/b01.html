@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Get the toolkit</title>
+<style>
+  /* A hand-written stand-in for a builder's answer to brief b01 (test/builders.test.mjs). The link draws
+     its focus state as a box-shadow ring and removes the outline, the common pattern in builder output.
+     The ring is visible when the link has focus, and the outline is none: a known limit of the builders
+     benchmark, where focus-hidden reads the outline alone. Nothing else is planted. */
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: Inter, system-ui, sans-serif; color: #0F172A; background: #FFFFFF; line-height: 1.6; }
+  main { max-width: 40rem; margin: 0 auto; padding: 48px 24px; }
+  h1 { font-size: 36px; line-height: 1.1; margin: 0 0 20px; }
+  p { font-size: 18px; margin: 0 0 16px; }
+  a.cta { display: inline-block; min-height: 44px; padding: 12px 24px; background: #1D4ED8; color: #FFFFFF; text-decoration: underline; border-radius: 8px; }
+  a.cta:focus { outline: none; box-shadow: 0 0 0 3px #FFFFFF, 0 0 0 5px #1D4ED8; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Get the toolkit</h1>
+  <p>The toolkit is free to download under an open licence, with its calibration data and notes.</p>
+  <p><a class="cta" href="#download">Download the toolkit</a></p>
+</main>
+</body>
+</html>

@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Measurement notes</title>
+<style>
+  /* A hand-written stand-in for a builder's answer to brief b01 (test/builders.test.mjs). It declares
+     no register and no background anywhere, so the browser paints white. Its one grey line is #727272:
+     4.81:1 on white, which clears the 4.5:1 floor, and 4.41:1 on the study system's Register I paper,
+     which does not. Nothing else is planted for the universal rules. */
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: Inter, system-ui, sans-serif; color: #0F172A; line-height: 1.6; }
+  .wrap { max-width: 40rem; margin: 0 auto; padding: 64px 24px; }
+  h1 { font-size: 40px; line-height: 1.1; margin: 0 0 24px; }
+  p { margin: 0 0 16px; font-size: 18px; }
+  .muted { color: #727272; font-size: 16px; }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <h1>Measurement notes</h1>
+  <p>The toolkit was calibrated on two years of bench readings, taken with the instruments as they now ship.</p>
+  <p>Each reading records the instrument, the operator and the conditions, so that a later reader can repeat it.</p>
+  <p class="muted">Figures are provisional until the second round of calibration is complete.</p>
+</main>
+</body>
+</html>

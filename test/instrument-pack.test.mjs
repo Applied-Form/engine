@@ -24,17 +24,10 @@ const pages = join(root, 'test/fixtures/packs/instrument');
 let skip = false;
 try { await (await launchBrowser()).close(); } catch (e) { if (process.env.CI) throw e; skip = `no Chromium: ${e.message.split('\n')[0]}`; }
 
-const GENUINE = {
-  'band-statement.html': [],
-  'datum.html': ['spacing: 19px is off the 8px spacing scale'],      // row-gap: 0.2em on the datum figure
-  'key.html': ['spacing: 3px is off the 8px spacing scale'],         // gap: 3px between key rows
-  'matrix.html': ['spacing: 1px is off the 8px spacing scale'],      // th keeps the browser's 1px padding
-  'plate.html': [],
-  'register.html': [],
-  'running-index.html': [],
-  'schedule.html': [],
-  'series.html': ['spacing: 4px is off the 8px spacing scale'],      // padding-left: 4px !important
-};
+// The list lives beside the pages, so anything else that reports on the pack reads the same record.
+// The causes, from each page's CSS: datum, row-gap: 0.2em on the datum figure; key, gap: 3px between
+// key rows; matrix, th keeps the browser's 1px padding; series, padding-left: 4px !important.
+const GENUINE = Object.fromEntries(Object.entries(JSON.parse(readFileSync(join(root, 'test/fixtures/packs/instrument.breaches.json'), 'utf8'))).filter(([k]) => !k.startsWith('$')));
 
 test("Instrument's reference pages show exactly Instrument's own breaches under Instrument", { skip, timeout: 300_000 }, () => {
   const dir = mkdtempSync(join(tmpdir(), 'af-instrument-'));

@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en" data-register="ii">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Postmortem: payments outage</title>
+<style>
+  /* A hand-written stand-in for the pipeline's page for brief b07 (test/builders.test.mjs), in the
+     study system's values. It passes every rule under that system. */
+  body { margin: 0; background: #FFFFFF; color: #161D19; font-family: "Libre Franklin", "Helvetica Neue", Arial, sans-serif; font-size: 19px; line-height: 1.5; }
+  main { max-width: 36rem; margin: 0 auto; padding: 48px 24px; }
+  h1 { font-size: 32px; font-weight: 700; line-height: 1.13; margin: 0 0 16px; }
+  h2 { font-size: 22px; font-weight: 700; line-height: 1.2; margin: 32px 0 8px; }
+  p, li { margin: 0 0 8px; }
+  ul { margin: 0; padding-left: 24px; }
+  table { border-collapse: collapse; }
+  th, td { text-align: left; vertical-align: top; padding: 8px 16px 8px 0; }
+  th, time { font-family: "IBM Plex Mono", SFMono-Regular, Menlo, monospace; font-weight: 400; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Payments outage: postmortem</h1>
+  <p>Card payments failed for four hours after a gateway certificate expired. No money was lost.</p>
+  <h2>Timeline</h2>
+  <table>
+    <tr><th scope="row"><time>09:12</time></th><td>The gateway certificate expired.</td></tr>
+    <tr><th scope="row"><time>09:20</time></th><td>Declines rose; the on-call engineer was paged.</td></tr>
+    <tr><th scope="row"><time>13:05</time></th><td>A renewed certificate went out; payments recovered.</td></tr>
+  </table>
+  <h2>Remediation</h2>
+  <ul>
+    <li>Alert a month before any certificate expires. Owner: platform team.</li>
+    <li>Renew certificates automatically. Owner: payments team.</li>
+  </ul>
+</main>
+</body>
+</html>

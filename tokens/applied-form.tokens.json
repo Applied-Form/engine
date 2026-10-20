@@ -2,7 +2,7 @@
   "$description": "Reference: the neutral system the open engine is tested against. Colour derived by `af brand --hue 200 --paper #F6F6F4 --saturation 0.2`; positive-light and critical-light are the overlay's positive and critical mixed toward white until they clear 4.6:1 on its espresso, where the base pair sits at 4.5:1; structure, rules and the three OFL voices come from the base file. It exists so the engine can be published without publishing Applied Form's own palette, and it is not a design anyone should ship. The mark's shape parameters are replaced, because Applied Form's identify the brand; its size and placement limits are rules and stay. The two literal steps of the sequential chart scale are the midpoints of its own sand, clay and terra deep.",
   "$extensions": {
     "form.applied": {
-      "version": "3.2.1",
+      "version": "3.3.0",
       "aspectRatios": [
         "1:1",
         "2:1",
@@ -12,7 +12,7 @@
         "16:9"
       ],
       "absent": {
-        "$description": "Effects Applied Form deliberately does not use. The absence rules in src/lib/rules/absence.mjs flag any element that reaches for one outside its named exemptions.",
+        "$description": "Effects this system deliberately does not use. The absence rules in src/lib/rules/absence.mjs flag any element that reaches for one outside its named exemptions.",
         "$value": [
           "shadow",
           "gradient-fill",
@@ -539,7 +539,7 @@
         "$authoredForColumns": 16
       },
       "prohibitions": {
-        "$description": "Colour prohibitions this system declares, stated as token references so another system states its own rather than inheriting Applied Form’s. neverGround is checked by support-as-ground; pairs by forbidden-pairing.",
+        "$description": "Colour prohibitions this system declares, stated as token references, so a system built on this one states its own rather than inheriting them. neverGround is checked by support-as-ground; pairs by forbidden-pairing.",
         "neverGround": [
           "{color.teal}"
         ],
@@ -914,6 +914,10 @@
       },
       "link": {
         "$value": "{color.terra-deep}"
+      },
+      "link-on-dark": {
+        "$value": "{color.tint}",
+        "$description": "The link colour for a plain link, one with no fill of its own, on an ink or espresso ground, as on the ink masthead, where the link colour cannot be read. Of the palette's colours with real colour (CIE Lab chroma above 10) that clear both the body floor and the label floor of APCA Lc 60 on both grounds, the one nearest the link's hue."
       },
       "support": {
         "$value": "{color.teal}"

@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Incident report</title>
+<style>
+  /* A hand-written stand-in for a second builder's answer to brief b07 (test/builders.test.mjs).
+     Planted for the universal rules: the one link has its focus outline removed, and the status
+     image has no text alternative. */
+  body { margin: 0; font-family: Poppins, "Segoe UI", sans-serif; color: #18181B; background: #FFFFFF; line-height: 1.6; }
+  main { max-width: 44rem; margin: 0 auto; padding: 40px 22px; }
+  h1 { font-size: 30px; margin: 0 0 14px; }
+  h2 { font-size: 20px; margin: 26px 0 6px; }
+  p { font-size: 17px; margin: 0 0 12px; }
+  img { display: block; width: 160px; height: 90px; }
+  a { color: #1E40AF; }
+  a:focus { outline: none; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Payments service outage</h1>
+  <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='90'%3E%3Crect width='160' height='90' fill='%23DC2626'/%3E%3C/svg%3E">
+  <h2>What happened</h2>
+  <p>For four hours on Tuesday, card payments failed because a certificate on the payment gateway expired.</p>
+  <h2>What we are changing</h2>
+  <p>Certificates now renew on their own, and we are alerted a month before any of them expires.</p>
+  <p><a href="#status">Subscribe to status updates</a></p>
+</main>
+</body>
+</html>
