@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Postmortem: payments outage</title>
+<style>
+  /* A hand-written stand-in for a builder's answer to brief b07 (test/builders.test.mjs). Planted
+     for the universal rules: the headings skip from h1 to h3, and the copy-link control is a 16px
+     square. The cards' radius and shadow are house findings only. */
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: Inter, system-ui, sans-serif; color: #0F172A; background: #F8FAFC; line-height: 1.5; }
+  .wrap { max-width: 48rem; margin: 0 auto; padding: 48px 20px; }
+  h1 { font-size: 32px; margin: 0 0 12px; }
+  h3 { font-size: 20px; margin: 28px 0 8px; }
+  p, li { font-size: 16px; color: #334155; }
+  .card { background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08); }
+  .copy { display: inline-flex; width: 16px; height: 16px; padding: 0; border: 0; background: #CBD5E1; vertical-align: middle; cursor: pointer; }
+  table { width: 100%; border-collapse: collapse; font-size: 15px; }
+  td { padding: 6px 4px; border-bottom: 1px solid #E2E8F0; color: #334155; }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <h1>Payments outage, four hours <button class="copy" type="button" aria-label="Copy link to this postmortem"></button></h1>
+  <div class="card">
+    <h3>Summary</h3>
+    <p>Card payments failed for four hours after a certificate on the payment gateway expired. No money was lost; around twelve thousand payments were declined and retried.</p>
+    <h3>Timeline</h3>
+    <table>
+      <tr><td>09:12</td><td>The gateway certificate expired.</td></tr>
+      <tr><td>09:20</td><td>Declines rose and the on-call engineer was paged.</td></tr>
+      <tr><td>13:05</td><td>A renewed certificate was deployed and payments recovered.</td></tr>
+    </table>
+    <h3>Remediation</h3>
+    <ul>
+      <li>Alert thirty days before any certificate expires. Owner: platform team, by 1 March.</li>
+      <li>Renew certificates automatically. Owner: payments team, by 15 March.</li>
+    </ul>
+  </div>
+</main>
+</body>
+</html>

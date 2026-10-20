@@ -4,7 +4,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { readdirSync, readFileSync } from 'node:fs';
 import { lint, advise, registerFor, typeTokensFor, ARTEFACT_REGISTER } from '../src/lib/rules.mjs';
-import { colors as c } from '../src/lib/tokens.mjs';
+import { colors as c, registers, colorName } from '../src/lib/tokens.mjs';
 import { RULES } from '../src/lib/rules/registry.mjs';
 
 const rules = (spec) => lint(spec).map((v) => v.rule);
@@ -200,6 +200,92 @@ test('focus may never be hidden or restyled, on any tab stop', () => {
 test('links are underlined and, in II, terra deep', () => {
   assert.deepEqual(rules({ register: 'ii', links: [{ color: c.terracotta, underlined: false }] }).sort(), ['link-colour-ii', 'link-not-underlined']);
   assert.deepEqual(rules({ register: 'i', links: [{ color: c.terracotta, underlined: true }] }), []);
+});
+
+test('link-colour-ii: a link with no fill of its own on ink or espresso passes in the link colour or the on-dark link colour', () => {
+  // Decision 0025. The ground is the link's own, `bgOf` on the link element, which the extractor reports
+  // for every link. Terra deep reads 2.04:1 on ink; contrast, not this rule, catches that.
+  const ii = registers.ii, dark = registers['ii-dark'];
+  assert.deepEqual([dark.background, dark.layer], [c.ink, c.espresso]);
+  const link = (color, background, extra = {}) => rules({ register: 'ii', links: [{ color, background, underlined: true, ...extra }] });
+  for (const ground of [c.ink, c.espresso]) {
+    // Passing: either colour.
+    assert.deepEqual(link(ii['link-on-dark'], ground), [], `the on-dark link colour on ${ground}`);
+    assert.deepEqual(link(ii['link-on-dark'], ground, { paintsGround: false }), [], `as the fixer's run reports it, on ${ground}`);
+    assert.deepEqual(link(ii.link, ground), [], `the link colour on ${ground}, as on 5722c0a`);
+    // Failing: any other colour, as on 5722c0a.
+    assert.deepEqual(link(c.paper, ground), ['link-colour-ii'], `paper on ${ground}`);
+    assert.deepEqual(link(ii.text, ground), ['link-colour-ii'], `the text colour on ${ground}`);
+  }
+  // The violation names the ground and both colours it accepts, and recommends the on-dark one.
+  const [v] = lint({ register: 'ii', links: [{ color: c.paper, background: c.ink, underlined: true }] });
+  assert.equal(v.rule, 'link-colour-ii');
+  const named = (hex) => `${colorName(hex)} ${hex}`;
+  assert.equal(v.message, `A Register II link on ${named(c.ink)} is the on-dark link colour, ${named(ii['link-on-dark'])}, or the link colour, ${named(ii.link)}. Use the on-dark link colour: the register names it for this ground.`);
+  // Anywhere else the link colour is the one, and the on-dark colour is not.
+  assert.deepEqual(link(ii.link, ii.background), []);
+  assert.deepEqual(link(ii.link, ii.layer), []);
+  assert.deepEqual(link(ii['link-on-dark'], ii.background), ['link-colour-ii']);
+  // Exactly ink or espresso: a dark ground the system does not name, such as the text colour, keeps the
+  // link colour, as before. Only the ground can change there.
+  assert.deepEqual(link(ii.link, ii.text), []);
+  assert.deepEqual(link(ii['link-on-dark'], ii.text), ['link-colour-ii']);
+  // A link with no measured ground keeps the link colour, whatever the page background reads.
+  assert.deepEqual(rules({ register: 'ii', background: ii.background, links: [{ color: ii.link, background: null, underlined: true }] }), []);
+  assert.deepEqual(rules({ register: 'ii', background: c.ink, links: [{ color: ii.link, background: null, underlined: true }] }), ['background']);
+  // On the dark theme the page is judged against the dark palette, which declares no on-dark colour.
+  assert.deepEqual(rules({ register: 'ii', theme: 'dark', links: [{ color: dark.link, background: c.ink, underlined: true }] }), []);
+  assert.deepEqual(rules({ register: 'ii-dark', links: [{ color: dark.link, background: c.espresso, underlined: true }] }), []);
+  // Register I is not judged on link colour.
+  assert.deepEqual(rules({ register: 'i', links: [{ color: c.terracotta, background: c.ink, underlined: true }] }), []);
+});
+
+test('a label-size plain link on ink or espresso passes link-colour-ii and label-apca in the on-dark link colour', () => {
+  // Decision 0025, as the owner resolved it on 2026-10-18: the on-dark link colour clears Lc 60 on both
+  // dark grounds, so a label-size link in it passes both rules. Terracotta light, the colour before,
+  // reads Lc 55.0 on ink and 47.6 on espresso, and is now in neither accepted colour.
+  const ii = registers.ii;
+  const labelLink = (color, background) => rules({ register: 'ii', links: [{ color, background, underlined: true }], text: [{ voice: 'data', sizePx: 11.5, color, background, isData: true }] }).sort();
+  for (const ground of [c.ink, c.espresso]) {
+    assert.deepEqual(labelLink(ii['link-on-dark'], ground), [], `the on-dark link colour on ${ground}`);
+    assert.deepEqual(labelLink(c['terracotta-light'], ground), ['label-apca', 'link-colour-ii'], `terracotta light on ${ground}`);
+  }
+});
+
+test('link-colour-ii: a link that paints its own ground is judged against the link colour on any ground, as before decision 0025', () => {
+  // The extractor reports a filled link's ground as its own fill. Ink fill on a white page, accent fill
+  // on the ink masthead, and a white skip link on the ink masthead all read as they did on 5722c0a.
+  const ii = registers.ii;
+  const filled = (color, fill) => rules({ register: 'ii', links: [{ color, background: fill, paintsGround: true, underlined: true }] });
+  for (const fill of [c.ink, c.espresso, ii.accent, ii.background]) {
+    assert.deepEqual(filled(ii.link, fill), [], `the link colour on a ${fill} fill`);
+    assert.deepEqual(filled(ii['link-on-dark'], fill), ['link-colour-ii'], `the on-dark colour on a ${fill} fill`);
+  }
+  const [v] = lint({ register: 'ii', links: [{ color: c.paper, background: ii.accent, paintsGround: true, underlined: true }] });
+  assert.equal(v.message, `Register II link text is terra deep ${ii.link}`);
+});
+
+test('link-colour-ii: decision 0025 can only pass a link 5722c0a failed, never fail one it passed', () => {
+  // 5722c0a failed a Register II link exactly when its colour was not the link colour. Every colour,
+  // ground, fill and theme here is judged as that, except a plain link on ink or espresso in the
+  // on-dark colour, which now passes.
+  const ii = registers.ii;
+  const colours = [...new Set([ii.link, ii['link-on-dark'], ii.text, ii.accent, c.paper, c.ink, '#FFFFFF'])];
+  const grounds = [...new Set([c.ink, c.espresso, ii.background, ii.layer, ii.text, ii.accent, null])];
+  let relaxed = 0;
+  for (const theme of ['light', 'dark']) {
+    const palette = registers[theme === 'dark' ? 'ii-dark' : 'ii'];
+    for (const color of colours) for (const background of grounds) for (const paintsGround of [undefined, true]) {
+      const now = rules({ register: 'ii', theme, links: [{ color, background, underlined: true, ...(paintsGround ? { paintsGround } : {}) }] }).includes('link-colour-ii');
+      const before = color.toUpperCase() !== palette.link.toUpperCase();
+      assert.ok(!now || before, `${color} on ${background} (${theme}${paintsGround ? ', filled' : ''}) fails now and passed on 5722c0a`);
+      if (before && !now) {
+        relaxed += 1;
+        assert.ok(theme === 'light' && !paintsGround && color === ii['link-on-dark'] && [c.ink, c.espresso].includes(background), `${color} on ${background} passes now`);
+      }
+    }
+  }
+  assert.equal(relaxed, 2, 'the on-dark colour on ink and on espresso');
 });
 
 test('decorative imagery is flagged in II only', () => {

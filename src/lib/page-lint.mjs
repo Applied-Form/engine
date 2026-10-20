@@ -1,5 +1,6 @@
 /** Playwright driver: open each URL at each viewport, extract, lint, advise. */
 import { fileURLToPath } from 'node:url';
+import { realpathSync } from 'node:fs';
 import { dirname, resolve, sep } from 'node:path';
 import { specFromPage } from './page-spec.mjs';
 import { lint, advise } from './rules.mjs';
@@ -23,18 +24,38 @@ export const ENGINE_ROOT = fileURLToPath(new URL('../../', import.meta.url));
  * The default roots are the working directory, where a person's own page may keep its assets,
  * and the engine's files. A caller rendering something it did not write (the MCP server, for a
  * draft) passes the engine's files alone.
+ *
+ * A path is checked as it is written, so a link inside a root is read wherever it leads. That is
+ * what `af lint`, `af fix` and the MCP server rely on: a person's own site may link its assets in.
+ * `realpaths: true` checks the file a link leads to instead, so a link inside a root that leads
+ * outside every root is refused. `af audit`, which renders other people's pages, asks for this. A
+ * file that does not exist is then checked by its path, and fails as not found.
+ *
+ * `network: false` also refuses every request a `file://` page makes over the network, WebSockets
+ * included. `af audit --offline` renders pages this way. `onRefused({ url, type })` hears every
+ * request refused, with its resource type.
  */
 export const DEFAULT_FILE_ROOTS = () => [process.cwd(), ENGINE_ROOT];
 
-export async function confine(page, url, roots = DEFAULT_FILE_ROOTS()) {
+const realOr = (p) => { try { return realpathSync(p); } catch { return p; } };
+const inside = (p, root) => p === root || p.startsWith(root.endsWith(sep) ? root : root + sep);
+
+export async function confine(page, url, roots = DEFAULT_FILE_ROOTS(), { network = true, onRefused = null, realpaths = false } = {}) {
   if (!String(url).startsWith('file:')) return;
-  const within = [dirname(fileURLToPath(url)), ...roots].map((r) => resolve(r));
+  const own = resolve(fileURLToPath(url));
+  const real = realpaths ? realOr : (p) => p;
+  // The page's directory as named and, with realpaths, as it really is (they differ when the page is a link).
+  const within = [...new Set([dirname(own), ...roots].map((r) => real(resolve(r))).concat(realpaths ? [dirname(realOr(own))] : []))];
   const allowed = (href) => {
     let p;
-    try { p = resolve(fileURLToPath(href)); } catch { return false; }
-    return within.some((r) => p === r || p.startsWith(r.endsWith(sep) ? r : r + sep));
+    try { p = real(resolve(fileURLToPath(href))); } catch { return false; }
+    return within.some((r) => inside(p, r));
   };
-  await page.route((u) => u.protocol === 'file:', (route) => (allowed(route.request().url()) ? route.continue() : route.abort('accessdenied')));
+  const refuse = (route, why) => { onRefused?.({ url: route.request().url(), type: route.request().resourceType() }); return route.abort(why); };
+  await page.route((u) => u.protocol === 'file:', (route) => (allowed(route.request().url()) ? route.continue() : refuse(route, 'accessdenied')));
+  if (network) return;
+  await page.route((u) => u.protocol !== 'file:', (route) => refuse(route, 'blockedbyclient'));
+  await page.routeWebSocket(() => true, (ws) => { onRefused?.({ url: ws.url(), type: 'websocket' }); ws.close(); });
 }
 
 export const FAMILIES = Object.fromEntries(Object.entries(fonts).map(([voice, list]) => [list[0], voice]));
@@ -114,7 +135,43 @@ const assume = (register) => (register ? (page) => page.addInitScript((r) => {
   }, { once: true, capture: true });
 }, register) : async () => {});
 
-export async function lintPages(urls, { viewports = VIEWPORTS, browser, register = null, fileRoots = DEFAULT_FILE_ROOTS(), withIds = false, unregistered = 'house' } = {}) {
+/**
+ * `css` is added to every load of the page, at the end of its head once the document is parsed, in
+ * the top frame only: where the block `af fix` writes sits in the fixed page, so the page is measured
+ * at its own address, with its own origin and its own relative URLs, as it would be with the fixes.
+ */
+const withCss = (css) => (css ? (page) => page.addInitScript((text) => {
+  if (window !== window.top) return;
+  document.addEventListener('DOMContentLoaded', () => {
+    const st = document.createElement('style');
+    st.setAttribute('data-af-fixes', '');
+    st.textContent = text;
+    (document.head ?? document.documentElement).append(st);
+  }, { once: true, capture: true });
+}, css) : async () => {});
+
+/**
+ * `network: false` renders a `file://` page offline, with every request over the network refused
+ * (see confine). `requireOk` makes a page served over http that answers the browser with anything
+ * but a 2xx document an error, rather than a page to measure: a 403 or a bot wall is not the page.
+ *
+ * `onFailed({ url, type, why })` hears every request the page made that did not load, on every load
+ * the linter makes, with its resource type (stylesheet, script, font, image, fetch, …): `why` is
+ * 'refused' when confine refused it, `HTTP <status>` for an answer of 400 or more, or the browser's
+ * error (net::ERR_FILE_NOT_FOUND). The page's own document is not among them, and nor is a request
+ * the page cancelled itself (net::ERR_ABORTED). The same request is heard once per load.
+ * `onRequest({ url, type })` hears every request the page made, loaded, failed or refused, other
+ * than its own document.
+ *
+ * `realpaths: true` checks the file a link leads to (see confine). Only `af audit` asks for it.
+ * `css` is added to the page on every load (withCss above); only `af audit` asks for it.
+ *
+ * `settle` (ms, default 0) keeps each measured page open after it is measured until its network has
+ * been quiet for 300ms, or `settle` ms have passed, so a request the page makes after its load event
+ * (a fetch a script starts, a late image) is heard by `onFailed` before the page is closed rather
+ * than cancelled by the close. It changes nothing that is measured. Only `af audit` asks for it.
+ */
+export async function lintPages(urls, { viewports = VIEWPORTS, browser, register = null, fileRoots = DEFAULT_FILE_ROOTS(), withIds = false, unregistered = 'house', network = true, requireOk = false, onFailed = null, onRequest = null, realpaths = false, css = null, settle = 0 } = {}) {
   if (register != null && !Object.hasOwn(registers, register)) throw new Error(`unknown register "${register}"; the tokens define ${Object.keys(registers).join(', ')}`);
   // A page under a Standards pack needs no register of its own: the pack's is assumed for it.
   register ??= pack ? 'pack' : null;
@@ -126,8 +183,61 @@ export async function lintPages(urls, { viewports = VIEWPORTS, browser, register
   const own = !browser;
   browser ||= await launchBrowser();
   const tag = assume(register);
+  const fixes = withCss(css);
   let current = null;
-  const open = async (options) => { const p = await browser.newPage(options); await confine(p, current, fileRoots); await tag(p); return p; };
+  // The status the browser was answered with, for the document of a page served over http: the
+  // first that is not a success or a redirect. Checked after every load the linter makes.
+  let refusedStatus = null;
+  const inflightOf = new WeakMap();
+  const offline = (url) => !network && String(url).startsWith('file:');
+  const open = async (options) => {
+    const p = await browser.newPage({ ...options, ...(offline(current) ? { offline: true } : {}) });
+    const refused = new Set();
+    const onRefused = onFailed ? ({ url, type }) => {
+      refused.add(url);
+      // A WebSocket refused is never a failed request; it is heard here.
+      if (type === 'websocket') onFailed({ url, type, why: 'refused' });
+    } : null;
+    await confine(p, current, fileRoots, { network, onRefused, realpaths });
+    const isDocument = (req) => req.isNavigationRequest() && req.frame() === p.mainFrame();
+    if (onRequest) p.on('request', (req) => { if (!isDocument(req)) onRequest({ url: req.url(), type: req.resourceType() }); });
+    if (onFailed) {
+      p.on('requestfailed', (req) => {
+        const why = refused.has(req.url()) ? 'refused' : req.failure()?.errorText ?? 'failed';
+        if (!isDocument(req) && why !== 'net::ERR_ABORTED') onFailed({ url: req.url(), type: req.resourceType(), why });
+      });
+    }
+    p.on('response', (res) => {
+      const s = res.status(), req = res.request();
+      if (isDocument(req)) {
+        if (requireOk && /^https?:/i.test(String(current)) && (s < 200 || s >= 400)) refusedStatus ??= s;
+      } else if (onFailed && s >= 400) onFailed({ url: req.url(), type: req.resourceType(), why: `HTTP ${s}` });
+    });
+    if (settle > 0) {
+      const count = { inflight: 0 };
+      const done = () => { count.inflight = Math.max(0, count.inflight - 1); };
+      p.on('request', () => { count.inflight += 1; });
+      p.on('requestfinished', done);
+      p.on('requestfailed', done);
+      inflightOf.set(p, count);
+    }
+    await tag(p);
+    await fixes(p);
+    return p;
+  };
+  // Wait until the page's network has been quiet for 300ms, or `settle` ms have passed.
+  const quietDown = async (p) => {
+    const count = inflightOf.get(p);
+    if (!count) return;
+    const started = Date.now();
+    let since = Date.now();
+    while (Date.now() - started < settle) {
+      await p.waitForTimeout(50);
+      if (count.inflight > 0) since = Date.now();
+      else if (Date.now() - since >= 300) return;
+    }
+  };
+  const loaded = () => { if (refusedStatus != null) throw new Error(`the browser was answered HTTP ${refusedStatus}, not the page`); };
   const permittedRatios = aspectRatios.map((r) => r.split(':').map(Number));
   const layersByRegister = Object.fromEntries(Object.entries(registers).map(([k, r]) => [k, [r.layer]]));
   const breakpoints = Object.values(grid.breakpoints);
@@ -139,11 +249,14 @@ export async function lintPages(urls, { viewports = VIEWPORTS, browser, register
   try {
     for (const url of urls) {
       current = url;
+      refusedStatus = null;
       let printSpec = null, printDone = false;
       for (const width of viewports) {
         const page = await open({ viewport: { width, height: 900 } });
         const spec = await specFromPage(page, url, extractOpts);
+        await quietDown(page);
         await page.close();
+        loaded();
         if (spec.register == null) {
           results.push({ url, viewport: width, spec, violations: [{ rule: 'register', message: 'No [data-register] root in the document' }], advisories: [] });
           continue;
@@ -153,6 +266,7 @@ export async function lintPages(urls, { viewports = VIEWPORTS, browser, register
         await quiet.goto(url, { waitUntil: 'load' });
         const underReducedMotion = await quiet.evaluate(() => document.getAnimations().length);
         await quiet.close();
+        loaded();
         spec.motion = { animations: spec.animations ?? 0, underReducedMotion };
         // Print pass, once per URL: emulate print media at the page size the tokens set.
         if (spec.register.startsWith('ii') && !printDone) {
@@ -176,6 +290,7 @@ export async function lintPages(urls, { viewports = VIEWPORTS, browser, register
             return { overflowX: Math.max(0, de.scrollWidth - de.clientWidth), linksWithoutHref: withoutHref, orphanHeadings: orphans, pages: Math.ceil(de.scrollHeight / pageH) };
           }, pageH);
           await printPage.close();
+          loaded();
         }
         if (printSpec) spec.print = printSpec;
         const violations = [...lint(spec), ...spec.charts.flatMap((chart) => lint({ register: spec.register, theme: spec.theme, background: spec.background, chart }))];

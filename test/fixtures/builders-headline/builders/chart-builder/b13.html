@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Calls per week</title>
+<style>
+  /* A hand-written stand-in for a builder's answer to brief b13 (test/builders.test.mjs). The chart is
+     drawn on a canvas, the way a charting library draws one, and carries no data-figure attribute, which
+     is an attribute of ours. Nothing else is planted for the universal rules. */
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: Inter, system-ui, sans-serif; color: #0F172A; background: #FFFFFF; line-height: 1.6; }
+  main { max-width: 40rem; margin: 0 auto; padding: 48px 24px; }
+  h1 { font-size: 36px; line-height: 1.1; margin: 0 0 20px; }
+  p { font-size: 18px; margin: 0 0 16px; }
+  canvas { display: block; width: 100%; height: 600px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Calls per week</h1>
+  <p>Support calls fell in every week after the new help pages went live.</p>
+  <canvas width="640" height="600"></canvas>
+  <p>Figure 1. Calls per week, April to June.</p>
+</main>
+</body>
+</html>

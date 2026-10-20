@@ -3,8 +3,10 @@
  * af: one command for the system.
  *
  *   af lint <page.html|url> [...] [--register i|ii] lint pages in Chromium (four viewports, reduced motion, print)
+ *   af fix <page.html|url> [--out f]  apply the fixes the engine can make on its own, and say what is left
  *   af baseline <page|url> [--out f]  record the current violations as the baseline, so adoption can start
  *   af rules [--json|--wcag]           what every rule requires, and which WCAG criteria it touches
+ *   af audit <pages… | dir> [--fix]    lint (and fix) a set of pages and write one self-contained report
  *   af report <run.json> [...]         aggregate lint runs by team, with a trend against the last report
  *   af form <data.csv> [--out x.svg]   a generative Form from a dataset
  *   af mark issue --key k --dataset d  freeze a mark and commit the record of what made it
@@ -18,6 +20,7 @@
  *   af drift <page.html> [...]         what a site's design system actually is, and how far it has drifted
  *   af check                           build, unit tests, page lint
  *   af init --pack <tokens.json|instrument>  import a Standards pack and name it in af.config.json
+ *   af init --from-site <page.html|url> [...]  propose a pack from a rendered site; written once a person confirms it
  *   af mcp-config [--client claude-code|cursor]  the MCP server block for an agent's config
  */
 import { spawnSync } from 'node:child_process';
@@ -55,9 +58,11 @@ const npm = (script) => {
 
 switch (cmd) {
   case 'lint': run('lint-page.mjs', rest); break;
+  case 'fix': run('fix-page.mjs', rest); break;
   case 'baseline': run('lint-page.mjs', [...rest, '--baseline-write']); break;
   case 'rules': run('rules.mjs', rest); break;
   case 'report': run('report.mjs', rest); break;
+  case 'audit': run('audit-pages.mjs', rest); break;
   case 'form': run('form-from-data.mjs', rest); break;
   // `af mark issue` reads as a sentence; the subcommand is dropped before the script sees it.
   case 'mark': run('issue-mark.mjs', rest[0] === 'issue' ? rest.slice(1) : rest); break;
@@ -69,12 +74,12 @@ switch (cmd) {
   case 'system': run('system.mjs', rest); break;
   case 'drift': run('drift.mjs', rest); break;
   case 'mcp': run('mcp.mjs', rest); break;
-  case 'init': run('init.mjs', rest); break;
+  case 'init': run(rest.some((a) => /^--from-(site|survey|tailwind)$/.test(a)) ? 'init-from-site.mjs' : 'init.mjs', rest); break;
   case 'mcp-config': run('mcp-config.mjs', rest); break;
   case 'build': npm('build'); break;
   case 'site': npm('build:site'); break;
   case 'check': npm('check'); break;
   default:
-    console.error(`usage: af <init|lint|baseline|rules|report|form|mark|move|build|site|pdf|golden|figma-diff|brand|check|system|mcp|mcp-config|drift> ...`);
+    console.error(`usage: af <init|lint|fix|baseline|rules|report|audit|form|mark|move|build|site|pdf|golden|figma-diff|brand|check|system|mcp|mcp-config|drift> ...`);
     process.exit(cmd ? 2 : 0);
 }

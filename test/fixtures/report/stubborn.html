@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en" data-register="ii">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stubborn · a report fixture with a fault the fixer cannot cure</title>
+<link rel="stylesheet" href="../../../dist/tokens.css">
+<style>
+  /* One fault the fixer cures (a shadow on .card) and one it cannot: a heading that skips from h1
+     to h4, which needs a change to the markup. */
+  body { margin: 0; background: var(--af-color-white); color: var(--af-color-text-ii); font: var(--af-type-body-weight) var(--af-type-body-size)/var(--af-type-body-leading) var(--af-font-text); }
+  main { max-width: 66ch; margin: 0 auto; padding: var(--af-space-04) var(--af-space-03); }
+  h1 { font: var(--af-type-heading-02-weight) var(--af-type-heading-02-size)/var(--af-type-heading-02-leading) var(--af-font-text); margin: 0 0 var(--af-space-02); }
+  h4 { font: var(--af-type-heading-03-weight) var(--af-type-heading-03-size)/var(--af-type-heading-03-leading) var(--af-font-text); margin: 0 0 var(--af-space-02); }
+  p { margin: 0 0 var(--af-space-02); }
+  .card { box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2); }
+</style>
+</head>
+<body>
+<main id="main">
+  <h1>A page with one fault the fixer cannot cure</h1>
+  <p class="card">This paragraph sits on a card with a shadow.</p>
+  <h4>A heading that skips two levels</h4>
+  <p>The fixer does not edit markup, so the heading level stays as it is.</p>
+</main>
+</body>
+</html>

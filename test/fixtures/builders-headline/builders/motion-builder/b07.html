@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Service status</title>
+<style>
+  /* A hand-written stand-in for a builder's answer to brief b07 (test/builders.test.mjs). A dot pulses
+     forever, and nothing turns the pulse off for a reader who asks for reduced motion: AAA's 2.3.3, which
+     the benchmark reports apart from its headline. Nothing else is planted for the universal rules. */
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: Inter, system-ui, sans-serif; color: #0F172A; background: #FFFFFF; line-height: 1.6; }
+  main { max-width: 40rem; margin: 0 auto; padding: 48px 24px; }
+  h1 { font-size: 36px; line-height: 1.1; margin: 0 0 20px; }
+  p { font-size: 18px; margin: 0 0 16px; }
+  .dot { display: inline-block; width: 24px; height: 24px; background: #1D4ED8; vertical-align: middle; animation: pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>Service status</h1>
+  <p><span class="dot" aria-hidden="true"></span> Live: fourteen services are running normally.</p>
+</main>
+</body>
+</html>

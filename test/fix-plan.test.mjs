@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { planFixes, FIXABLE, snap } from '../src/lib/fix/plan.mjs';
+import { planFixes, FIXABLE, snap, snapOther } from '../src/lib/fix/plan.mjs';
 import { colors, spacingScale, floors } from '../src/lib/tokens.mjs';
 
 const result = (violations, spec = {}) => [{ spec, violations }];
@@ -28,6 +28,58 @@ test('spacing snaps the property that produced the value, keeping its sign', () 
   assert.equal(p.length, 1);
   assert.deepEqual(p[0].decl, { 'margin-top': `-${snap(13)}px` });
   assert.ok(spacingScale.includes(snap(13)));
+});
+
+test('spacing snaps any value that is not 0 to a step of the scale, and offers 0 only as the second answer below half the first step', () => {
+  // Spacing that is there stays there: a 1px to 7px gap or label margin goes to the first step,
+  // not to 0. 0, which the rule also accepts, is the second answer for when the step is refused,
+  // as the browser's own 1px padding on a table cell was at 320px (engine8 mini b36-s0). From half
+  // the first step up, a value is spacing an author chose (6px of cell padding on engine8 mini
+  // b12-s0), and taking it to 0 would remove it rather than correct it, so there is no second answer.
+  const first = Math.min(...spacingScale);
+  for (const px of [1, 3, first / 2, first - 1]) assert.equal(snap(px), first, `snap(${px})`);
+  for (const px of [1, 3]) assert.equal(snapOther(px), 0, `snapOther(${px})`);
+  for (const px of [first / 2, first - 2, first - 1]) assert.equal(snapOther(px), null, `snapOther(${px})`);
+  assert.equal(snap(13), 16);
+  const p = planFixes(result([{ rule: 'spacing', value: 1 }], { spacingSources: [{ value: 1, raw: 1, prop: 'paddingLeft', afId: '2' }] }), { secondAnswers: true });
+  assert.deepEqual(p[0].decl, { 'padding-left': `${first}px` });
+  assert.deepEqual(p[0].alt, { 'padding-left': '0px' });
+});
+
+test('spacing and raised sizes carry a second answer for the fixer to try when the first makes a rule worse', () => {
+  assert.equal(snapOther(20), 24, '20 snaps to 16; the far side is 24');
+  assert.equal(snapOther(13), 8);
+  assert.equal(snapOther(1), 0);
+  assert.equal(snapOther(100), 96, 'beyond the scale, the other multiple of the unit');
+  const p = planFixes(result([
+    { rule: 'spacing', value: 20 },
+    { rule: 'body-too-small', text: { afId: '6', sizePx: 13 } },
+    { rule: 'radius-present', absence: { afId: '4' } },
+  ], { spacingSources: [{ value: 20, raw: 20, prop: 'paddingLeft', afId: '2' }] }), { secondAnswers: true });
+  const by = Object.fromEntries(p.map((x) => [x.rules[0], x]));
+  assert.deepEqual(by.spacing.alt, { 'padding-left': '24px' });
+  assert.deepEqual(by['body-too-small'].alt, { 'font-size': `${floors.bodyMinPxRegisterII}px`, 'overflow-wrap': 'anywhere' });
+  assert.equal(by['radius-present'].alt, undefined, 'a remedy with one answer has no second');
+  const svg = planFixes(result([{ rule: 'text-too-small', text: { afId: '7', sizePx: 8, isSvgText: true } }]), { secondAnswers: true });
+  assert.equal(svg[0].alt, undefined, 'svg text does not wrap');
+});
+
+test('with no option, a fixer plans no second answers: a caller opts in, so no arm gets them by omission', () => {
+  const p = planFixes(result([
+    { rule: 'spacing', value: 20 },
+    { rule: 'body-too-small', text: { afId: '6', sizePx: 13 } },
+  ], { spacingSources: [{ value: 20, raw: 20, prop: 'paddingLeft', afId: '2' }] }));
+  assert.equal(p.length, 2);
+  for (const x of p) assert.equal(x.alt, undefined, `${x.rules} carries a second answer by default`);
+});
+
+test('a fixer told to offer no second answers plans none', () => {
+  const p = planFixes(result([
+    { rule: 'spacing', value: 20 },
+    { rule: 'body-too-small', text: { afId: '6', sizePx: 13 } },
+  ], { spacingSources: [{ value: 20, raw: 20, prop: 'paddingLeft', afId: '2' }] }), { secondAnswers: false });
+  assert.equal(p.length, 2, 'the first answers are still planned');
+  for (const x of p) assert.equal(x.alt, undefined, `${x.rules} carries a second answer`);
 });
 
 test('skips violations it cannot locate', () => {
@@ -71,6 +123,203 @@ test('register II accent on non-interactive text takes the text colour', async (
   const { registers } = await import('../src/lib/tokens.mjs');
   const p = planFixes(result([{ rule: 'accent-non-interactive-ii', text: { afId: '3' } }]));
   assert.equal(p[0].decl.color, registers.ii.text);
+});
+
+test('a register II link takes the register\'s link colour, on the link itself', async () => {
+  const { registers } = await import('../src/lib/tokens.mjs');
+  const p = planFixes(result([{ rule: 'link-colour-ii', link: { afId: '3', sel: 'a', color: '#222222', background: registers.ii.background } }], { register: 'ii' }));
+  assert.equal(p.length, 1);
+  assert.equal(p[0].afId, '3');
+  assert.deepEqual(p[0].decl, { color: registers.ii.link });
+  assert.deepEqual(p[0].rules, ['link-colour-ii']);
+  assert.equal(p[0].subtree, undefined, 'the rule reads the link\'s own colour, so nothing inside it is touched');
+});
+
+test('a register II link on the dark theme takes the dark palette\'s link colour', async () => {
+  const { registers } = await import('../src/lib/tokens.mjs');
+  if (!registers['ii-dark']) return;
+  const p = planFixes(result([{ rule: 'link-colour-ii', link: { afId: '3', sel: 'a', background: registers['ii-dark'].background } }], { register: 'ii', theme: 'dark' }));
+  assert.deepEqual(p[0].decl, { color: registers['ii-dark'].link });
+});
+
+test('a link whose ground the link colour cannot read on is left alone: only the ground can change', async () => {
+  const { registers } = await import('../src/lib/tokens.mjs');
+  // A link on a band in the text colour, which is not one of the dark grounds: the link colour on it
+  // would trade link-colour-ii for contrast.
+  assert.deepEqual(planFixes(result([{ rule: 'link-colour-ii', link: { afId: '3', sel: 'a', background: registers.ii.text } }], { register: 'ii' })), []);
+});
+
+test('a register II link in neither accepted colour, with no fill of its own on ink or espresso, takes the on-dark link colour', async () => {
+  const { registers } = await import('../src/lib/tokens.mjs');
+  // engine11: 7 of the 18 pages failing link-colour-ii carried a link on the ink masthead, where the
+  // link colour reads 2.05:1. The rule accepts the link colour or the on-dark one there (decision 0025),
+  // and the fixer recommends the on-dark one: on 5722c0a it planned nothing for these links.
+  for (const ground of [colors.ink, colors.espresso]) {
+    for (const extra of [{}, { paintsGround: false, underlined: true }]) {
+      const link = { afId: '3', sel: 'a', color: '#FFFFFF', background: ground, groundTrusted: true, hasText: true, ...extra };
+      const p = planFixes(result([{ rule: 'link-colour-ii', link }], { register: 'ii' }));
+      assert.equal(p.length, 1);
+      assert.deepEqual(p[0].decl, { color: registers.ii['link-on-dark'] }, ground);
+      assert.deepEqual(p[0].rules, ['link-colour-ii']);
+    }
+  }
+});
+
+test('on ink, a link with no text of its own, an untrusted ground, the dark theme and the dark register are planned as on 5722c0a', async () => {
+  const { registers } = await import('../src/lib/tokens.mjs');
+  const link = { afId: '3', sel: 'a', color: colors.paper, background: colors.ink, groundTrusted: true, hasText: true };
+  const plan = (l, spec = { register: 'ii' }) => planFixes(result([{ rule: 'link-colour-ii', link: l }], spec));
+  // A link with no text of its own: one whose only content is an svg or an img, such as the outlined
+  // wordmark used as the home link, even with a <title>, which gives it a text run (underlined is then
+  // not null). Its colour paints only the image, so it is left to the model, as on 5722c0a.
+  assert.deepEqual(plan({ ...link, hasText: false }), []);
+  assert.deepEqual(plan({ ...link, hasText: false, underlined: true }), []);
+  assert.deepEqual(plan({ ...link, hasText: undefined }), [], 'a link the extractor did not report on is not recoloured');
+  // A ground the checker cannot vouch for, as for a contrast fix.
+  assert.deepEqual(plan({ ...link, groundTrusted: false }), []);
+  assert.deepEqual(plan({ ...link, groundTrusted: undefined }), []);
+  // The dark theme is judged against the dark palette, which declares no on-dark colour.
+  assert.deepEqual(plan(link, { register: 'ii', theme: 'dark' })[0].decl, { color: registers['ii-dark'].link });
+  // A page that declares the dark register: nothing is planned, as before.
+  assert.deepEqual(plan(link, { register: 'ii-dark' }), []);
+});
+
+test('a link measured on ink at one width and on the page at another is not given the on-dark colour', async () => {
+  const { registers } = await import('../src/lib/tokens.mjs');
+  const at = (background) => ({ afId: '3', sel: 'a', color: colors.paper, background, groundTrusted: true, hasText: true });
+  const results = [
+    { url: 'p', viewport: 1280, spec: { register: 'ii', links: [at(colors.ink)] }, violations: [{ rule: 'link-colour-ii', link: at(colors.ink) }] },
+    { url: 'p', viewport: 320, spec: { register: 'ii', links: [at(registers.ii.background)] }, violations: [{ rule: 'link-colour-ii', link: at(registers.ii.background) }] },
+  ];
+  // The 320 width plans the link colour, as on 5722c0a; the 1280 width plans nothing of its own.
+  assert.deepEqual(planFixes(results).map((p) => p.decl), [{ color: registers.ii.link }]);
+});
+
+/** A contrast violation on a run inside a link, as the fixer's run reports both. */
+const linkRun = (link, run = {}) => {
+  const t = { afId: '7', sel: `${link.sel} > span:nth-of-type(1)`, color: link.color, background: link.background, isInteractive: true, sizePx: 18, weight: 400, groundTrusted: true, ...run };
+  return [{ spec: { register: 'ii', links: [link], text: [t] }, violations: [{ rule: 'contrast', text: t, ratio: 2.04, need: 4.5, suggestion: null }] }];
+};
+
+test('a register II link in the link colour on ink, whose text fails contrast, takes the on-dark link colour on the link', async () => {
+  const { registers } = await import('../src/lib/tokens.mjs');
+  // link-colour-ii passes it, as on 5722c0a; contrast fails it, and on 5722c0a the fixer left that to the
+  // model, since a Register II link's colour is the register's. The on-dark colour passes both rules.
+  for (const ground of [colors.ink, colors.espresso]) {
+    const link = { afId: '5', sel: 'html > body:nth-of-type(1) > header:nth-of-type(1) > a:nth-of-type(1)', color: registers.ii.link, background: ground, groundTrusted: true, hasText: true };
+    for (const run of [{}, { afId: link.afId, sel: link.sel }]) {
+      const p = planFixes(linkRun(link, run));
+      assert.equal(p.length, 1, ground);
+      assert.equal(p[0].afId, link.afId, 'the patch is on the link, whose colour the run inherits');
+      assert.deepEqual(p[0].decl, { color: registers.ii['link-on-dark'] });
+      assert.deepEqual(p[0].rules, ['contrast']);
+    }
+    // Planned for contrast, so only where the fixer may fix contrast.
+    assert.deepEqual(planFixes(linkRun(link), { allow: ['link-colour-ii'] }), []);
+  }
+});
+
+test('a contrast failure inside a link is planned as on 5722c0a where the link cannot take the on-dark colour', async () => {
+  const { registers } = await import('../src/lib/tokens.mjs');
+  const link = { afId: '5', sel: 'html > body:nth-of-type(1) > header:nth-of-type(1) > a:nth-of-type(1)', color: registers.ii.link, background: colors.ink, groundTrusted: true, hasText: true };
+  // Untrusted ground, no text of its own, a link not in the link colour, a run in a colour of its own,
+  // a link on another ground, a page on the dark theme: the Register II link colour stays the model's call.
+  for (const [l, run, spec] of [
+    [{ ...link, groundTrusted: false }, {}],
+    [{ ...link, hasText: false }, {}],
+    [{ ...link, color: colors.paper }, { color: registers.ii.link }],
+    [link, { color: registers.ii.text }],
+    [{ ...link, background: registers.ii.text }, {}],
+    [link, {}, { register: 'ii', theme: 'dark' }],
+  ]) {
+    const results = linkRun(l, run);
+    if (spec) results[0].spec = { ...results[0].spec, ...spec };
+    assert.deepEqual(planFixes(results), [], JSON.stringify([l, run, spec]));
+  }
+  // A run in no link is planned as before: on the run, in the register's own colour that reads there.
+  const plain = planFixes(linkRun(link, { sel: 'html > body:nth-of-type(1) > p:nth-of-type(1)', isInteractive: false }));
+  assert.deepEqual(plain.map((p) => [p.afId, p.rules]), [['7', ['contrast']]]);
+  assert.notEqual(plain[0].decl.color, registers.ii['link-on-dark']);
+});
+
+/** A link on ink holding runs, each a span of it measured as `run` says, and the violations given. */
+const holding = (link, runs, violations) => {
+  const text = runs.map((run, i) => ({ afId: String(20 + i), sel: `${link.sel} > span:nth-of-type(${i + 1})`, isInteractive: true, sizePx: 18, weight: 400, groundTrusted: true, alpha: 1, ...run }));
+  return [{ spec: { register: 'ii', links: [link], text }, violations: violations(text) }];
+};
+const failsContrast = (...runs) => (text) => runs.map((i) => ({ rule: 'contrast', text: text[i], ratio: 2.04, need: 4.5, suggestion: null }));
+
+test('a link is given the on-dark colour only when every run it colours reads in it, not only the one that fails', async () => {
+  const { registers } = await import('../src/lib/tokens.mjs');
+  const ii = registers.ii;
+  const sel = 'html > body:nth-of-type(1) > header:nth-of-type(1) > a:nth-of-type(1)';
+  const onInk = (color) => ({ color, paint: color, background: colors.ink });
+  const onChip = (color) => ({ color, paint: color, background: ii.background });
+  // contrast: a link in the link colour on ink, holding a plain run on the ink, which fails, and a run
+  // on a white chip, in the link colour it inherits, which passes. The on-dark colour would fail the
+  // chip's run (1.43:1 on Applied Form; the open engine's palette differs), so the link is not
+  // recoloured, and nothing else is planned for it.
+  const link = { afId: '5', sel, color: ii.link, background: colors.ink, groundTrusted: true, hasText: true };
+  const { contrast } = await import('../src/lib/contrast.mjs');
+  assert.ok(contrast(ii['link-on-dark'], ii.background) < floors.bodyContrast, 'the on-dark colour fails the body floor on the chip');
+  assert.deepEqual(planFixes(holding(link, [onInk(ii.link), onChip(ii.link)], failsContrast(0))), []);
+  // Every run on the ink: the link takes the on-dark colour, for contrast.
+  const fixed = planFixes(holding(link, [onInk(ii.link), onInk(ii.link)], failsContrast(0, 1)));
+  assert.deepEqual(fixed.map((p) => [p.afId, p.decl, p.rules]), [[link.afId, { color: ii['link-on-dark'] }, ['contrast']]]);
+  // A chip run in a colour of its own takes nothing from the link, so it does not hold the fix back.
+  assert.equal(planFixes(holding(link, [onInk(ii.link), onChip(ii.text)], failsContrast(0)))[0].decl.color, ii['link-on-dark']);
+
+  // link-colour-ii: the same check, on a link in neither accepted colour.
+  const paper = { ...link, color: colors.paper };
+  const flagged = () => [{ rule: 'link-colour-ii', link: paper }];
+  assert.deepEqual(planFixes(holding(paper, [onInk(colors.paper), onChip(colors.paper)], flagged)), []);
+  assert.deepEqual(planFixes(holding(paper, [onInk(colors.paper), onInk(colors.paper)], flagged)).map((p) => p.decl), [{ color: ii['link-on-dark'] }]);
+  assert.deepEqual(planFixes(holding(paper, [onInk(colors.paper), onChip(ii.text)], flagged)).map((p) => p.decl), [{ color: ii['link-on-dark'] }]);
+
+  // A run the link colours at reduced opacity is read as it would paint: the on-dark colour at 50%
+  // on ink (#8B7C71 on Applied Form, 3.79:1) is under the floor, so the link is left alone. The
+  // fixer's run reports the run's colour before opacity, which is how it is known to be the link's.
+  const half = (fg, bg) => '#' + [1, 3, 5].map((i) => Math.round((parseInt(fg.slice(i, i + 2), 16) + parseInt(bg.slice(i, i + 2), 16)) / 2).toString(16).padStart(2, '0')).join('').toUpperCase();
+  const faded = { color: half(colors.paper, colors.ink), paint: colors.paper, alpha: 0.5, background: colors.ink };
+  assert.ok(contrast(half(ii['link-on-dark'], colors.ink), colors.ink) < floors.bodyContrast, 'the on-dark colour at 50% on ink is under the floor');
+  assert.deepEqual(planFixes(holding(paper, [onInk(colors.paper), faded], flagged)), []);
+  // A run with no measured ground cannot be judged, so the link is left alone.
+  assert.deepEqual(planFixes(holding(paper, [onInk(colors.paper), { ...onInk(colors.paper), background: null }], flagged)), []);
+
+  // onDark: false plans neither fix, so both links are planned as on 5722c0a: nothing for either.
+  assert.deepEqual(planFixes(holding(link, [onInk(ii.link)], failsContrast(0)), { onDark: false }), []);
+  assert.deepEqual(planFixes(holding(paper, [onInk(colors.paper)], flagged), { onDark: false }), []);
+});
+
+test('a link that paints its own ground is planned exactly as on 5722c0a, on ink as anywhere else', async () => {
+  const { registers } = await import('../src/lib/tokens.mjs');
+  const ii = registers.ii;
+  const plan = (link) => planFixes(result([{ rule: 'link-colour-ii', link: { afId: '3', sel: 'a', paintsGround: true, behindTrusted: true, ...link } }], { register: 'ii' })).map((x) => x.decl);
+  const lifted = { color: ii.link, 'background-color': 'transparent', 'background-image': 'none' };
+  // Filled with ink or espresso on a white page: it loses its fill and takes the link colour.
+  for (const fill of [colors.ink, colors.espresso]) assert.deepEqual(plan({ color: '#FFFFFF', background: fill, behind: ii.background }), [lifted], fill);
+  // Filled with the accent on the ink masthead: the link colour reads neither on the fill nor on the
+  // ink behind it, so nothing is planned.
+  assert.deepEqual(plan({ color: colors.paper, background: ii.accent, behind: colors.ink }), []);
+  // Filled with ink on the ink masthead: nothing is planned either.
+  assert.deepEqual(plan({ color: colors.paper, background: colors.ink, behind: colors.ink }), []);
+  // A skip link filled with white on the ink masthead: the link colour reads on its fill, which stays.
+  assert.deepEqual(plan({ color: ii['link-on-dark'], background: ii.background, behind: colors.ink }), [{ color: ii.link }]);
+});
+
+test('a link drawn as a filled button gives up its fill and takes the link colour, where that reads on the ground behind it', async () => {
+  const { registers } = await import('../src/lib/tokens.mjs');
+  // engine10: 13 of 18 pages failing link-colour-ii carried a link painted as a filled button, white on
+  // the accent, where the link colour reads at 1.41:1. On the page's own ground it reads.
+  const button = { afId: '3', sel: 'a.btn', color: '#FFFFFF', background: '#257E4F', paintsGround: true, behind: registers.ii.background, behindTrusted: true };
+  const p = planFixes(result([{ rule: 'link-colour-ii', link: button }], { register: 'ii' }));
+  assert.equal(p.length, 1);
+  assert.deepEqual(p[0].decl, { color: registers.ii.link, 'background-color': 'transparent', 'background-image': 'none' });
+  // Not where the ground behind it is one the checker cannot vouch for, or one the link colour fails on.
+  assert.deepEqual(planFixes(result([{ rule: 'link-colour-ii', link: { ...button, behindTrusted: false } }], { register: 'ii' })), []);
+  assert.deepEqual(planFixes(result([{ rule: 'link-colour-ii', link: { ...button, behind: registers.ii.text } }], { register: 'ii' })), []);
+  // A link that paints no ground of its own keeps the ground it has: on a band in the text colour nothing is planned.
+  assert.deepEqual(planFixes(result([{ rule: 'link-colour-ii', link: { ...button, paintsGround: false, background: registers.ii.text } }], { register: 'ii' })), []);
 });
 
 test('measure caps the block that set the line length, and only where a cap is safe', async () => {

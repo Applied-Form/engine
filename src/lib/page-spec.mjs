@@ -203,6 +203,64 @@ export function extract(opts) {
     return lines;
   };
   const onLine = (lines, x) => lines.some((l) => Math.abs(l - x) <= 1);
+  // A length that may be a percentage of a size.
+  const lengthOf = (v, size) => (v.endsWith('%') ? (parseFloat(v) / 100) * size : parseFloat(v));
+  // Placement is judged before motion: the translation an element's own transform and translate add,
+  // so a layer sliding into register is not read where it is mid-slide. A translate percentage is of
+  // the element's own border box; the computed value keeps it as a percentage.
+  const translationOf = (el, s) => {
+    let tx = 0, ty = 0;
+    if (s.translate && s.translate !== 'none') {
+      const [px, py = '0px'] = s.translate.split(/\s+/);
+      tx += lengthOf(px, el.offsetWidth) || 0; ty += lengthOf(py, el.offsetHeight) || 0;
+    }
+    const tm = s.transform && s.transform !== 'none' && s.transform.match(/matrix\(([^)]+)\)/);
+    if (tm) { const m = tm[1].split(','); tx += Number(m[4]) || 0; ty += Number(m[5]) || 0; }
+    return [tx, ty];
+  };
+  // A positioned element that paints nothing where it is placed has no placement to judge. On
+  // engine8 that was every offset failure but one: text hidden for screen readers by clipping it to
+  // nothing, laid out wherever the flow left it, and skip links parked at left:-9999px until focus
+  // brings them in. Parked is a box wholly before the page's origin, where no reader can scroll to it.
+  // That box is the one before the element's own translation, the box it is judged by below: a drawer
+  // or toast moved off the page by a transform is revealed where the transform takes it from, and is
+  // judged there. An element only partly off the page, or clipped to part of itself, still paints and
+  // is judged.
+  //
+  // Hidden for screen readers is a `clip` rect with no area left, or the visually-hidden clip-path,
+  // an inset() of at least half on every side, such as inset(50%). Content waiting to be revealed is
+  // judged where it waits, as content waiting at opacity 0 is: a clip-path cut from one side, such as
+  // inset(0 100% 0 0), is where a wipe starts, and a clip or clip-path that a transition or an
+  // animation is set to change is a reveal. The `clip` rect has no such shape test, because text is
+  // hidden with rect(0, 0, 1px, 1px), which has no width but a height, as a wipe's start has.
+  // `transition: all` with a duration moves a clip as surely as naming it does.
+  const trDurations = (s) => s.transitionDuration.split(',').map((d) => parseFloat(d) || 0);
+  const clipMoves = (el, s) => s.transitionProperty.split(',').some((p, i) => /^(-webkit-)?clip(-path)?$/.test(p.trim())
+      || (p.trim() === 'all' && trDurations(s)[i % trDurations(s).length] > 0))
+    || el.getAnimations().some((a) => a.effect?.getKeyframes().some((k) => 'clip' in k || 'clipPath' in k));
+  // The box with no transform at all, the element's own or an ancestor's: offsets summed up the chain.
+  const layoutBox = (el) => { let x = 0, y = 0; for (let e = el; e; e = e.offsetParent) { x += e.offsetLeft ?? NaN; y += e.offsetTop ?? NaN; } return [x, y]; };
+  // Parked off the page means off it on one axis both as painted and with no transform anywhere up the
+  // chain, so a parked drawer's children and an element a transform brings into view are still judged.
+  const paintsNothing = (el, s, r) => {
+    const scroll = s.position === 'fixed' ? 0 : window.scrollY;
+    const [x, y] = layoutBox(el);
+    if ((r.right <= 0 && x + el.offsetWidth <= 0) || (r.bottom + scroll <= 0 && y + el.offsetHeight <= 0)) return true;
+    const w = el.offsetWidth, h = el.offsetHeight;
+    let hidden = false;
+    // `clip` applies only to an absolutely positioned box, which every placed element is.
+    const clip = /^(absolute|fixed)$/.test(s.position) && /^rect\((.+)\)$/.exec(s.clip);
+    if (clip) {
+      const [t, rt, b, l] = clip[1].split(/[\s,]+/).map((v) => (v === 'auto' ? null : parseFloat(v)));
+      hidden = (rt ?? w) - (l ?? 0) <= 0 || (b ?? h) - (t ?? 0) <= 0;
+    }
+    const inset = /^inset\(([^)]*?)(?:\s+round\b[^)]*)?\)$/.exec(s.clipPath);
+    if (inset) {
+      const [t, rt = t, b = t, l = rt] = inset[1].trim().split(/\s+/);
+      hidden ||= [[t, h], [rt, w], [b, h], [l, w]].every(([v, size]) => lengthOf(v, size) >= size / 2);
+    }
+    return hidden && !clipMoves(el, s);
+  };
   const gridOf = (el) => el.closest('[data-grid]');
   const linesFor = (g) => columnLines(g.closest('[data-spread]') ?? g);
   const rotationOf = (s) => {
@@ -301,6 +359,9 @@ export function extract(opts) {
         // What a contrast fix needs: SVG paints text with fill, the element's own opacity dims its colour,
         // and a ground the checker cannot vouch for is not one to recolour against.
         ...(withIds ? { isSvgText, opacitySelf: Number(s.opacity), groundTrusted: groundTrusted(el, ground) } : {}),
+        // The colour the run is painted in before any opacity, and the alpha it is painted at, so the
+        // fixer can tell a run painted in its link's colour, dimmed or not (decision 0025).
+        ...(withIds ? { paint: fill ? hexOf(fill) : null, alpha: fill ? fill.a * effectiveOpacity(el) : null } : {}),
         // The block is what sets the line length, so a measure fix has to address it rather than
         // the run inside it; its display and contents say whether capping its width is safe.
         ...(withIds ? { block: { ...tagged(block), display: cs(block).display, hasLayoutChild: !!block.querySelector('img, svg, video, canvas, table, iframe, figure') } } : {}),
@@ -327,7 +388,7 @@ export function extract(opts) {
         isData: !!el.closest(dataSelector), isWordmark: !!el.closest('.af-wordmark'), isInteractive: !!el.closest('a[href], button'), isDisabled: !!el.closest('[disabled], [aria-disabled="true"], .af-disabled, fieldset[disabled]'), pseudo, sample: txt.slice(0, 40),
         // Located by its host, so a fix can address `host::before`; a run nothing can name goes unfixed.
         ...tagged(el, { cssPx: parseFloat(ps.fontSize) }),
-        ...(withIds ? { isSvgText: false, opacitySelf: Number(ps.opacity), groundTrusted: groundTrusted(el, ground) } : {}),
+        ...(withIds ? { isSvgText: false, opacitySelf: Number(ps.opacity), groundTrusted: groundTrusted(el, ground), paint: fill ? hexOf(fill) : null, alpha: fill ? fill.a * effectiveOpacity(el) : null } : {}),
       });
     }
 
@@ -380,7 +441,13 @@ export function extract(opts) {
     // ancestor's underline unless it is inline-block or floated.
     if (tag === 'a' && el.hasAttribute('href')) {
       const runs = [el, ...el.querySelectorAll('*')].filter((e) => ownText(e));
-      const underlined = runs.length > 0 && runs.every((e) => {
+      // A link with no text at all (the home link around an outlined wordmark) has nothing to underline:
+      // it is neither underlined nor not. Text drawn by ::before or ::after is still text to judge,
+      // and any generated content but none, normal, a blank string or an image (a counter, an
+      // attribute, a mix) is taken to draw some.
+      const drawn = (e) => ['::before', '::after'].some((p) => !/^(none|normal|(["'])\s*\2|url\([^)]*\))$/.test(getComputedStyle(e, p).content.trim()));
+      const textless = !runs.length && ![el, ...el.querySelectorAll('*')].some(drawn);
+      const underlined = textless ? null : runs.length > 0 && runs.every((e) => {
         for (let n = e; n && n !== parent; n = n.parentElement) {
           const ns = cs(n);
           if (ns.textDecorationLine.includes('underline')) return true;
@@ -388,7 +455,49 @@ export function extract(opts) {
         }
         return false;
       });
-      links.push({ color: toHex(s.color), background: bgOf(el), underlined, sample: el.textContent.trim().slice(0, 40), ...tagged(el) });
+      // Whether the link paints its own ground (a link drawn as a filled button). The rule reads it on
+      // every run: a link that paints no ground of its own on ink or espresso may also take the on-dark
+      // link colour (decision 0025). Read from the link's own style, with no lookup, and reported only
+      // where it is true, so every other link reads as it did. For the fixer only: the ground behind the
+      // link once that paint is gone, so a remedy that lifts the paint can be judged.
+      const paintsGround = !!parse(s.backgroundColor)?.a || gradientStops(s.backgroundImage).length > 0;
+      const behind = withIds && paintsGround && el.parentElement ? bgOf(el.parentElement) : null;
+      const background = bgOf(el);
+      // Also for the fixer only (decision 0025): whether the checker can vouch for the link's own
+      // ground, as it asks of a run's ground before a contrast fix, and whether the link holds text of
+      // its own that a reader can see and that is not the wordmark. The first reuses the hit-test the
+      // lookup for `background` already made, and the second reads only the link's own subtree, so the
+      // fixer's run measures nothing else differently.
+      //
+      // Text inside an svg (the <title> of an outlined wordmark) is the image's, text inside
+      // .af-wordmark is the wordmark's, as the text runs mark it, and an img holds none. Text no reader
+      // can see is not text the link's colour paints: text that is not displayed, is hidden or is fully
+      // transparent, or that sits, at any depth inside the link, in a box a screen-reader-only pattern
+      // hides. The patterns are the ones the placement check above recognises (`paintsNothing`: a
+      // `clip` rect with no area, an inset() clip-path of half or more on every side, a box parked
+      // before the page's origin), and a box 1px or less across that clips what overflows it.
+      // aria-hidden hides nothing from the eye, so text inside it still counts. So a link whose only
+      // visible content is an svg or an img holds no text: the outlined wordmark painted in
+      // currentColor as the home link, named by a screen-reader-only label, is one.
+      const ofLink = (e) => !e.closest('svg') && !e.closest('.af-wordmark');
+      const srOnly = (n) => {
+        const ns = cs(n);
+        return ns.display === 'none'
+          || (n.offsetWidth <= 1 && ns.overflowX !== 'visible') || (n.offsetHeight <= 1 && ns.overflowY !== 'visible')
+          || paintsNothing(n, ns, rectOf(n));
+      };
+      const seen = (e) => {
+        const es = cs(e);
+        if (es.visibility === 'hidden' || !(effectiveOpacity(e) > 0) || !(rectOf(e).width > 0) || /^transparent$|,\s*0(\.0+)?\)$/.test(es.color) || !(parseFloat(es.fontSize) > 0)) return false;
+        for (let n = e; n; n = n === el ? null : n.parentElement) if (srOnly(n)) return false;
+        return true;
+      };
+      const fixerOnly = withIds ? {
+        paintsGround, behind, behindTrusted: behind ? groundTrusted(el.parentElement, behind) : false,
+        groundTrusted: !!background && groundTrusted(el, background),
+        hasText: [el, ...el.querySelectorAll('*')].some((e) => ofLink(e) && (!!ownText(e) || drawn(e)) && seen(e)),
+      } : {};
+      links.push({ color: toHex(s.color), background, underlined, sample: el.textContent.trim().slice(0, 40), ...(paintsGround ? { paintsGround } : {}), ...tagged(el, fixerOnly) });
     }
 
     // Charts.
@@ -449,17 +558,17 @@ export function extract(opts) {
       // anywhere: an arm of the evaluation never told the attribute exists placed freely and
       // scored clean. With no grid to give column lines, both axes are held to the 8px scale,
       // which is the part of "on the grid" that survives without columns.
-      if ((s.position === 'absolute' || s.position === 'fixed') && !inSvg(el) && !el.closest('.af-mark')) {
+      const placed = (s.position === 'absolute' || s.position === 'fixed') && !inSvg(el) && !el.closest('.af-mark');
+      const [tx, ty] = placed ? translationOf(el, s) : [0, 0];
+      if (placed && !paintsNothing(el, s, rect)) {
         const lines = g ? linesFor(g) : [];
-        // Placement is judged before motion: subtract any translate so a layer sliding into register is not read as off-grid.
-        let tx = 0, ty = 0;
-        if (s.translate && s.translate !== 'none') {
-          const [px, py] = s.translate.split(/\s+/).map(parseFloat);
-          tx += px || 0; ty += py || 0;
-        }
-        const tm = s.transform && s.transform !== 'none' && s.transform.match(/matrix\(([^)]+)\)/);
-        if (tm) { const m = tm[1].split(','); tx += Number(m[4]) || 0; ty += Number(m[5]) || 0; }
-        const left = rect.left - tx;
+        // Against column lines the left edge is read where it lands in the viewport, since that is
+        // where the lines are. With no grid it is read from the offset parent, as the top is below:
+        // read from the viewport, a toggle's hit area at left:0 inside a switch the flow put 165px in
+        // was judged at 165px, a number its author never wrote, while the switch itself is not placed
+        // and not judged. offsetLeft ignores transforms, so a translate needs no subtracting there.
+        // An element with no offsetLeft (MathML) is read in the viewport, as before.
+        const left = lines.length ? rect.left - tx : el.offsetLeft ?? (rect.left - tx);
         // The vertical offset is read from offsetTop rather than from the computed `top` and
         // `bottom`. A browser resolves both of those to used values for a positioned element —
         // the skip link reports top 8px and bottom 854.25px — so judging them both meant judging
@@ -542,35 +651,116 @@ export function extract(opts) {
   // The boxes that stick out are recorded too: "the page scrolls at 320px" alone sent whole-page
   // repairs after the wrong elements, and gpt-5-mini's still overflowed 52% of the time (engine5).
   // A culprit overflows while its parent fits; a box inside its own scroller is not one.
-  const [overflowX, overflowCulprits] = (() => {
+  //
+  // For the fixer only (withIds), the remedies that would stop it are tried here, in the page as it
+  // was measured: each rung of the ladder is one declaration on the boxes past the edge, applied in a
+  // style element that is removed again, and kept if the page then fits this width. engine9's 23
+  // overflowing pipeline pages were each cleared by one of them (eval/overflow-diag.mjs). The scorer
+  // never asks for ids, so it never runs this and its output is unchanged.
+  const [overflowX, overflowCulprits, overflowRemedies] = (() => {
     const de = document.documentElement;
     const measure = () => Math.max(0, de.scrollWidth - de.clientWidth);
+    const edge = de.clientWidth + 0.5;
+    const over = (e) => e.getBoundingClientRect().right > edge;
+    const scrolls = (e) => { for (let a = e.parentElement; a && a !== document.body; a = a.parentElement) if (cs(a).overflowX !== 'visible' && !over(a)) return true; return false; };
     const culprits = () => {
-      const edge = de.clientWidth + 0.5;
-      const over = (e) => e.getBoundingClientRect().right > edge;
-      const scrolls = (e) => { for (let a = e.parentElement; a && a !== document.body; a = a.parentElement) if (cs(a).overflowX !== 'visible' && !over(a)) return true; return false; };
       return [...document.body.querySelectorAll('*')]
         .filter((e) => !(e instanceof SVGElement && e.localName !== 'svg') && over(e) && (!e.parentElement || !over(e.parentElement) || e.parentElement === document.body) && !scrolls(e))
         .map((e) => { const r = e.getBoundingClientRect(); return { tag: e.localName, cls: (e.getAttribute('class') ?? '').trim().split(/\s+/)[0], width: Math.round(r.width), right: Math.round(r.right), sample: (e.textContent ?? '').trim().replace(/\s+/g, ' ').slice(0, 40), ...tagged(e) }; })
         .sort((a, b) => b.right - a.right).slice(0, 3);
+    };
+    const ladder = () => {
+      const body = document.body;
+      const boxes = new Set([...body.querySelectorAll('*')].filter((e) => !(e instanceof SVGElement && e.localName !== 'svg') && over(e) && !scrolls(e)));
+      const outer = [...boxes].filter((e) => !boxes.has(e.parentElement) || e.parentElement === body);
+      const inner = [...boxes].filter((e) => ![...e.children].some((c) => boxes.has(c)));
+      // Text past the edge, which can spill from a box that itself fits: its parent is where it breaks.
+      const runs = new Set();
+      const range = document.createRange();
+      const walker = document.createTreeWalker(body, NodeFilter.SHOW_TEXT);
+      for (let t = walker.nextNode(); t; t = walker.nextNode()) {
+        const p = t.parentElement;
+        if (!p || !t.textContent.trim() || p.closest('svg') || /^(script|style|noscript|template)$/.test(p.localName) || scrolls(p)) continue;
+        range.selectNodeContents(t);
+        if ([...range.getClientRects()].some((r) => r.width > 0 && r.right > edge)) runs.add(p);
+      }
+      // Each innermost box's ancestors up to its outermost: the boxes a width passes down through.
+      const chain = new Set();
+      for (const e of [...inner, ...runs]) for (let a = e; a && a !== body && a !== de; a = a.parentElement) { chain.add(a); if (outer.includes(a)) break; }
+      const parents = new Set([...chain].map((e) => e.parentElement).filter((p) => p && p !== de));
+      const html = (els) => [...new Set(els)].filter((e) => !(e instanceof SVGElement && e.localName !== 'svg'));
+      const patch = (els, decl) => html(els).map((e) => ({ ...tagged(e), decl }));
+      const isMedia = (e) => /^(img|svg|video|canvas|iframe|picture|object|embed)$/.test(e.localName);
+      const rungs = {
+        wrap: patch([...runs, ...inner], { 'overflow-wrap': 'anywhere' }),
+        nowrap: patch([...chain, ...runs].filter((e) => /nowrap|pre/.test(cs(e).whiteSpace)), { 'white-space': 'normal' }),
+        media: patch([...chain].filter(isMedia), { 'max-width': '100%', height: 'auto' }),
+        shrink: patch([...chain], { 'max-width': '100%', 'min-width': '0', 'box-sizing': 'border-box' }),
+        flexwrap: patch([...chain, ...parents].filter((e) => /flex/.test(cs(e).display) && cs(e).flexWrap === 'nowrap'), { 'flex-wrap': 'wrap' }),
+      };
+      // Every rung at once, one patch per element, for an overflow with more than one cause.
+      const merged = new Map();
+      for (const k of ['wrap', 'nowrap', 'media', 'shrink', 'flexwrap']) for (const p of rungs[k]) merged.set(p.afId, { ...p, decl: { ...merged.get(p.afId)?.decl, ...p.decl } });
+      rungs.all = [...merged.values()];
+      // Before the scroller: every outermost box that is not itself a table, svg or code block reflows,
+      // all the way down (words may break, minimums lift, nowrap wraps), except tables, svg and code
+      // inside it; a table or code block still past the edge then scrolls in a box of its own. On
+      // engine10 the scroller put whole panels and metadata rows behind a sideways scroll when only a
+      // table inside them needed one. Offered only when some outermost box is not a table, svg or code
+      // block: otherwise it is the scroller under another name.
+      const keepsShape = (e) => cs(e).display === 'table' || e.localName === 'svg' || e.localName === 'pre' || isMedia(e);
+      const flows = outer.filter((e) => !keepsShape(e));
+      if (flows.length) {
+        const deep = { 'overflow-wrap': 'anywhere', 'min-width': '0', 'max-width': '100%', 'white-space': 'normal', 'box-sizing': 'border-box' };
+        const scroll = (e) => ({ ...tagged(e), decl: { 'max-width': '100%', 'overflow-x': 'auto', ...(cs(e).display === 'table' ? { display: 'block' } : {}) } });
+        const wide = [...outer.filter((e) => cs(e).display === 'table' || e.localName === 'pre'), ...flows.flatMap((e) => [...e.querySelectorAll('table, pre')].filter((t) => over(t) && !t.parentElement.closest('table, pre')))];
+        rungs.reflow = [
+          ...(withIds ? flows.map((e) => { const t = tagged(e); return { afId: `${t.afId}~reflow`, sel: `${t.sel}, ${t.sel} :not(table, table *, svg, svg *, pre, pre *)`, decl: deep }; }) : []),
+          ...[...new Set(wide)].map(scroll),
+        ];
+      }
+      // Last, since it hides content behind a scrollbar of its own: the outermost box scrolls.
+      // A table cannot scroll as a table, so it is made a block.
+      rungs.scroller = outer.map((e) => ({ ...tagged(e), decl: { 'max-width': '100%', 'overflow-x': 'auto', ...(cs(e).display === 'table' ? { display: 'block' } : {}) } }));
+      const host = document.head ?? de;
+      const clears = (patches) => {
+        if (!patches.length) return false;
+        const st = document.createElement('style');
+        st.textContent = patches.map((p) => `${p.sel} { ${Object.entries(p.decl).map(([k, v]) => `${k}: ${v} !important`).join('; ')}; }`).join('\n');
+        host.appendChild(st);
+        const left = measure();
+        st.remove();
+        return left === 0;
+      };
+      // Transitions are held while the trials run: a page that transitions `all` would otherwise show
+      // each trial's first frame rather than where it lands, and start a transition on every change
+      // that the motion rules would then count (engine8 mini b30-s0 put one on every element).
+      const freeze = document.createElement('style');
+      freeze.textContent = '*, *::before, *::after { transition: none !important; }';
+      host.appendChild(freeze);
+      try {
+        return Object.entries(rungs).filter(([, ps]) => clears(ps)).map(([name, patches]) => ({ name, patches }));
+      } finally { freeze.remove(); }
     };
     const clipped = [de, document.body].filter((e) => e && /hidden|clip/.test(getComputedStyle(e).overflowX + getComputedStyle(e).overflowY));
     const saved = clipped.map((e) => [e, e.getAttribute('style')]);
     for (const e of clipped) e.style.setProperty('overflow', 'visible', 'important');
     const n = measure();
     const found = n > 0 ? culprits() : [];
+    const remedies = n > 0 && withIds ? ladder() : null;
     for (const [e, style] of saved) (style == null ? e.removeAttribute('style') : e.setAttribute('style', style));
-    return [n, found];
+    return [n, found, remedies];
   })();
 
   return {
     register, theme, spreads, offGrid, composition,
-    headings: [...root.querySelectorAll('h1, h2, h3, h4, h5, h6')].filter((h) => cs(h).display !== 'none').map((h) => ({ level: Number(h.tagName[1]), sample: h.textContent.trim().slice(0, 40) })),
+    headings: [...root.querySelectorAll('h1, h2, h3, h4, h5, h6')].filter((h) => cs(h).display !== 'none').map((h) => ({ level: Number(h.tagName[1]), sample: h.textContent.trim().slice(0, 40), ...tagged(h) })),
     wordCount: (root.querySelector('main') ?? root).innerText.split(/\s+/).filter(Boolean).length,
     hasProvenance: !!root.querySelector('.af-provenance'),
     animations: document.getAnimations().length,
     mixedRegisters,
     overflowX, overflowCulprits,
+    ...(overflowRemedies ? { overflowRemedies } : {}),
     viewport: vw,
     background: rootBg,
     grounds: [...new Set(grounds)],
@@ -604,11 +794,17 @@ export async function specFromPage(page, url, opts) {
   if (opts?.withIds) await page.evaluate(stampIds);
   const seen = new Set();
   spec.focusStyles = [];
+  // How long a ring may take to arrive and still be read where it settles: the longest motion token.
+  const settle = Math.max(0, ...(opts?.durations ?? []));
   for (let i = 0; i < 60; i++) {
     await page.keyboard.press('Tab');
-    const f = await page.evaluate((withIds) => {
+    const f = await page.evaluate(([withIds, settle]) => {
       const el = document.activeElement;
       if (!el || el === document.body) return null;
+      // A ring that transitions in is read where it settles: read at once, it is still at its first
+      // frame, 0px wide in the text colour, and how far in the read lands depends on the machine.
+      // One that only arrives after the longest motion token is read as it is when focus lands.
+      for (const a of el.getAnimations()) if (a instanceof CSSTransition && a.effect.getComputedTiming().endTime <= settle) a.finish();
       const s = getComputedStyle(el);
       const visible = s.outlineStyle !== 'none' && parseFloat(s.outlineWidth) > 0;
       const m = s.outlineColor.match(/\d+/g);
@@ -624,7 +820,7 @@ export async function specFromPage(page, url, opts) {
         return ['html', ...parts].join(' > ');
       };
       return { visible, color, element: el.tagName.toLowerCase(), key, ...(withIds ? { afId: el.getAttribute('data-af-id'), sel: selOf(el) } : {}) };
-    }, !!opts?.withIds);
+    }, [!!opts?.withIds, settle]);
     if (!f || seen.has(f.key)) break;
     seen.add(f.key);
     spec.focusStyles.push(f);

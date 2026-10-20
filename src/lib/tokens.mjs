@@ -111,6 +111,16 @@ export const registers = Object.fromEntries(
   ]),
 );
 
+/**
+ * The dark grounds: the ground and layer of the dark register (ink and espresso here), the surfaces
+ * the light variants are measured against. A Register II page meets them on the ink masthead and
+ * on the dark theme. Matched exactly, as a ground is matched against the grounds a register
+ * declares. Empty for a system with no dark register.
+ */
+export const darkGrounds = registers['ii-dark']
+  ? [...new Set([registers['ii-dark'].background, registers['ii-dark'].layer].filter(Boolean))]
+  : [];
+
 const series = (group) => leafEntries(group).sort(([a], [b]) => Number(a) - Number(b)).map(([, t]) => resolve(t.$value));
 export const chartSeries = series(tokens.chart.series);
 export const chartSeriesOnLight = series(tokens.chart['series-on-light']);
@@ -290,3 +300,9 @@ export const print = {
 
 /** The brand block, if any: name, wordmark asset, self-hosted font files, fonts directory. */
 export const brandInfo = ext().brand ?? null;
+/**
+ * What a generated file calls the system it was built from: a brand's own name and version under its overlay,
+ * the base system's otherwise. A built brand carries no other system's name (docs/decisions/0026).
+ */
+export const systemName = brandInfo ? brandInfo.name : 'Applied Form';
+export const systemVersion = brandInfo ? brandInfo.version : version;

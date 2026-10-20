@@ -1,0 +1,12 @@
+{
+  "$description": "Instrument's own reference pages and the breaches of Instrument's own declared rules each one carries under Instrument, read against the page's CSS and Instrument's source (\"Spacing 8/16/24/32/48/64/96. Nothing off the scale.\"). They are the pack's findings, not the gate's: a new entry is a false positive to fix, a missing one is a breach the gate stopped seeing. test/instrument-pack.test.mjs holds the gate to this list; the catalogue reads it.",
+  "band-statement.html": [],
+  "datum.html": ["spacing: 19px is off the 8px spacing scale"],
+  "key.html": ["spacing: 3px is off the 8px spacing scale"],
+  "matrix.html": ["spacing: 1px is off the 8px spacing scale"],
+  "plate.html": [],
+  "register.html": [],
+  "running-index.html": [],
+  "schedule.html": [],
+  "series.html": ["spacing: 4px is off the 8px spacing scale"]
+}

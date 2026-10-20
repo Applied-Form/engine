@@ -10,7 +10,7 @@
  * Colour maths is HSL-based; every candidate is checked with the WCAG ratio,
  * not assumed. The output is a token-file fragment.
  */
-import { contrast } from './contrast.mjs';
+import { contrast, apca } from './contrast.mjs';
 import { colors as systemColors, colorLike } from './tokens.mjs';
 
 export function hslToHex(h, s, l) {
@@ -47,9 +47,18 @@ export function derivePalette({ hue, paper, saturation = 0.55, floors = { body: 
   if (pl < 0.9) reasons.push(`paper ${paper} is too dark (lightness ${pl.toFixed(2)}); a paper is 0.90 or lighter`);
   const ph = hexToHsl(paper).h, ps = Math.min(hexToHsl(paper).s, 0.4);
   const sand = hslToHex(ph, ps, Math.max(pl - 0.05, 0.86));
-  const tint = hslToHex(ph, Math.min(ps + 0.1, 0.5), Math.max(pl - 0.12, 0.8));
   const ink = hslToHex(hue, 0.12, 0.15);
   const espresso = hslToHex(hue, 0.35, 0.26);
+  // Tint is also the Register II on-dark link colour (decision 0025), so it must read as body text
+  // and as a label (APCA Lc 60) on both dark grounds. Lighten it toward the paper until it does; a
+  // tint that already does is the one the paper gives, unchanged.
+  const tintS = Math.min(ps + 0.1, 0.5);
+  let tint = null;
+  for (let l = Math.max(pl - 0.12, 0.8); l <= 0.97 && !tint; l += 0.005) {
+    const hex = hslToHex(ph, tintS, l);
+    if ([ink, espresso].every((g) => contrast(hex, g) >= floors.body && Math.abs(apca(hex, g)) >= 60)) tint = hex;
+  }
+  if (!tint) reasons.push(`no tint of paper ${paper} reaches ${floors.body}:1 and APCA Lc 60 on ink and espresso, where it is the on-dark link colour`);
   const white = '#FFFFFF';
   // Accent: the most saturated lightness that still reads as body text on paper and white (4.5), like terracotta.
   const primary = fit(hue, saturation, 0.5, 0.2, [[paper, floors.body], [white, floors.body]]);

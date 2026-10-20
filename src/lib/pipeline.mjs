@@ -39,6 +39,10 @@ const idOf = (v) =>
  * gpt-5-mini it failed 20/72 pipeline pages under whole-page repair (engine2) against 55/72 in the
  * blind arm, which is never told about it; once the repair returned edit lists the pipeline arm
  * moved to 49/72 and 48/72 (engine3, engine4) — level with blind, i.e. cured by nothing.
+ *
+ * From engine10 the fixer has a remedy for it (the overflow ladder, src/lib/fix/plan.mjs), so an
+ * overflow reaches the repair only when no rung cleared it without making another rule worse, and
+ * that is an overflow a declaration could not fix: it stays here.
  */
 export const PAGE_ONLY = new Set([
   'horizontal-overflow', 'print-overflow', 'content-not-dom',
@@ -72,7 +76,7 @@ export function repairPrompt(violations, brief = null) {
   ].join('\n');
 }
 
-export async function generateConformant({ prompt, brief = null, generate, toHtml, browser, allow = FIXABLE, judge = () => true, visible = (vs) => vs, register = null, viewports, workDir, maxRepairs = 1, costOf = () => 0, ceiling = Infinity }) {
+export async function generateConformant({ prompt, brief = null, generate, toHtml, browser, allow = FIXABLE, judge = () => true, secondAnswers = false, visible = (vs) => vs, register = null, viewports, workDir, maxRepairs = 1, costOf = () => 0, ceiling = Infinity }) {
   const messages = [{ role: 'user', content: prompt }];
   const usage = { input: 0, output: 0 };
   let fixes = [], rounds = 0, out, fixed, html = null, repairKind = null, patchStats = null;
@@ -93,7 +97,7 @@ export async function generateConformant({ prompt, brief = null, generate, toHtm
         html = toHtml(out.text);
       }
     }
-    const next = await autoFix(html, { browser, allow, judge, register, viewports, workDir });
+    const next = await autoFix(html, { browser, allow, judge, secondAnswers, register, viewports, workDir });
     // The model's patches get the same discipline as the fixer's own: a repair that makes any rule
     // worse is not shipped.
     //
