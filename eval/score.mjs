@@ -50,7 +50,7 @@ export function normalise(html, register) {
  * Perceptual colour distance lives in `src/lib/lab.mjs` and is re-exported here so the harness's
  * public surface does not change. It used to be a private copy in this file, which meant a
  * product feature could not use it: `eval/` is dev-only and nothing in `src/` may import from it.
- * `af drift` needed exactly this arithmetic, so it moved to where both halves can reach it.
+ * `standards drift` needed exactly this arithmetic, so it moved to where both halves can reach it.
  */
 import { paletteDistance } from '../src/lib/lab.mjs';
 export { paletteDistance };

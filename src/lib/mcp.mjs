@@ -1,14 +1,14 @@
 /**
  * The gate, served to an agent as tools rather than as context.
  *
- * There are two halves to giving a design system to a model. `appliedform/standards` serves the
+ * There are two halves to giving a design system to a model. `Applied-Form/standards-schema` serves the
  * first: what the system *is* — its rules, its tokens, the move to reach for. This serves the
  * second: whether an artefact actually obeys one. They are different questions, they belong in
  * different servers, and a client can hold both at once, which is the arrangement this file is
  * written for. Nothing here re-serves a ruleset.
  *
  * Why a server rather than a paragraph in a prompt. A model handed a design system as text has to
- * hold every rule in context and check its own work against them. A model handed `af_lint` has
+ * hold every rule in context and check its own work against them. A model handed `standards_lint` has
  * the check made for it from the rendered page: it writes a page, calls a tool, and is told what
  * is wrong and what to change. Whether that yields better pages than the rules alone is what the
  * evaluation tests; the pilot found it removes most violations of the rules it checks and does
@@ -25,12 +25,13 @@ import { contrast, requiredContrast, apca } from './contrast.mjs';
 import { colors, floors, registers, spacingScale, fonts, typeScale, aspectRatios, recipes, prohibitions, absent, radiusScale } from './tokens.mjs';
 import { derivePalette } from './palette.mjs';
 import { fromPack } from './pack.mjs';
+import { CLIENT_KEY, TOOL_MAP, deprecated } from './names.mjs';
 
-export const SERVER = { name: 'applied-form', version: '3.3.1' };
+export const SERVER = { name: CLIENT_KEY, version: '4.0.0' };
 
 export const TOOLS = [
   {
-    name: 'af_lint',
+    name: 'standards_lint',
     description: 'Measure a page against the design system in a real browser and return every violation with the fix. Pass html for a draft, or url for something already served. This is the loop: draft, lint, apply the fixes, lint again.',
     inputSchema: {
       type: 'object',
@@ -43,8 +44,8 @@ export const TOOLS = [
     },
   },
   {
-    name: 'af_fix',
-    description: 'Apply the fixes the engine can make on its own to a draft, measured in a real browser, and return the fixed HTML with a report: rules fixed, patches applied and refused, and what still fails, by element. No model is called, and a fix that makes any rule worse is not applied. Pass html; what remains needs a change to the markup.',
+    name: 'standards_fix',
+    description: 'Apply the fixes Standards can make on its own to a draft, measured in a real browser, and return the fixed HTML with a report: rules fixed, patches applied and refused, and what still fails, by element. No model is called, and a fix that makes any rule worse is not applied. Pass html; what remains needs a change to the markup.',
     inputSchema: {
       type: 'object',
       required: ['html'],
@@ -56,17 +57,17 @@ export const TOOLS = [
     },
   },
   {
-    name: 'af_rules',
+    name: 'standards_rules',
     description: 'Every rule the gate enforces: what it requires, why, how to fix it, and which WCAG criteria it touches. Filter by group to keep the answer small.',
     inputSchema: { type: 'object', properties: { group: { type: 'string' }, wcag: { type: 'boolean', description: 'Only rules that touch a WCAG criterion.' } } },
   },
   {
-    name: 'af_tokens',
+    name: 'standards_tokens',
     description: 'The values the system permits: colours, spacing scale, type scale, voices, floors, ratios, and what it declares absent. Ask for this instead of guessing a value.',
     inputSchema: { type: 'object', properties: { group: { type: 'string', description: 'colour, spacing, type, floors, absent — omit for all.' } } },
   },
   {
-    name: 'af_contrast',
+    name: 'standards_contrast',
     description: 'Measure a foreground against a background: the WCAG 2 ratio, the floor required at that size and weight, whether it passes, and the APCA reading as an advisory.',
     inputSchema: {
       type: 'object',
@@ -78,22 +79,22 @@ export const TOOLS = [
     },
   },
   {
-    name: 'af_brand',
+    name: 'standards_brand',
     description: 'Derive a complete palette from a hue and a paper colour, measured against every floor, or refuse it with the reasons. Use this instead of inventing a palette.',
     inputSchema: { type: 'object', required: ['hue', 'paper'], properties: { hue: { type: 'number' }, paper: { type: 'string' } } },
   },
   {
-    name: 'af_move',
+    name: 'standards_move',
     description: 'The recipe for a named compositional move: its cells, layers, voices and ground. One move is active per artefact; ask for the one you need rather than reading all of them.',
     inputSchema: { type: 'object', properties: { name: { type: 'string', description: 'Omit to list the moves that exist.' } } },
   },
   {
-    name: 'af_system',
+    name: 'standards_system',
     description: 'Read a design system authored elsewhere (a Standards pack tokens.json) into this one, reporting what it stated, what had to be derived, and what could not be carried across.',
     inputSchema: { type: 'object', required: ['pack'], properties: { pack: { type: 'object', description: 'The pack\'s token contract, parsed.' } } },
   },
   {
-    name: 'af_drift',
+    name: 'standards_drift',
     description: 'Measure what a design system actually is on pages that were not built to this one, and how far they have drifted from it: the palette, spacing step and type scale in use, plus how many values are indistinguishable duplicates. Use this to learn somebody else\'s system before working in it, rather than guessing from a screenshot.',
     inputSchema: {
       type: 'object',
@@ -146,8 +147,8 @@ function draftFiles(docs) {
 
 /** Tool implementations. Each returns MCP content; each is callable directly, which is how they are tested. */
 export const HANDLERS = {
-  async af_lint({ html, url, register, viewports } = {}) {
-    if (!html && !url) throw new Error('af_lint needs html or url');
+  async standards_lint({ html, url, register, viewports } = {}, tool = 'standards_lint') {
+    if (!html && !url) throw new Error(`${tool} needs html or url`);
     const { lintPages, VIEWPORTS, sampledViewports, ENGINE_ROOT } = await import('./page-lint.mjs');
     // The register is assumed by the linter itself, so a URL gets it as well as a draft.
     const [target] = html ? draftFiles([html]) : [url];
@@ -179,13 +180,13 @@ export const HANDLERS = {
   },
 
   /**
-   * A draft only, as a string. af_lint also takes a url, and returns what it measured; this returns
+   * A draft only, as a string. standards_lint also takes a url, and returns what it measured; this returns
    * the page itself, so a url here would hand a model the full text of any local file the server can
    * read. The draft gets a draft's roots: its own temporary directory and the engine's files.
    */
-  async af_fix({ html, url, register, viewports } = {}) {
-    if (url != null) throw new Error('af_fix takes html only, never a url: it returns the page, and a url would let a draft read any file the server can. Read the page yourself and pass its html.');
-    if (typeof html !== 'string' || !html) throw new Error('af_fix needs html');
+  async standards_fix({ html, url, register, viewports } = {}, tool = 'standards_fix') {
+    if (url != null) throw new Error(`${tool} takes html only, never a url: it returns the page, and a url would let a draft read any file the server can. Read the page yourself and pass its html.`);
+    if (typeof html !== 'string' || !html) throw new Error(`${tool} needs html`);
     const { VIEWPORTS, sampledViewports, ENGINE_ROOT } = await import('./page-lint.mjs');
     const { fixPage } = await import('./fix/page.mjs');
     const widths = viewports?.length ? viewports : [...VIEWPORTS, ...sampledViewports(2)].sort((a, b) => a - b);
@@ -199,12 +200,12 @@ export const HANDLERS = {
     });
   },
 
-  async af_drift({ html, urls, declared, viewports } = {}) {
+  async standards_drift({ html, urls, declared, viewports } = {}, tool = 'standards_drift') {
     const { surveyPages } = await import('./survey.mjs');
     const { driftReport } = await import('./drift.mjs');
     const { ENGINE_ROOT } = await import('./page-lint.mjs');
     const targets = [...(urls ?? []), ...draftFiles(html ?? [])];
-    if (!targets.length) throw new Error('af_drift needs html or urls');
+    if (!targets.length) throw new Error(`${tool} needs html or urls`);
     // Drafts may be among the targets, so every page gets a draft's roots.
     const fileRoots = html?.length ? [ENGINE_ROOT] : undefined;
     const { merged, pages } = await surveyPages(targets, { browser: await browser(), viewports: viewports?.length ? viewports : [1280], fileRoots });
@@ -218,14 +219,14 @@ export const HANDLERS = {
     });
   },
 
-  af_rules({ group, wcag } = {}) {
+  standards_rules({ group, wcag } = {}) {
     let out = RULES;
     if (group) out = out.filter((r) => r.group === group);
     if (wcag) out = out.filter((r) => r.wcag.length > 0);
-    return text(out.map(({ id, group: g, severity, summary, why, fix, wcag: w }) => ({ id, group: g, severity, summary, why, fix, wcag: w })));
+    return text(out.map(({ id, group: g, severity, level, summary, why, fix, wcag: w }) => ({ id, group: g, severity, level, summary, why, fix, wcag: w })));
   },
 
-  af_tokens({ group } = {}) {
+  standards_tokens({ group } = {}) {
     const all = {
       colour: colors,
       register: registers,
@@ -241,7 +242,7 @@ export const HANDLERS = {
     return text(group ? { [group]: all[group] ?? `no such group; try ${Object.keys(all).join(', ')}` } : all);
   },
 
-  af_contrast({ foreground, background, sizePx = 16, weight = 400 } = {}) {
+  standards_contrast({ foreground, background, sizePx = 16, weight = 400 } = {}) {
     const ratio = contrast(foreground, background);
     const need = requiredContrast(sizePx, weight, floors);
     return text({
@@ -254,7 +255,7 @@ export const HANDLERS = {
     });
   },
 
-  af_brand({ hue, paper } = {}) {
+  standards_brand({ hue, paper } = {}) {
     try {
       const p = derivePalette({ hue, paper });
       return text({ derived: p.colors, note: 'Every role measured against the floors before it was returned.' });
@@ -263,21 +264,43 @@ export const HANDLERS = {
     }
   },
 
-  af_move({ name } = {}) {
+  standards_move({ name } = {}) {
     if (!name) return text({ moves: Object.keys(recipes), note: 'One move is active per artefact. Ask for the one you need.' });
     const recipe = recipes[name];
     if (!recipe) return text({ error: `no move named ${name}`, moves: Object.keys(recipes) });
     return text({ name, recipe });
   },
 
-  af_system({ pack } = {}) {
+  standards_system({ pack } = {}) {
     const { overlay, report } = fromPack(pack ?? {});
     return text({ imported: !!overlay, report, overlay });
   },
 };
 
-/** One JSON-RPC message in, one out, or null for a notification. */
-export async function handle(msg) {
+/**
+ * The tool list a client sees. The default profile lists the `standards_*` names. The legacy
+ * profile lists the `af_*` names and nothing else about the tools differs: it is for a client
+ * configured with `af mcp` or `af-mcp`, which has `af_*` in its instructions and allowlists. Both
+ * profiles accept both spellings on a call.
+ */
+const LEGACY_NAME = Object.fromEntries(Object.entries(TOOL_MAP).map(([old, current]) => [current, old]));
+const toolsFor = (legacy) => (legacy ? TOOLS.map((t) => ({ ...t, name: LEGACY_NAME[t.name] })) : TOOLS);
+
+/** Per process: which old names have already been named on stderr. */
+const toldInThisProcess = new Set();
+const toStderr = (line) => process.stderr.write(`${line}\n`);
+
+/**
+ * One JSON-RPC message in, one out, or null for a notification.
+ *
+ * `profile` is `{ legacy }`: which spelling `tools/list` uses. It is never read from the
+ * environment, so a child process cannot inherit it; the entry point passes it from an argument.
+ * A call under an old name is answered as the new name would be, with the notice appended as a
+ * second content item and, once per name per process, a line on stderr. Under the legacy profile
+ * the old names are the ones listed and the entry point has already said once that they are
+ * deprecated, so only the item is added. `told` and `warn` are the profile's own, for the tests.
+ */
+export async function handle(msg, { legacy = false, told = toldInThisProcess, warn = toStderr } = {}) {
   const { id, method, params = {} } = msg ?? {};
   const ok = (result) => ({ jsonrpc: '2.0', id, result });
   const fail = (code, message) => ({ jsonrpc: '2.0', id, error: { code, message } });
@@ -285,23 +308,33 @@ export async function handle(msg) {
   if (method === 'initialize') {
     return ok({ protocolVersion: '2024-11-05', capabilities: { tools: {} }, serverInfo: SERVER });
   }
-  if (method === 'tools/list') return ok({ tools: TOOLS });
+  if (method === 'tools/list') return ok({ tools: toolsFor(legacy) });
   if (method === 'tools/call') {
-    const handler = HANDLERS[params.name];
+    // Own properties only: a name every object has (constructor, toString) is not a tool.
+    const old = Object.hasOwn(TOOL_MAP, params.name);
+    const current = old ? TOOL_MAP[params.name] : params.name;
+    const handler = Object.hasOwn(HANDLERS, current) ? HANDLERS[current] : null;
     if (!handler) return fail(-32602, `unknown tool: ${params.name}`);
+    let result;
     try {
-      return ok(await handler(params.arguments ?? {}));
+      result = await handler(params.arguments ?? {}, params.name);
     } catch (e) {
       // A failed measurement is a result the model can act on, not a transport error.
-      return ok({ ...text({ error: e.message }), isError: true });
+      result = { ...text({ error: e.message }), isError: true };
     }
+    if (old) {
+      const line = deprecated(params.name, current);
+      if (!legacy && !told.has(params.name)) { told.add(params.name); warn(line); }
+      result = { ...result, content: [...result.content, { type: 'text', text: line }] };
+    }
+    return ok(result);
   }
   if (method === 'notifications/initialized' || id === undefined) return null;
   return fail(-32601, `unknown method: ${method}`);
 }
 
-/** Serve over stdio, one JSON-RPC message per line. */
-export async function serve(stdin = process.stdin, stdout = process.stdout) {
+/** Serve over stdio, one JSON-RPC message per line. `profile` is handle's: `{ legacy }`. */
+export async function serve(stdin = process.stdin, stdout = process.stdout, profile = {}) {
   let buffer = '';
   stdin.setEncoding('utf8');
   for await (const chunk of stdin) {
@@ -313,7 +346,7 @@ export async function serve(stdin = process.stdin, stdout = process.stdout) {
       if (!line) continue;
       let response;
       try {
-        response = await handle(JSON.parse(line));
+        response = await handle(JSON.parse(line), profile);
       } catch (e) {
         response = { jsonrpc: '2.0', id: null, error: { code: -32700, message: e.message } };
       }

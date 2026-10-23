@@ -28,7 +28,7 @@ const keyOf = (p) => `${p.sel ?? p.afId}|${p.pseudo}|${p.rules.join(',')}`;
 /**
  * `fileRoots` are the directories the rendered page may read besides its own: the working directory
  * and the engine's files unless the caller says otherwise. A caller rendering a page it did not write
- * (the MCP server) passes the engine's files alone, as it does for `af_lint`. `unregistered`,
+ * (the MCP server) passes the engine's files alone, as it does for `standards_lint`. `unregistered`,
  * `network`, `onFailed` and `realpaths` are handed to the linter unchanged, and `onDark` to the
  * planner (`planFixes`).
  */

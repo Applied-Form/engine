@@ -1,8 +1,8 @@
 {
-  "$description": "Reference: the neutral system the open engine is tested against. Colour derived by `af brand --hue 200 --paper #F6F6F4 --saturation 0.2`; positive-light and critical-light are the overlay's positive and critical mixed toward white until they clear 4.6:1 on its espresso, where the base pair sits at 4.5:1; structure, rules and the three OFL voices come from the base file. It exists so the engine can be published without publishing Applied Form's own palette, and it is not a design anyone should ship. The mark's shape parameters are replaced, because Applied Form's identify the brand; its size and placement limits are rules and stay. The two literal steps of the sequential chart scale are the midpoints of its own sand, clay and terra deep.",
+  "$description": "Reference: the neutral system the open package is tested against. Colour derived by `standards brand --hue 200 --paper #F6F6F4 --saturation 0.2`; positive-light and critical-light are the overlay's positive and critical mixed toward white until they clear 4.6:1 on its espresso, where the base pair sits at 4.5:1; structure, rules and the three OFL voices come from the base file. It exists so Standards can be published without publishing Applied Form's own palette, and it is not a design anyone should ship. The mark's shape parameters are replaced, because Applied Form's identify the brand; its size and placement limits are rules and stay. The two literal steps of the sequential chart scale are the midpoints of its own sand, clay and terra deep.",
   "$extensions": {
     "form.applied": {
-      "version": "3.3.1",
+      "version": "4.0.0",
       "aspectRatios": [
         "1:1",
         "2:1",
@@ -213,7 +213,7 @@
         ]
       },
       "recipes": {
-        "$description": "Each move as data. cells: grid-column range, layer, voice, role; optional aspect (a permitted ratio), offset {x: columns, y: spacing steps}, bleed (half-gutter | column | frame), rotation (0 | 90 | -90), motion (draw | register | count | step), form {g, lobes, ...}. The linter checks a data-spread section's grid children against its recipe; af move <name> emits the scaffold with the matching composition classes.",
+        "$description": "Each move as data. cells: grid-column range, layer, voice, role; optional aspect (a permitted ratio), offset {x: columns, y: spacing steps}, bleed (half-gutter | column | frame), rotation (0 | 90 | -90), motion (draw | register | count | step), form {g, lobes, ...}. The linter checks a data-spread section's grid children against its recipe; standards move <name> emits the scaffold with the matching composition classes.",
         "colossus": {
           "ground": "paper",
           "cells": [
@@ -548,6 +548,19 @@
             "text": "{color.white}",
             "ground": "{color.clay}"
           }
+        ]
+      },
+      "levels": {
+        "$description": "Rule levels (decision 0027). The rules listed are mandatory: a violation fails the page, and no pack, job or team policy can lower them. In this file the list is the platform floor; a system's own file may add to it and may not remove from it. Every other rule is standard, which a team policy may lower, except the rules the registry marks advisory, which never fail a page.",
+        "mandatory": [
+          "contrast",
+          "text-too-small",
+          "target-size",
+          "focus-hidden",
+          "link-not-underlined",
+          "alt-missing",
+          "horizontal-overflow",
+          "wordmark-live-text"
         ]
       }
     }

@@ -3,6 +3,7 @@ import { fileURLToPath } from 'node:url';
 import { realpathSync } from 'node:fs';
 import { dirname, resolve, sep } from 'node:path';
 import { specFromPage } from './page-spec.mjs';
+import { chromiumFromEnv } from './env.mjs';
 import { lint, advise } from './rules.mjs';
 import { appliesToPack } from './rules/registry.mjs';
 import { aspectRatios, registers, grid, layers, composition, recipes, motion, print, fonts, recipeColumns, pack } from './tokens.mjs';
@@ -26,13 +27,13 @@ export const ENGINE_ROOT = fileURLToPath(new URL('../../', import.meta.url));
  * draft) passes the engine's files alone.
  *
  * A path is checked as it is written, so a link inside a root is read wherever it leads. That is
- * what `af lint`, `af fix` and the MCP server rely on: a person's own site may link its assets in.
+ * what `standards lint`, `standards fix` and the MCP server rely on: a person's own site may link its assets in.
  * `realpaths: true` checks the file a link leads to instead, so a link inside a root that leads
- * outside every root is refused. `af audit`, which renders other people's pages, asks for this. A
+ * outside every root is refused. `standards audit`, which renders other people's pages, asks for this. A
  * file that does not exist is then checked by its path, and fails as not found.
  *
  * `network: false` also refuses every request a `file://` page makes over the network, WebSockets
- * included. `af audit --offline` renders pages this way. `onRefused({ url, type })` hears every
+ * included. `standards audit --offline` renders pages this way. `onRefused({ url, type })` hears every
  * request refused, with its resource type.
  */
 export const DEFAULT_FILE_ROOTS = () => [process.cwd(), ENGINE_ROOT];
@@ -105,7 +106,7 @@ export function sampledViewports(count = 2, seed = Date.now()) {
 export async function launchBrowser() {
   const { chromium } = await import('playwright');
   return chromium.launch({
-    executablePath: process.env.AF_CHROMIUM || undefined,
+    executablePath: chromiumFromEnv() || undefined,
     args: ['--allow-file-access-from-files', '--font-render-hinting=none'],
   });
 }
@@ -137,7 +138,7 @@ const assume = (register) => (register ? (page) => page.addInitScript((r) => {
 
 /**
  * `css` is added to every load of the page, at the end of its head once the document is parsed, in
- * the top frame only: where the block `af fix` writes sits in the fixed page, so the page is measured
+ * the top frame only: where the block `standards fix` writes sits in the fixed page, so the page is measured
  * at its own address, with its own origin and its own relative URLs, as it would be with the fixes.
  */
 const withCss = (css) => (css ? (page) => page.addInitScript((text) => {
@@ -163,20 +164,20 @@ const withCss = (css) => (css ? (page) => page.addInitScript((text) => {
  * `onRequest({ url, type })` hears every request the page made, loaded, failed or refused, other
  * than its own document.
  *
- * `realpaths: true` checks the file a link leads to (see confine). Only `af audit` asks for it.
- * `css` is added to the page on every load (withCss above); only `af audit` asks for it.
+ * `realpaths: true` checks the file a link leads to (see confine). Only `standards audit` asks for it.
+ * `css` is added to the page on every load (withCss above); only `standards audit` asks for it.
  *
  * `settle` (ms, default 0) keeps each measured page open after it is measured until its network has
  * been quiet for 300ms, or `settle` ms have passed, so a request the page makes after its load event
  * (a fetch a script starts, a late image) is heard by `onFailed` before the page is closed rather
- * than cancelled by the close. It changes nothing that is measured. Only `af audit` asks for it.
+ * than cancelled by the close. It changes nothing that is measured. Only `standards audit` asks for it.
  */
 export async function lintPages(urls, { viewports = VIEWPORTS, browser, register = null, fileRoots = DEFAULT_FILE_ROOTS(), withIds = false, unregistered = 'house', network = true, requireOk = false, onFailed = null, onRequest = null, realpaths = false, css = null, settle = 0 } = {}) {
   if (register != null && !Object.hasOwn(registers, register)) throw new Error(`unknown register "${register}"; the tokens define ${Object.keys(registers).join(', ')}`);
   // A page under a Standards pack needs no register of its own: the pack's is assumed for it.
   register ??= pack ? 'pack' : null;
   // With no system loaded and no register given, a page that declares none is judged by the rules that
-  // hold for any page (`unregistered: 'universal'`, what `af lint` asks for), instead of stopping at
+  // hold for any page (`unregistered: 'universal'`, what `standards lint` asks for), instead of stopping at
   // "no register". A page that declares a register keeps every rule. The default is unchanged.
   const universalIfUndeclared = unregistered === 'universal' && register == null;
   if (universalIfUndeclared) register = 'ii';

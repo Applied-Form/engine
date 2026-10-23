@@ -6,10 +6,11 @@
  *   node scripts/rules.mjs --json       the registry as JSON
  *   node scripts/rules.mjs --wcag       only rules with a WCAG 2.2 mapping, grouped by SC
  */
+import '../src/lib/env-guard.mjs'; // first: a name conflict exits 2 (src/lib/env-guard.mjs)
 import { pathToFileURL } from 'node:url';
 import { RULES, GROUPS } from '../src/lib/rules/registry.mjs';
 
-// `af rules --deprecated` lists what is on its way out, with the replacement and the release it
+// `standards rules --deprecated` lists what is on its way out, with the replacement and the release it
 // goes in. A deprecation nobody can see is a removal with extra steps.
 if (process.argv.includes('--deprecated')) {
   const { deprecations, version } = await import('../src/lib/tokens.mjs');
@@ -28,7 +29,7 @@ function printTable() {
     if (!rules.length) continue;
     console.log(`\n${group}`);
     for (const r of rules) {
-      console.log(`  ${r.id.padEnd(28)} ${r.severity.padEnd(9)} ${r.summary}`);
+      console.log(`  ${r.id.padEnd(28)} ${r.severity.padEnd(9)} ${r.level.padEnd(10)} ${r.summary}`);
     }
   }
 }

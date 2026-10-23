@@ -47,6 +47,19 @@ test('derivation is deterministic', () => {
   assert.deepEqual(derivePalette({ hue: 200, paper: '#F2F6F8' }).colors, derivePalette({ hue: 200, paper: '#F2F6F8' }).colors);
 });
 
+test("a derived overlay's description is true of the overlay: colour only, no mark stated, and no claim that its mark comes from the base file", () => {
+  const p = derivePalette({ hue: 285, paper: '#F7F4FA' });
+  for (const o of [toOverlay(p, { name: 'Test Press', key: 'test' }), toOverlay(p, { name: 'Test Press', key: 'test', wordmark: 'brands/test/wordmark.svg' })]) {
+    const text = o.$description;
+    assert.ok(!('mark' in o.$extensions['form.applied']), 'the overlay states no mark');
+    assert.match(text, /^Test Press: a brand overlay derived by standards brand\. Colour only;/);
+    assert.match(text, /\bstates no mark\b/, 'it says it states no mark');
+    assert.doesNotMatch(text, /\bmark\b[^.]*\b(?:come|comes|inherit|inherits|inherited)\b[^.]*\bbase\b/i, 'it does not say the mark comes from the base file');
+    assert.doesNotMatch(text, /type, mark/, 'the list of what the base file supplies does not include a mark');
+    assert.match(text, /unless the overlay adds one/, 'and it stays true once a mark is added');
+  }
+});
+
 test('toOverlay emits the derived roles under system colour names, and nothing else', () => {
   const p = derivePalette({ hue: 285, paper: '#F7F4FA' });
   const o = toOverlay(p, { name: 'Lilac Press', key: 'lilac', wordmark: 'brands/lilac/wordmark.svg' });

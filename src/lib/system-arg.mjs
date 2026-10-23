@@ -1,9 +1,9 @@
 /**
- * `--system`, resolved to what AF_BRAND takes: a path to a token overlay, or a brand name. A
+ * `--system`, resolved to what STANDARDS_SYSTEM takes: a path to a token overlay, or a brand name. A
  * Standards pack (a pack tokens.json, or a bundled pack by key) is imported first, by the path
- * `af system import` takes, in a child process, because the tokens are read once per process and
- * the caller has not read them yet. The caller sets AF_BRAND to `brand` before it imports anything
- * that reads the tokens.
+ * `standards system import` takes, in a child process, because the tokens are read once per process and
+ * the caller has not read them yet. The caller sets the system to `brand` (setSystem in env.mjs) before it
+ * imports anything that reads the tokens.
  *
  * Throws with a message a person can act on; the command decides how to exit.
  */
@@ -12,6 +12,7 @@ import { spawnSync } from 'node:child_process';
 import { resolve, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { tmpdir } from 'node:os';
+import { childEnv } from './env.mjs';
 
 const ENGINE = fileURLToPath(new URL('../../', import.meta.url));
 const HINT = 'Give a token overlay, a Standards pack tokens.json, a bundled pack (instrument) or a brand name.';
@@ -35,7 +36,7 @@ export function resolveSystem(given) {
     throw new Error(`--system: no system named ${given}. ${HINT}`);
   }
   const out = join(mkdtempSync(join(tmpdir(), 'af-system-')), 'system.json');
-  const env = { ...process.env }; delete env.AF_BRAND;
+  const env = childEnv({ STANDARDS_SYSTEM: undefined });
   const r = spawnSync(process.execPath, [join(ENGINE, 'scripts', 'system.mjs'), 'import', pack, '--out', out, ...(key ? ['--key', key] : [])], { encoding: 'utf8', env });
   if (r.status !== 0 || !existsSync(out)) throw new Error(`--system: the pack at ${given} was refused\n${(r.stdout + r.stderr).trim()}`);
   return { brand: out, label: given };

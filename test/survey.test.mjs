@@ -1,5 +1,5 @@
 /**
- * `af drift` end to end, against a stand-in client site whose defects were planted on purpose.
+ * `standards drift` end to end, against a stand-in client site whose defects were planted on purpose.
  *
  * The inference is unit-tested in `test/infer.test.mjs` without a browser. What this covers is
  * the half that only Chromium can answer: whether the survey reads a page that knows nothing
@@ -159,7 +159,7 @@ test('a page that builds itself after load is surveyed once it has settled', { s
 });
 
 test('a saved survey reproduces its report exactly, with no browser', { skip }, async () => {
-  // This is what makes `af drift --save-survey` / `--from-survey` sound, and it is the property
+  // This is what makes `standards drift --save-survey` / `--from-survey` sound, and it is the property
   // the reproducibility claim rests on: measure once on a machine that can reach the site,
   // analyse anywhere, re-run at a different tolerance without going back to a site that has
   // moved underneath the numbers. If the survey did not survive a JSON round trip intact, the
@@ -174,11 +174,11 @@ test('a saved survey reproduces its report exactly, with no browser', { skip }, 
 
 test('the spacing the gate judges leaves out alignment margins, as the gate does', { skip }, async () => {
   // A centred wrapper and the items of a flex row take horizontal margins for alignment, not spacing.
-  // page-spec.mjs skips them, and so does gateSpacing; spacing, which af drift reads, keeps every one.
+  // page-spec.mjs skips them, and so does gateSpacing; spacing, which standards drift reads, keeps every one.
   const html = '<style>body{margin:0}.wrap{width:600px;margin:0 auto;padding:16px 24px}.row{display:flex;gap:8px}.row span{margin:0 13px}p{margin:0 0 40px}</style><div class="wrap"><p>text</p><div class="row"><span>a</span><span>b</span></div></div>';
   const { merged } = await surveyPages([`data:text/html,${encodeURIComponent(html)}`], { browser });
   const values = (bucket) => merged[bucket].map((s) => s.value);
-  assert.ok(values('spacing').includes(13), 'the flex items\' side margins are spacing to af drift');
+  assert.ok(values('spacing').includes(13), 'the flex items\' side margins are spacing to standards drift');
   assert.ok(values('spacing').some((v) => v > 200), 'and so are the auto margins that centre the wrapper');
   assert.deepEqual([...new Set(values('gateSpacing'))].sort((a, b) => a - b), [8, 16, 24, 40], 'the gate sees the padding, the gap and the paragraph margin only');
 });

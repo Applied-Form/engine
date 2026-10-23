@@ -37,6 +37,7 @@
  * the second: it refuses a panel whose every judge shares a route with every generator in the run,
  * unless `--allow-same-family` says the person running it knows.
  */
+import '../src/lib/env-guard.mjs'; // first: a name conflict exits 2 (src/lib/env-guard.mjs)
 import { readFileSync, writeFileSync, appendFileSync, existsSync, mkdirSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { resolve, dirname, basename } from 'node:path';

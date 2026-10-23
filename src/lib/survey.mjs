@@ -125,7 +125,7 @@ function collect() {
   // `typeRun`, `textOn`, `bleed` and `gateSpacing` pair values the other buckets keep apart, or
   // keep the ones the gate judges: which family is set large (a display face), which text sits on
   // which ground at what size, which grounds cross the whole viewport (the ones the gate judges as
-  // grounds), and the spacing the gate judges. `af drift` does not read them.
+  // grounds), and the spacing the gate judges. `standards drift` does not read them.
   const out = {
     textColor: [], ground: [], borderColor: [],
     spacing: [], fontSize: [], fontFamily: [], fontWeight: [], lineHeight: [],

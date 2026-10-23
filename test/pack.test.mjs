@@ -1,6 +1,6 @@
 /**
  * Importing a system authored elsewhere. The fixture is Instrument's real published contract
- * (appliedform/standards, CC BY 4.0), not one written to pass: it has six colours where this
+ * (Applied-Form/standards-schema, CC BY 4.0), not one written to pass: it has six colours where this
  * system has twenty-three, two voices where this one has three, and a twelve-column grid.
  */
 import { test } from 'node:test';
@@ -132,4 +132,11 @@ test("a paid pack's shape imports, and the report quotes the sentence each job c
   assert.match(stated, /jade → signal.*"Single accent, once per artefact\. Interaction"/);
   assert.match(stated, /brass → ornament \(pack-brass ← #A9853F\)/);
   assert.equal(hexes(overlay)['pack-brass'], '#A9853F', 'a job this system has no token for is kept under its own name');
+});
+
+test("an imported overlay's description says it was imported from the pack, and does not claim what it is not", () => {
+  const { overlay } = fromPack(instrument, { key: 'instrument' });
+  assert.match(overlay.$description, /^Instrument \(imported\): an overlay imported from the Instrument pack by standards init --pack\./);
+  assert.doesNotMatch(overlay.$description, /derived by standards brand|Colour only/, '`standards brand` did not derive it, and it states more than colour');
+  assert.ok(overlay.font && overlay.register, 'the overlay does state type and register, as the description says');
 });

@@ -1,6 +1,6 @@
 /**
  * The deterministic fixer, reached without the evaluation harness: one page in, the fixed page and an
- * account of it out. `af fix` and the `af_fix` tool both come through here. No model is called.
+ * account of it out. `standards fix` and the `standards_fix` tool both come through here. No model is called.
  *
  * The settings are the pipeline arm's (`pipelineOptions('pipeline')` in eval/arms.mjs): every fixable
  * rule, judged on every rule, with second answers. The never-worse rule is autoFix's own: a fix that
@@ -14,7 +14,7 @@ export const PRODUCT_SETTINGS = Object.freeze({ allow: FIXABLE, judge: () => tru
 
 export const NOT_CHECKED = Object.freeze({
   doc: 'docs/accessibility-scope.md',
-  note: 'A pass covers the rules this engine measures and nothing else. It is not a WCAG conformance claim and does not replace an accessibility audit. What is not tested is listed in docs/accessibility-scope.md.',
+  note: 'A pass covers the rules Standards measures and nothing else. It is not a WCAG conformance claim and does not replace an accessibility audit. What is not tested is listed in docs/accessibility-scope.md.',
 });
 
 /** The structural selectors of the elements a violation is about, or none when it is about the page. */
@@ -63,7 +63,7 @@ export function fixReport(out, { widths = [] } = {}) {
     register: first.register ?? null,
     assumedRegister: first.assumedRegister ?? false,
     // With no system loaded and no register given, a page that declares none is held to the rules
-    // that apply to any page, as `af lint` holds it.
+    // that apply to any page, as `standards lint` holds it.
     scope: (out.results ?? []).some((r) => r.scope === 'universal') ? 'universal' : 'system',
     before: { violations: sum(before), rules: sorted(before) },
     after: { violations: sum(after), rules: sorted(after) },
@@ -98,7 +98,7 @@ export async function fixPage(html, { browser, register = null, viewports, fileR
   const based = withBase(html, baseHref);
   const out = await autoFix(based.html, { browser, ...PRODUCT_SETTINGS, register, viewports, unregistered, network, onFailed, realpaths, ...(fileRoots ? { fileRoots } : {}) });
   // The lint results before and after go back too, with the fixer's CSS, for a caller that accounts
-  // for each violation (`af audit`, which renders the page at its own address with `css` added);
-  // `report` is the summary `af fix` prints.
+  // for each violation (`standards audit`, which renders the page at its own address with `css` added);
+  // `report` is the summary `standards fix` prints.
   return { html: based.strip(out.html), css: out.css, report: fixReport(out, { widths: viewports ?? [] }), initial: out.initial, results: out.results };
 }

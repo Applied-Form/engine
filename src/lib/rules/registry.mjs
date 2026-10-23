@@ -11,7 +11,10 @@
  * least partially. An empty array means the rule is a house style rule with
  * no WCAG basis. See docs/accessibility-scope.md for what this does and does
  * not cover.
+ *
+ * `level` is set below from the token file: mandatory, standard or advisory (decision 0027).
  */
+import { brand, mandatoryFloor, mandatoryDeclared } from '../tokens.mjs';
 
 export const GROUPS = [
   'colour', 'type', 'layout', 'composition', 'interaction', 'imagery',
@@ -59,7 +62,7 @@ export const RULES = [
   { id: 'panel-ratio', group: 'composition', severity: 'error', summary: "A panel's measured aspect ratio matches its declared ratio.", why: 'A mismatch signals the panel was resized without updating its declaration.', wcag: [] , fix: 'Resize the panel to the ratio it declares, or declare the ratio it actually is.' },
   { id: 'form-over-type', group: 'composition', severity: 'error', summary: 'Type always sits above the generative Form mark, never behind it.', why: 'Legibility of text takes priority over the mark.', wcag: [] , fix: 'Raise the type above the mark, or move the mark out from under the copy.' },
   { id: 'motion-off-scale', group: 'composition', severity: 'error', summary: 'Every animated property uses one of the motion duration tokens (short, medium, long).', why: "Off-scale durations break the system's motion rhythm.", wcag: [] , fix: 'Use a motion duration token: short, medium or long.' },
-  { id: 'recipe-mismatch', group: 'composition', severity: 'error', summary: "A spread's grid cells match its named recipe.", why: 'Recipes define which cells a spread archetype needs to be recognisable.', wcag: [] , fix: 'Add the cells the recipe names, or use a different spread; af move <name> emits the scaffold.' },
+  { id: 'recipe-mismatch', group: 'composition', severity: 'error', summary: "A spread's grid cells match its named recipe.", why: 'Recipes define which cells a spread archetype needs to be recognisable.', wcag: [] , fix: 'Add the cells the recipe names, or use a different spread; standards move <name> emits the scaffold.' },
   { id: 'layer-unknown', group: 'composition', severity: 'error', summary: "Every element's z-index is one of the defined layer tokens (ground, form, type, data, overlay).", why: 'Undeclared stacking order is unpredictable across contexts.', wcag: [] , fix: 'Take the z-index from a layer token: ground, form, type, data or overlay.' },
   { id: 'rotation-off-set', group: 'composition', severity: 'error', summary: 'Rotation is one of the permitted angles.', why: "Arbitrary rotation breaks the system's controlled set of moves.", wcag: [] , fix: 'Use one of the permitted angles, or none.' },
   { id: 'offset-off-grid', group: 'composition', severity: 'error', summary: "A placed element's left and top sit on column lines and the 8px scale.", why: 'Off-grid placement breaks alignment with everything else on the page.', wcag: [] , fix: 'Place the element on a column line horizontally and on the 8px scale vertically.' },
@@ -146,6 +149,39 @@ for (const r of RULES) {
   r.scope = UNIVERSAL.includes(r.id) ? 'universal' : SYSTEM[r.id] ? 'system' : 'house';
   if (SYSTEM[r.id]) r.declares = SYSTEM[r.id];
 }
+
+/**
+ * How hard each rule counts (decision 0027), separate from whose rule it is (scope, above).
+ *
+ *   mandatory  fails the page; no pack, job or team policy can lower it.
+ *   standard   fails the page by default; a team policy may run it as warn or off.
+ *   advisory   never fails a page: the rules `advise()` emits.
+ *
+ * The token file lists the mandatory rules. `floor` is the platform's list, which is locked; each
+ * layer after it (the loaded system, then a job) may add to it, and one that leaves out a rule the
+ * floor names is refused. A layer that states no list leaves the levels as they are.
+ */
+export const LEVELS = ['mandatory', 'standard', 'advisory'];
+
+export function resolveLevels({ floor = [], layers = [] } = {}) {
+  const mandatory = new Set(floor);
+  for (const { source, mandatory: list } of layers) {
+    if (list === undefined) continue;
+    for (const id of floor) {
+      if (!list.includes(id)) throw new Error(`${source}: rule "${id}" is mandatory in the platform floor and cannot be lowered (decision 0027)`);
+    }
+    for (const id of list) mandatory.add(id);
+  }
+  for (const id of mandatory) {
+    const r = RULES.find((x) => x.id === id);
+    if (!r) throw new Error(`the mandatory list names "${id}", which is not a rule`);
+    if (r.severity === 'advisory') throw new Error(`the mandatory list names "${id}", an advisory rule, which never fails a page`);
+  }
+  return Object.fromEntries(RULES.map((r) => [r.id, mandatory.has(r.id) ? 'mandatory' : r.severity === 'advisory' ? 'advisory' : 'standard']));
+}
+
+const LEVEL = resolveLevels({ floor: mandatoryFloor, layers: [{ source: brand ? `the system ${brand}` : 'the token file', mandatory: mandatoryDeclared }] });
+for (const r of RULES) r.level = LEVEL[r.id];
 
 /** Whether a rule applies to a page judged under a pack that states `declares` (a list of paths). */
 export function appliesToPack(id, declares = []) {

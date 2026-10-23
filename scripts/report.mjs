@@ -12,12 +12,13 @@
  * --history <path> override the history file (default dist/compliance-history.json)
  * --stamp <iso>    stamp this run with a given ISO timestamp (default: now)
  */
+import '../src/lib/env-guard.mjs'; // first: a name conflict exits 2 (src/lib/env-guard.mjs)
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
 import { basename } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { summarise, compare, toMarkdown } from '../src/lib/report.mjs';
 
-// `af report --tokens <css|html ...>` — which of this system's tokens a codebase actually
+// `standards report --tokens <css|html ...>` — which of this system's tokens a codebase actually
 // references, and which it never has.
 //
 // The research report scored analytics at zero and it was right: a design system with no idea
@@ -28,7 +29,7 @@ if (process.argv.includes('--tokens')) {
   const { readFileSync } = await import('node:fs');
   const { colors, spacingScale, fonts } = await import('../src/lib/tokens.mjs');
   const files = process.argv.slice(2).filter((a) => !a.startsWith('--'));
-  if (!files.length) { console.error('usage: af report --tokens <file ...>'); process.exit(2); }
+  if (!files.length) { console.error('usage: standards report --tokens <file ...>'); process.exit(2); }
 
   const names = [
     ...Object.keys(colors).map((k) => `--af-color-${k}`),

@@ -1,7 +1,7 @@
 /**
  * Reading somebody else's design system into this one.
  *
- * A Standards pack (`appliedform/standards`) states a system as a `tokens.json` on its own
+ * A Standards pack (`Applied-Form/standards-schema`) states a system as a `tokens.json` on its own
  * contract: a handful of named colour roles with a sentence of intent each, one or two type
  * families, and a set of system values. It is not DTCG and it is not ours, which is the point —
  * this is the path by which a system authored elsewhere becomes an instance the gate enforces.
@@ -18,7 +18,7 @@
  * so nobody mistakes a derivation for a decision the pack's author made.
  *
  * **A pack that cannot satisfy the floors is refused with the measurement.** This is the same
- * contract `af brand` has: the system says no and shows its working, rather than emitting an
+ * contract `standards brand` has: the system says no and shows its working, rather than emitting an
  * overlay that fails contrast the first time it is linted.
  *
  * What cannot be imported is reported too. A pack with no display voice cannot fill Register I,
@@ -132,7 +132,14 @@ export function fromPack(pack, { key, name } = {}) {
     return { overlay: null, report };
   }
 
-  const overlay = toOverlay(derived, { key, name: name ?? `${pack.system} (imported)` });
+  // Not the description `standards brand` writes: this overlay states the pack's own type, floors and register, and
+  // `standards brand` did not derive it.
+  const label = name ?? `${pack.system} (imported)`;
+  const overlay = toOverlay(derived, {
+    key,
+    name: label,
+    description: `${label}: an overlay imported from the ${pack.system} pack by standards init --pack. It states the pack's own colours, type and register, derives the colours the pack leaves out, and takes whatever else it needs from the base file.`,
+  });
   const before = Object.fromEntries(Object.entries(overlay.color).map(([k, v]) => [k, v.$value.hex ?? v.$value]));
   for (const [token, hex] of Object.entries(stated)) {
     overlay.color[token] = { $value: { colorSpace: 'srgb', components: [1, 3, 5].map((i) => Math.round((parseInt(hex.slice(i, i + 2), 16) / 255) * 10000) / 10000), hex } };

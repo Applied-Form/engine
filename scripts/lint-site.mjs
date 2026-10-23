@@ -4,6 +4,7 @@
  * lints each, and writes a report to dist/site-lint.json so successive runs can be diffed.
  *   node scripts/lint-site.mjs [url ...]
  */
+import '../src/lib/env-guard.mjs'; // first: a name conflict exits 2 (src/lib/env-guard.mjs)
 import { dirname, resolve } from 'node:path';
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';

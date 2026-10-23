@@ -1,4 +1,4 @@
-# The first ten minutes, measured on every push: from an empty directory, install the engine as npm
+# The first ten minutes, measured on every push: from an empty directory, install the package as npm
 # would ship it, lint an ordinary page with no system, load a Standards pack, lint again, and start
 # the MCP server an agent would use. Readiness milestone M3; the target is three commands and two
 # minutes on a cold cache, not counting the operating system's browser libraries.
@@ -20,7 +20,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Pack the engine as npm would publish it
+      - name: Pack the package as npm would publish it
         run: |
           npm install --no-audit --no-fund
           npm pack --pack-destination "$RUNNER_TEMP"
@@ -32,24 +32,24 @@ jobs:
           mkdir "$RUNNER_TEMP/j" && cd "$RUNNER_TEMP/j" && npm init -y > /dev/null
           export npm_config_cache="$RUNNER_TEMP/cold-cache"
           t0=$(date +%s)
-          npm install --no-audit --no-fund "$RUNNER_TEMP"/appliedform-engine-*.tgz
+          npm install --no-audit --no-fund "$RUNNER_TEMP"/appliedform-standards-*.tgz
           npx playwright install chromium
           cat > page.html <<'HTML'
           <!doctype html><html lang="en"><head><meta charset="utf-8"><title>Mine</title><style>body{font-family:Arial;margin:24px}.card{border-radius:12px;box-shadow:0 2px 8px #0003;padding:13px}.note{color:#AAAAAA}</style></head><body><main><h1>My page</h1><p class="card">A card someone wrote.</p><p class="note">Last updated yesterday.</p></main></body></html>
           HTML
           # 1. No system: universal rules, and the way to load one.
-          set +e; npx af lint page.html --sample 0 > first.txt; rc=$?; set -e; cat first.txt
+          set +e; npx standards lint page.html --sample 0 > first.txt; rc=$?; set -e; cat first.txt
           test "$rc" = 1; grep -q 'No system loaded' first.txt; grep -q 'contrast' first.txt
           # 2. A Standards pack, then the same page under its rules.
-          npx af init --pack instrument
-          set +e; npx af lint page.html --sample 0 > pack.txt; rc=$?; set -e; cat pack.txt
+          npx standards init --pack instrument
+          set +e; npx standards lint page.html --sample 0 > pack.txt; rc=$?; set -e; cat pack.txt
           test "$rc" = 1; grep -q 'register PACK' pack.txt; grep -q 'radius-present' pack.txt
           # 3. The agent's server, from the printed config.
-          npx af mcp-config --client claude-code > mcp.json
+          npx standards mcp-config --client claude-code > mcp.json
           node -e '
-            const cfg = require("./mcp.json").mcpServers["applied-form"];
+            const cfg = require("./mcp.json").mcpServers["standards"];
             const p = require("node:child_process").spawn(cfg.command, cfg.args, { stdio: ["pipe", "pipe", "inherit"] });
-            let out = ""; p.stdout.on("data", (d) => { out += d; if (out.includes("\"id\":2")) { const ok = /"name":"af_lint"/.test(out); p.kill(); process.exit(ok ? 0 : 1); } });
+            let out = ""; p.stdout.on("data", (d) => { out += d; if (out.includes("\"id\":2")) { const ok = /"name":"standards_lint"/.test(out); p.kill(); process.exit(ok ? 0 : 1); } });
             const send = (m) => p.stdin.write(JSON.stringify({ jsonrpc: "2.0", ...m }) + "\n");
             send({ id: 1, method: "initialize", params: { protocolVersion: "2025-06-18", capabilities: {}, clientInfo: { name: "journey", version: "0" } } });
             send({ method: "notifications/initialized" }); send({ id: 2, method: "tools/list", params: {} });

@@ -56,6 +56,11 @@ engine run and the study baseline puts the verdict in `rescore/summary.txt` and
 the thirteen tier 1 rules no page breaks, naming the pages that break each one. The same `rescore`
 dispatch runs it over every re-scored `pipeline` arm.
 
+`node eval/panel-shots.mjs eval/panel/selection.json` draws the pages a selection names, at 1280×800
+and 390×844, for a blind designer panel, under opaque ids, with a blind manifest and a separate key.
+A `rescore` dispatch given `panel_shots` runs it on the downloaded pages and commits the result to
+the dispatched branch. `eval/panel/README.md` says what each file is and which ones raters never see.
+
 ## The two stub providers
 
 `stub` always succeeds, and proves the plumbing. `stub-flaky` emits what real models actually do —
@@ -96,7 +101,7 @@ The cloud session that develops this repository cannot reach any model host. `.g
 can: dispatch it with a run name, the model keys and the scope, with the keys as repository
 secrets, and it runs the study on a runner, commits the JSONL and the analysis under `eval/results/`
 on the branch it was dispatched from, and keeps the generated pages as a 90-day artifact for the
-judging round. `.github/workflows/drift.yml` does the same for `af drift` over the public design
+judging round. `.github/workflows/drift.yml` does the same for `standards drift` over the public design
 systems listed in `drift/targets.json`, committing the surveys under `eval/drift/`.
 
 ## The judging round
@@ -126,7 +131,7 @@ produced it has changed.
 
 ## Beside instruments we did not write
 
-`npm run eval:compare` runs `af lint`, axe-core and stylelint (with the config this repository
+`npm run eval:compare` runs `standards lint`, axe-core and stylelint (with the config this repository
 generates) on the same pages and prints the three side by side. `test/compare.test.mjs` holds the
 shape of the result on the planted-defect fixtures. The first run of it found two things about the
 static tier that nobody had seen because nobody had run it: the generated config flags every token
@@ -159,7 +164,7 @@ rates only after being counted, because a page that could not be produced is not
 
 ## The study brand
 
-`fixtures/meridian.tokens.json` is derived by `af brand --hue 148 --paper "#F2F6F3"` and merged over
+`fixtures/meridian.tokens.json` is derived by `standards brand --hue 148 --paper "#F2F6F3"` and merged over
 the base tree. No colour in it is Applied Form's: the four values the derivation does not produce
 (two status tints, two chart-scale steps) are derived from Meridian's own palette (protocol
 amendment of 2026-10-08), and the open export refuses a tree that carries any base value. A model cannot

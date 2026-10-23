@@ -79,12 +79,13 @@ export function repairPrompt(violations, brief = null) {
 export async function generateConformant({ prompt, brief = null, generate, toHtml, browser, allow = FIXABLE, judge = () => true, secondAnswers = false, visible = (vs) => vs, register = null, viewports, workDir, maxRepairs = 1, costOf = () => 0, ceiling = Infinity }) {
   const messages = [{ role: 'user', content: prompt }];
   const usage = { input: 0, output: 0 };
-  let fixes = [], rounds = 0, out, fixed, html = null, repairKind = null, patchStats = null;
+  let fixes = [], rounds = 0, out, fixed, html = null, draft = null, repairKind = null, patchStats = null;
   for (;;) {
     out = await generate(messages);
     usage.input += out.usage.input; usage.output += out.usage.output;
     if (rounds === 0) {
       html = toHtml(out.text);
+      draft = html;
     } else {
       const patches = parsePatches(out.text);
       if (patches) {
@@ -120,5 +121,5 @@ export async function generateConformant({ prompt, brief = null, generate, toHtm
     rounds += 1;
   }
   const failing = [...new Set(fixed.results.flatMap((r) => r.violations.map((v) => v.rule)))].sort();
-  return { html: fixed.html, text: out.text, stop: out.stop, usage, rounds, fixes, fixStats: fixed.stats, repairKind, patchStats, gate: { passed: failing.length === 0, failing } };
+  return { html: fixed.html, draft, text: out.text, stop: out.stop, usage, rounds, fixes, fixStats: fixed.stats, repairKind, patchStats, gate: { passed: failing.length === 0, failing } };
 }

@@ -1,5 +1,5 @@
 /**
- * The inference behind `af drift`, tested without a browser.
+ * The inference behind `standards drift`, tested without a browser.
  *
  * Everything here is pure arithmetic over weighted samples, which is deliberate: the survey needs
  * Chromium, but deciding what counts as a token, a step or a mistake does not, and those are the

@@ -113,7 +113,7 @@ export const ROLE_TO_TOKEN = {
 };
 
 /** A complete brand overlay: the derived colours under system names, plus the brand block. */
-export function toOverlay(p, { name, key, wordmark, fontsDir, fonts } = {}) {
+export function toOverlay(p, { name, key, wordmark, fontsDir, fonts, description } = {}) {
   const color = {};
   // Written in the file's own colour form (DTCG 2025.10), so a derived overlay merges over
   // the base without mixing formats in one tree.
@@ -123,7 +123,7 @@ export function toOverlay(p, { name, key, wordmark, fontsDir, fonts } = {}) {
   if (fontsDir) brand.fontsDir = fontsDir;
   if (fonts) brand.fonts = fonts;
   return {
-    $description: `${brand.name}: a brand overlay derived by af brand. Colour only; type, mark, spacing, grid and every rule come from the base file.`,
+    $description: description ?? `${brand.name}: a brand overlay derived by standards brand. Colour only; type, spacing, grid and every rule come from the base file. As derived it states no mark, so its pages draw no Form unless the overlay adds one.`,
     $extensions: { 'form.applied': { brand } },
     color,
   };

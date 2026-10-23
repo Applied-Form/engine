@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 /**
- * af fix — lint a rendered page, apply the fixes the engine can make on its own, and write the result.
+ * standards fix — lint a rendered page, apply the fixes Standards can make on its own, and write the result.
  *
- *   af fix <page.html | url> [--out fixed.html] [--json] [--system <tokens.json | pack | name>]
+ *   standards fix <page.html | url> [--out fixed.html] [--json] [--system <tokens.json | pack | name>]
  *          [--register i|ii] [--widths 320,1280] [--sample n] [--seed n]
  *
  * The fixes are declarations in one appended `<style data-af-fixes>` block, addressed to the elements
@@ -13,24 +13,26 @@
  * only when `--out` names it.
  *
  *   --system    a token overlay, a Standards pack tokens.json, a bundled pack (instrument) or a brand
- *               name. Without it the system is AF_BRAND, or the one af.config.json names, as for af lint.
+ *               name. Without it the system is STANDARDS_SYSTEM, or the one standards.config.json names, as for standards lint.
  *   --widths    the widths to measure and fix at. Without it, the four fixed widths and --sample (2)
  *               widths drawn from between them, seeded by --seed so a run can be repeated.
  *
  * Exit 0 when the fixed page passes every checked rule at every width measured, 1 when violations
  * remain, 2 on a usage or load error.
  */
+import { exitOnConflict } from '../src/lib/env-guard.mjs'; // first: a name conflict exits 2 (src/lib/env-guard.mjs)
 import { readFileSync, writeFileSync, existsSync, mkdtempSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { resolve, dirname, basename, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { tmpdir } from 'node:os';
+import { systemFromEnv, setSystem, childEnv, CONFLICT } from '../src/lib/env.mjs';
 
 const ROOT = fileURLToPath(new URL('../', import.meta.url));
-const USAGE = 'usage: af fix <page.html | url> [--out fixed.html] [--json] [--system <tokens.json | pack | name>] [--register i|ii] [--widths 320,1280] [--sample n] [--seed n]';
+const USAGE = 'usage: standards fix <page.html | url> [--out fixed.html] [--json] [--system <tokens.json | pack | name>] [--register i|ii] [--widths 320,1280] [--sample n] [--seed n]';
 const VALUE_FLAGS = ['out', 'system', 'register', 'widths', 'sample', 'seed'];
 
-const fail = (message) => { console.error(`af fix: ${message}`); process.exit(2); };
+const fail = (message) => { console.error(`standards fix: ${message}`); process.exit(2); };
 
 const targets = [];
 const opts = {};
@@ -51,8 +53,8 @@ if (targets.length !== 1) fail(targets.length ? `one page at a time\n${USAGE}` :
 const json = !!opts.json;
 
 /**
- * --system, resolved to what AF_BRAND takes: a path to an overlay, or a brand name. A Standards pack
- * is imported first, by the same path `af system import` takes, in a child process, because the
+ * --system, resolved to what STANDARDS_SYSTEM takes: a path to an overlay, or a brand name. A Standards pack
+ * is imported first, by the same path `standards system import` takes, in a child process, because the
  * tokens are read once per process and this one has not read them yet.
  */
 function loadSystem(given) {
@@ -74,15 +76,15 @@ function loadSystem(given) {
     fail(`--system: no system named ${given}. Give a token overlay, a Standards pack tokens.json, a bundled pack (instrument) or a brand name.`);
   }
   const out = join(mkdtempSync(join(tmpdir(), 'af-fix-system-')), 'system.json');
-  const env = { ...process.env }; delete env.AF_BRAND;
+  const env = childEnv({ STANDARDS_SYSTEM: undefined });
   const r = spawnSync(process.execPath, [`${ROOT}scripts/system.mjs`, 'import', pack, '--out', out, ...(key ? ['--key', key] : [])], { encoding: 'utf8', env });
   if (r.status !== 0 || !existsSync(out)) fail(`--system: the pack at ${given} was refused\n${(r.stdout + r.stderr).trim()}`);
   return out;
 }
 
-let systemLabel = process.env.AF_BRAND || null;
+let systemLabel = systemFromEnv() || null;
 if (opts.system) {
-  process.env.AF_BRAND = loadSystem(opts.system);
+  setSystem(loadSystem(opts.system));
   systemLabel = opts.system.endsWith('.json') ? resolve(opts.system) : opts.system;
 }
 
@@ -130,17 +132,17 @@ if (/^https?:\/\//i.test(target)) {
   try { html = readFileSync(path, 'utf8'); } catch (e) { fail(`could not read ${target}: ${e.message}`); }
   input = path;
   baseHref = pathToFileURL(`${dirname(path)}/`).href;
-  // What af lint lets the page read: its own directory, the working directory, the engine's files.
+  // What standards lint lets the page read: its own directory, the working directory, the engine's files.
   fileRoots = [dirname(path), ...DEFAULT_FILE_ROOTS()];
   defaultOut = join(dirname(path), `${basename(path).replace(/\.html?$/i, '')}.fixed.html`);
 }
 const output = opts.out ? resolve(opts.out) : defaultOut;
 
 let browser;
-try { browser = await launchBrowser(); } catch (e) { fail(`could not start Chromium (${e.message.split('\n')[0]}). Run npx playwright install chromium, or set AF_CHROMIUM to a Chromium executable.`); }
+try { browser = await launchBrowser(); } catch (e) { if (e?.code === CONFLICT) exitOnConflict(e); fail(`could not start Chromium (${e.message.split('\n')[0]}). Run npx playwright install chromium, or set STANDARDS_CHROMIUM to a Chromium executable.`); }
 let fixed;
 try {
-  fixed = await fixPage(html, { browser, register, viewports, fileRoots, baseHref, unregistered: !process.env.AF_BRAND && register == null ? 'universal' : 'house' });
+  fixed = await fixPage(html, { browser, register, viewports, fileRoots, baseHref, unregistered: !systemFromEnv() && register == null ? 'universal' : 'house' });
 } catch (e) {
   await browser.close();
   fail(`could not fix ${target}: ${e.message}`);
@@ -160,9 +162,9 @@ const plural = (n, one, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
 const decls = (d) => Object.entries(d).map(([k, v]) => `${k}: ${v}`).join('; ');
 const where = (p) => `${p.selector ?? '(no selector)'}${p.pseudo ?? ''}`;
 
-console.log(`af fix: ${input} -> ${output}`);
+console.log(`standards fix: ${input} -> ${output}`);
 const systemLine = report.scope === 'universal'
-  ? 'none loaded, so a page without a register is held to the universal rules only (load one with --system or af init --pack)'
+  ? 'none loaded, so a page without a register is held to the universal rules only (load one with --system or standards init --pack)'
   : systemLabel ?? 'the base tokens';
 console.log(`system: ${systemLine}`);
 if (report.register) console.log(`register: ${report.register.toUpperCase()}${report.assumedRegister ? ', assumed' : ''}`);

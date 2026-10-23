@@ -11,6 +11,7 @@ import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 import { RULES, GROUPS } from './rules/registry.mjs';
 import { findingKey, REFUSED, quote, pageCommand } from './audit.mjs';
+import { GENERATOR, LEGACY_GENERATORS } from './names.mjs';
 
 const DIST = new URL('../../dist/', import.meta.url);
 
@@ -20,10 +21,13 @@ const DIST = new URL('../../dist/', import.meta.url);
 
 /**
  * The report names itself in a generator tag, so a later run over the same directory knows it for a
- * report and not a page of the set.
+ * report and not a page of the set. A report written under an older name is still a report, so the
+ * old values are recognised permanently.
  */
-export const GENERATOR = 'af audit';
-export const isReport = (html) => /<meta\s+name="generator"\s+content="af (?:audit|report)"/i.test(String(html).slice(0, 4096));
+export { GENERATOR };
+const escaped = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const REPORT = new RegExp(`<meta\\s+name="generator"\\s+content="(?:${[GENERATOR, ...LEGACY_GENERATORS].map(escaped).join('|')})"`, 'i');
+export const isReport = (html) => REPORT.test(String(html).slice(0, 4096));
 
 /**
  * dist/tokens.css and dist/components.css as one stylesheet, every font they name inlined as a
@@ -33,7 +37,7 @@ export const isReport = (html) => /<meta\s+name="generator"\s+content="af (?:aud
 export function houseCss() {
   const read = (name) => {
     const url = new URL(name, DIST);
-    if (!existsSync(url)) throw new Error(`dist/${name} is missing; run af build (npm run build) first`);
+    if (!existsSync(url)) throw new Error(`dist/${name} is missing; run standards build (npm run build) first`);
     return readFileSync(url, 'utf8');
   };
   const base = dirname(fileURLToPath(new URL('tokens.css', DIST)));
@@ -112,7 +116,7 @@ export function renderReport(report, { css, mark = null } = {}) {
   const incomplete = a.incomplete?.length ?? 0;
   const apart = fixed ? a.notComparable?.length ?? 0 : 0;
   const lede = [
-    `Of ${plural(a.pages, 'page')} named, ${d(a.loaded)} loaded and ${d(a.clean.before)} ${a.clean.before === 1 ? 'passes' : 'pass'} every rule checked at every width measured${fixed ? `, as found; ${d(a.clean.after)} would pass with the fixes the engine can make on its own` : ''}.`,
+    `Of ${plural(a.pages, 'page')} named, ${d(a.loaded)} loaded and ${d(a.clean.before)} ${a.clean.before === 1 ? 'passes' : 'pass'} every rule checked at every width measured${fixed ? `, as found; ${d(a.clean.after)} would pass with the fixes Standards can make on its own` : ''}.`,
     fixed && a.findings.before ? (() => {
       const unjudged = a.findings.notCompared ?? 0, person = a.findings.after - unjudged;
       return `The fixer would cure ${d(a.findings.fixed)} of ${plural(a.findings.before, 'finding')} (${d(pct(a.fixedWithoutModel.share))}) without a model; ${plural(person, 'finding')} ${person === 1 ? 'needs' : 'need'} a person${unjudged ? `, and ${plural(unjudged, 'finding')} on ${plural(apart, 'page')} not compared ${unjudged === 1 ? 'was' : 'were'} not judged` : ''}.`;
@@ -135,7 +139,7 @@ ${fixed ? `<dt>Clean if fixed</dt><dd>${d(a.clean.after)} of ${d(a.pages)}; the 
 ${apart ? `<dt>Not compared with the fixes</dt><dd>${a.notComparable.map((p) => d(p.input)).join(', ')}; counted as found, with nothing fixed</dd>` : ''}
 <dt>Findings as found</dt><dd>${d(a.findings.before)} (${plural(a.violations.before, 'violation')} counted per width)</dd>
 ${fixed ? `<dt>Findings if fixed</dt><dd>${d(a.findings.after)} (${plural(a.violations.after, 'violation')} counted per width)</dd>
-<dt>Fixable without a model</dt><dd>${d(a.findings.fixed)} of ${d(a.findings.before)}, ${d(pct(a.fixedWithoutModel.share))}${a.findings.introduced ? `; ${plural(a.findings.introduced, 'new finding')} after fixing` : ''}</dd>` : '<dt>Fixer</dt><dd>Not run. Run again with <code>--fix</code> to see what the engine can cure on its own.</dd>'}
+<dt>Fixable without a model</dt><dd>${d(a.findings.fixed)} of ${d(a.findings.before)}, ${d(pct(a.fixedWithoutModel.share))}${a.findings.introduced ? `; ${plural(a.findings.introduced, 'new finding')} after fixing` : ''}</dd>` : '<dt>Fixer</dt><dd>Not run. Run again with <code>--fix</code> to see what Standards can cure on its own.</dd>'}
 <dt>Widths</dt><dd>${d(report.widths.join(', '))} px</dd>
 <dt>Rules checked</dt><dd>${d(report.rulesChecked.length)}</dd>
 </dl>`;
@@ -166,7 +170,7 @@ ${a.byRule.map((r) => `<dt>${esc(r.rule)}</dt><dd>${esc(r.summary ?? '')}${r.fix
     const failed = p.failed ?? [];
     if (!failed.length) return '';
     const hints = [
-      failed.some((f) => f.why === REFUSED.file) ? "A local file outside the page's own directory, the directories named and the engine's files is refused: name the directory that holds the page's files." : '',
+      failed.some((f) => f.why === REFUSED.file) ? "A local file outside the page's own directory, the directories named and the Standards package's files is refused: name the directory that holds the page's files." : '',
       failed.some((f) => f.why === REFUSED.network) ? 'The run was offline: run it without <code>--offline</code> to load what the page asks for over the network.' : '',
     ].filter(Boolean).join(' ');
     const note = !p.loaded ? 'These requests failed while it was loading.'
@@ -211,23 +215,23 @@ ${table(`Fixes refused on ${p.name}`, ['Element', 'Declarations', 'Rules', 'Reas
   const overrides = Object.entries(report.policy?.overrides ?? {}).map(([rule, sev]) => `${rule}: ${sev}`);
   const provenance = [
     `System: ${systemLabel}${report.system?.version ? `, tokens ${report.system.version}` : ''}`,
-    `Engine: ${report.engine?.name ?? 'engine'} ${report.engine?.version ?? ''}`,
+    `Standards: ${report.engine?.name ?? 'standards'} ${report.engine?.version ?? ''}`,
     `Generated: ${report.generated}`,
     `Widths: ${report.widths.join(', ')} px${report.sampled.length ? ` (${report.sampled.join(', ')} sampled with seed ${report.seed})` : ''}`,
     `Register: ${report.register ? `${report.register.toUpperCase()}, assumed for pages that declare none` : 'as each page declares'}`,
     `Fixer: ${fixed ? "run on copies, with no model; each page measured with the fixes at its own address, with the fixer's CSS added; nothing written to the pages" : 'not run'}`,
     `Network: ${report.offline ? 'refused (--offline); every request over it is listed with its page' : "on, as a visitor's browser has it"}`,
-    `Local files: a page from a file could read its own directory and below, the directories named${report.roots?.length ? `, the --root ${report.roots.length === 1 ? 'directory' : 'directories'} ${report.roots.join(', ')}` : ''} and the engine's files; any other file it asked for was refused and is listed with it. A page from a URL reads none`,
-    `Rule overrides: ${overrides.length ? `${overrides.join(', ')} in af.config.json, not applied; every rule listed is checked` : 'none applied; every rule listed is checked'}`,
+    `Local files: a page from a file could read its own directory and below, the directories named${report.roots?.length ? `, the --root ${report.roots.length === 1 ? 'directory' : 'directories'} ${report.roots.join(', ')}` : ''} and the Standards package's files; any other file it asked for was refused and is listed with it. A page from a URL reads none`,
+    `Rule overrides: ${overrides.length ? `${overrides.join(', ')} in the project's config, not applied; every rule listed is checked` : 'none applied; every rule listed is checked'}`,
   ];
   // One page at a time, as this run measured it: the same widths, system, register, fixer, network
-  // and --root (af lint takes neither --widths nor --system). A page that could read a directory
+  // and --root (standards lint takes neither --widths nor --system). A page that could read a directory
   // named above its own, or read a file in another directory named, needs that directory too, so its
-  // own command is given. af fix writes the fixes.
+  // own command is given. standards fix writes the fixes.
   const one = report.pageCommand ?? pageCommand({ ...report, roots: [], system: report.system?.arg ?? null });
   const roots = (c) => (String(c).match(/ --root /g) ?? []).length;
   const own = report.pages.filter((p) => p.command && roots(p.command) > roots(one));
-  const writer = [`npx af fix <page>`, '--widths', report.widths.join(','),
+  const writer = [`npx @appliedform/standards@4 fix <page>`, '--widths', report.widths.join(','),
     ...(report.system?.arg ? ['--system', quote(report.system.arg)] : []),
     ...(report.register ? ['--register', report.register] : [])].join(' ');
   const alone = [`One page at a time: ${d(one)}.`,
@@ -292,7 +296,7 @@ ${provenance.map((l) => `    <p class="af-data-02">${esc(l)}</p>`).join('\n')}
 ${esc(report.command)} --json</pre>
   <p>${alone}</p>
 
-  <footer class="af-footer"><span class="af-data-02">Conformance report · ${esc(report.engine?.name ?? 'engine')} ${esc(report.engine?.version ?? '')} · ${esc(date)}</span></footer>
+  <footer class="af-footer"><span class="af-data-02">Conformance report · ${esc(report.engine?.name ?? 'standards')} ${esc(report.engine?.version ?? '')} · ${esc(date)}</span></footer>
 </main>
 </body>
 </html>

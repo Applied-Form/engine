@@ -1,19 +1,19 @@
 #!/usr/bin/env node
 /**
- * af audit <pages… | dir> — lint a set of pages, optionally fix them, and write one report.
+ * standards audit <pages… | dir> — lint a set of pages, optionally fix them, and write one report.
  *
- *   af audit <page.html | url | dir> [...] [--system <tokens.json | pack | name>] [--fix] [--offline]
+ *   standards audit <page.html | url | dir> [...] [--system <tokens.json | pack | name>] [--fix] [--offline]
  *             [--root dir]... [--out report.html] [--json] [--register i|ii] [--widths 320,1280]
  *             [--sample n] [--seed n]
  *
- * Every page is rendered at the widths `af lint` uses (the four fixed widths and two sampled from
+ * Every page is rendered at the widths `standards lint` uses (the four fixed widths and two sampled from
  * between them, seeded by --seed) and judged by the rules in force for it. With --fix the
- * deterministic fixer runs too, with the settings `af fix` uses, on a copy, and the report gives
+ * deterministic fixer runs too, with the settings `standards fix` uses, on a copy, and the report gives
  * each finding as found and as it is on the page at its own address with the fixer's CSS added. A
  * fixer that applied nothing cured nothing. A page that, with the fixes, did not load a stylesheet,
  * script or font it loaded as found is not compared: its findings are counted as found, and none as
  * fixed or introduced. A directory is read for .html files at
- * any depth, leaving out the `<name>.fixed.html` pages `af fix` writes and any report this command
+ * any depth, leaving out the `<name>.fixed.html` pages `standards fix` writes and any report this command
  * wrote. A page named twice is measured once. A page that cannot be read, fetched or rendered, or
  * has nothing on it to measure, is named in the report with the reason, and is never counted clean.
  *
@@ -33,10 +33,10 @@
  * fixer's copy, which is rendered from a file with the page's address as its base and can fail
  * requests a visitor's browser makes.
  *
- * The report is one self-contained Register II page, written to --out (default af-audit.html).
+ * The report is one self-contained Register II page, written to --out (default standards-audit.html).
  * --json prints the same account to stdout; with --json the page is written only when --out names it.
  * The pages audited are read and never written. No model is called. Rule overrides and baselines in
- * af.config.json are not applied: every rule listed is checked, and the report says so. A path in
+ * standards.config.json are not applied: every rule listed is checked, and the report says so. A path in
  * the report is shown from the working directory, or by its name outside it. The commands that
  * repeat the run, for the set and for one page, are the one exception: they carry the targets, the
  * --root directories and the system as they were typed, with the widths, the register, --fix and
@@ -49,18 +49,19 @@
  * otherwise, 2 on a usage error. --fix does not change that: the fixes are not written, so a page
  * that fails on disk fails the run.
  */
+import { exitOnConflict } from '../src/lib/env-guard.mjs'; // first: a name conflict exits 2 (src/lib/env-guard.mjs)
 import { readFileSync, writeFileSync, existsSync, statSync, realpathSync, readdirSync, mkdirSync } from 'node:fs';
 import { resolve, dirname, relative, join, isAbsolute, sep, basename, extname } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const ROOT = fileURLToPath(new URL('../', import.meta.url));
-const USAGE = `usage: af audit <page.html | url | dir> [...] [--system <tokens.json | pack | name>] [--fix] [--offline] [--root dir]... [--out report.html] [--json] [--register i|ii] [--widths 320,1280] [--sample n] [--seed n]`;
+const USAGE = `usage: standards audit <page.html | url | dir> [...] [--system <tokens.json | pack | name>] [--fix] [--offline] [--root dir]... [--out report.html] [--json] [--register i|ii] [--widths 320,1280] [--sample n] [--seed n]`;
 const VALUE_FLAGS = ['out', 'system', 'register', 'widths', 'sample', 'seed', 'root'];
 // How long a measured page stays open for its network to go quiet, so a request it makes after its
 // load event is heard and listed rather than cancelled when the page closes (lintPages `settle`).
 const SETTLE = 3000;
 
-const fail = (message) => { console.error(`af audit: ${message}`); process.exit(2); };
+const fail = (message) => { console.error(`standards audit: ${message}`); process.exit(2); };
 
 const targets = [];
 const opts = {};
@@ -101,7 +102,7 @@ const under = (path, base) => {
 };
 const shown = (path, dir = null) => under(path, process.cwd()) ?? under(path, here) ?? (dir ? under(path, dirname(dir)) : null) ?? basename(path);
 const shownDir = (path) => (relative(process.cwd(), path) === '' ? '.' : shown(path));
-// A system set by af.config.json reaches here as an absolute path (bin/af.mjs resolves it). The
+// A system set by standards.config.json reaches here as an absolute path (bin/standards.mjs resolves it). The
 // command that repeats the run gives it from the working directory, as ../system.json for a file
 // beside it, or by name when that would climb to the filesystem root.
 const fromHere = (s) => {
@@ -114,13 +115,14 @@ const fromHere = (s) => {
 const scrub = (s) => String(s).replace(/(?<=^|[\s'"(=,])(?:file:\/\/)?\/[^\s'"()<>,]*/g, (m) => m.split('/').filter(Boolean).pop() ?? '');
 
 // The system, fixed before anything that reads the tokens is imported. It came from --system, or
-// from AF_BRAND, which af.config.json sets through bin/af.mjs. The heading and the provenance show a
+// from STANDARDS_SYSTEM, which standards.config.json sets through bin/standards.mjs. The heading and the provenance show a
 // path to it as every path in the report is shown; the command that repeats the run carries it as
 // it was typed.
 const { resolveSystem } = await import('../src/lib/system-arg.mjs');
-let systemGiven = process.env.AF_BRAND || null;
+const { systemFromEnv, setSystem, CONFLICT } = await import('../src/lib/env.mjs');
+let systemGiven = systemFromEnv() || null;
 if (opts.system) {
-  try { ({ brand: process.env.AF_BRAND } = resolveSystem(opts.system)); } catch (e) { fail(e.message); }
+  try { setSystem(resolveSystem(opts.system).brand); } catch (e) { fail(e.message); }
   systemGiven = opts.system;
 }
 const isPath = (s) => isAbsolute(s) || /[\\/]/.test(s) || /\.json$/i.test(s);
@@ -157,12 +159,12 @@ if (opts.widths) {
 }
 
 // Rule overrides are a team's rollout choice, not a property of the pages, so the report does not
-// apply them. It records them, so a reader who runs af lint with them can see why the two differ.
-let overrides = {};
-try { overrides = loadConfig(process.cwd()).rules ?? {}; } catch { /* a malformed file is af lint's to report; nothing is applied either way */ }
-if (Object.keys(overrides).length && !opts.json) process.stderr.write(`af audit: af.config.json sets ${Object.entries(overrides).map(([r, s]) => `${r}: ${s}`).join(', ')}; the report does not apply rule overrides, and checks every rule it lists\n`);
+// apply them. It records them, so a reader who runs standards lint with them can see why the two differ.
+let overrides = {}, configSource = null;
+try { const config = loadConfig(process.cwd()); overrides = config.rules ?? {}; configSource = config.source; } catch { /* a malformed file is standards lint's to report; nothing is applied either way */ }
+if (Object.keys(overrides).length && !opts.json) process.stderr.write(`standards audit: ${basename(configSource)} sets ${Object.entries(overrides).map(([r, s]) => `${r}: ${s}`).join(', ')}; the report does not apply rule overrides, and checks every rule it lists\n`);
 
-const output = opts.out ? resolve(opts.out) : opts.json ? null : resolve('af-audit.html');
+const output = opts.out ? resolve(opts.out) : opts.json ? null : resolve('standards-audit.html');
 
 // The pages: URLs as given, files as given, directories read for .html at any depth. Links to
 // directories and files are not followed.
@@ -256,14 +258,14 @@ const nothingOn = (results) => results.length > 0 && results.every(({ spec = {} 
   && ![spec.text, spec.imagery, spec.links, spec.targets, spec.charts].some((xs) => xs?.length));
 
 let browser;
-try { browser = await launchBrowser(); } catch (e) { fail(`could not start Chromium (${e.message.split('\n')[0]}). Run npx playwright install chromium, or set AF_CHROMIUM to a Chromium executable.`); }
-const unregistered = !process.env.AF_BRAND && register == null ? 'universal' : 'house';
+try { browser = await launchBrowser(); } catch (e) { if (e?.code === CONFLICT) exitOnConflict(e); fail(`could not start Chromium (${e.message.split('\n')[0]}). Run npx playwright install chromium, or set STANDARDS_CHROMIUM to a Chromium executable.`); }
+const unregistered = !systemFromEnv() && register == null ? 'universal' : 'house';
 
 const pages = [];
 const notAPage = (why) => Object.assign(new Error(why), { notAPage: true });
 for (const entry of inputs) {
   const { input, url, path } = entry;
-  if (!json()) process.stderr.write(`af audit: ${input}\n`);
+  if (!json()) process.stderr.write(`standards audit: ${input}\n`);
   // Every request that did not load, on any render of the page as found and, apart, of the page with
   // the fixes, once each; and every local file either render asked for, for the command that measures
   // the page alone.
@@ -302,10 +304,10 @@ for (const entry of inputs) {
       fileRoots = [dirname(entry.page), ...NAMED, ...PUBLISHED];
       network = !opts.offline;
       // Its own directory holds the working directory, and nothing named holds that: the page, named
-      // alone, may read every file in and below where af audit was run.
+      // alone, may read every file in and below where standards audit was run.
       if (inside(here, dirname(entry.page)) && !NAMED.some((r) => inside(here, r))) {
         const sits = dirname(entry.page) === here;
-        process.stderr.write(`af audit: warning: ${input} sits ${sits ? 'in' : 'above'} the working directory and was named alone, so it may read every file in and below ${sits ? 'the working directory' : 'its own directory, the working directory included'}\n`);
+        process.stderr.write(`standards audit: warning: ${input} sits ${sits ? 'in' : 'above'} the working directory and was named alone, so it may read every file in and below ${sits ? 'the working directory' : 'its own directory, the working directory included'}\n`);
       }
     }
     if (!page.trim()) throw notAPage('it is empty');
@@ -337,7 +339,7 @@ for (const entry of inputs) {
     try {
       ({ report: fix, css } = await fixPage(page, { ...common, baseHref }));
     } catch (e) {
-      process.stderr.write(`af audit: the fixer could not run on ${input} (${scrub(e.message.split('\n')[0])}); it is reported as found, with nothing fixed\n`);
+      process.stderr.write(`standards audit: the fixer could not run on ${input} (${scrub(e.message.split('\n')[0])}); it is reported as found, with nothing fixed\n`);
       fix = { applied: [], refused: [], fixed: [] };
     }
     // The page with the fixes is the page as found, at its own address, with the fixer's CSS added,
@@ -361,7 +363,7 @@ function json() { return !!opts.json; }
 const { quote } = audit;
 // The targets, the --root directories and the system as typed, so the command works from the
 // directory it was run in.
-const command = ['npx af audit', ...targets.map(quote), ...ROOTS.flatMap((r) => ['--root', quote(r.typed)]),
+const command = ['npx @appliedform/standards@4 audit', ...targets.map(quote), ...ROOTS.flatMap((r) => ['--root', quote(r.typed)]),
   ...(systemArg ? ['--system', quote(systemArg)] : []), ...(register ? ['--register', register] : []),
   ...(opts.fix ? ['--fix'] : []), ...(opts.offline ? ['--offline'] : []), '--widths', viewports.join(',')].join(' ');
 const { version: engineVersion, name: engineName } = PKG;
@@ -400,7 +402,7 @@ if (json()) {
 }
 
 const plural = (n, one, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
-console.log(`af audit: ${plural(a.pages, 'page')}, system ${report.system.label}, widths ${viewports.join(', ')}px${sampled.length ? ` (${sampled.join(', ')} sampled; --seed ${seed} to repeat)` : ''}`);
+console.log(`standards audit: ${plural(a.pages, 'page')}, system ${report.system.label}, widths ${viewports.join(', ')}px${sampled.length ? ` (${sampled.join(', ')} sampled; --seed ${seed} to repeat)` : ''}`);
 console.log(`Loaded ${a.loaded} of ${a.pages}.${a.notLoaded.length ? ` Not loaded, and not counted clean: ${a.notLoaded.map((p) => `${p.input} (${p.error})`).join('; ')}` : ''}`);
 if (a.incomplete.length) console.log(`Measured incomplete, and not counted clean: ${a.incomplete.map((p) => `${p.input} (${p.failed.map((f) => `${f.type} ${f.resource}: ${f.why}`).join(', ')})`).join('; ')}`);
 if (a.notComparable.length) console.log(`Not compared with the fixes, and counted as found: ${a.notComparable.map((p) => `${p.input} (${p.error ?? p.lost.map((f) => `${f.type} ${f.resource}: ${f.why}`).join(', ')})`).join('; ')}`);

@@ -20,6 +20,7 @@ import { launchBrowser } from '../src/lib/page-lint.mjs';
 import { generate, extractHtml } from '../eval/providers.mjs';
 import { score, paletteFrom, normalise } from '../eval/score.mjs';
 import { classifyFailure, harnessFingerprint, fileSafe } from '../eval/run.mjs';
+import { ENV } from '../src/lib/names.mjs';
 
 let browser = null, launchError = null;
 try { browser = await launchBrowser(); } catch (e) { launchError = e; if (process.env.CI) throw e; }
@@ -77,7 +78,7 @@ test('a run measures the system the model was given, and keeps what the model co
   // Meridian's, and recorded no token usage because the scorer's result overwrote it. One stub cell
   // through the real entry point holds all three: the system, the cost, and the drift.
   const out = join(dir, 'run', 'r.jsonl');
-  const r = spawnSync(process.execPath, ['eval/run.mjs', '--models', 'stub', '--briefs', 'b01', '--arms', 'components', '--samples', '1', '--out', out], { encoding: 'utf8', env: { ...process.env, AF_BRAND: '' } });
+  const r = spawnSync(process.execPath, ['eval/run.mjs', '--models', 'stub', '--briefs', 'b01', '--arms', 'components', '--samples', '1', '--out', out], { encoding: 'utf8', env: { ...process.env, [ENV.STANDARDS_SYSTEM]: undefined, STANDARDS_SYSTEM: '' } });
   assert.equal(r.status, 0, r.stderr);
   const merged = JSON.parse(readFileSync('eval/fixtures/meridian.merged.tokens.json', 'utf8'));
   assert.match(r.stdout, new RegExp(`study system: .*meridian\\.merged\\.tokens\\.json \\(paper ${merged.color.paper.$value.hex}\\)`));
@@ -153,6 +154,12 @@ test('the harness fingerprint moves when anything that defines the experiment mo
   writeFileSync(join(root, 'eval', 'results', 'pilot.jsonl'), '{}');
   writeFileSync(join(root, 'eval', 'runs', 'x', 'pages', 'p.html'), '<p>');
   writeFileSync(join(root, 'eval', 'README.md'), 'prose');
+  // The panel's screenshots, its manifest and key, and the selection they were made from are drawn
+  // from a run's pages after it ends; a re-dispatch of them must not refuse a resume on the branch.
+  mkdirSync(join(root, 'eval', 'panel', 'shots'), { recursive: true });
+  writeFileSync(join(root, 'eval', 'panel', 'selection.json'), '{}');
+  writeFileSync(join(root, 'eval', 'panel', 'key.json'), '{}');
+  writeFileSync(join(root, 'eval', 'panel', 'shots', 'p0123456789-w1280.png'), 'png');
   assert.equal(harnessFingerprint(root), e, 'what a run writes, and what only describes it, are not the experiment');
   const out = join(root, 'eval', 'pilots', 'run.jsonl');
   const before = harnessFingerprint(root, undefined, { outputs: [out, join(root, 'eval', 'pilots', 'pages')] });

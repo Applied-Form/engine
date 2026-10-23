@@ -1,11 +1,12 @@
 /**
- * `af system import <pack-tokens.json>` — read a system authored elsewhere into this one.
+ * `standards system import <pack-tokens.json>` — read a system authored elsewhere into this one.
  *
  * The report is the deliverable as much as the overlay: what the pack stated, what had to be
  * derived because a six-colour contract cannot state a chart series, what could not be carried
  * across at all, and every contrast measurement taken on the way. A pack whose own colours fail
- * a floor is refused with the number, exactly as `af brand` refuses a hue that cannot work.
+ * a floor is refused with the number, exactly as `standards brand` refuses a hue that cannot work.
  */
+import '../src/lib/env-guard.mjs'; // first: a name conflict exits 2 (src/lib/env-guard.mjs)
 import { readFileSync, writeFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 import { fromPack } from '../src/lib/pack.mjs';
@@ -16,7 +17,7 @@ const flag = (name) => { const i = sub.indexOf(`--${name}`); return i === -1 ? n
 const file = sub.find((a) => !a.startsWith('--') && !sub[sub.indexOf(a) - 1]?.startsWith('--'));
 
 if (!file) {
-  console.error('usage: af system import <pack tokens.json> [--key k] [--name "Name"] [--out file]');
+  console.error('usage: standards system import <pack tokens.json> [--key k] [--name "Name"] [--out file]');
   process.exit(2);
 }
 

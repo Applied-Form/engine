@@ -1,4 +1,4 @@
-# The open engine's own check, on every push and pull request.
+# The open package's own check, on every push and pull request.
 name: CI
 
 on:
