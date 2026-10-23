@@ -29,14 +29,15 @@ test('severity defaults to error and is overridden per rule', () => {
 });
 
 test('warnings are reported and do not fail; off is silent', () => {
-  const results = [page('file:///r/a.html', 1280, [v('contrast'), v('measure'), v('spacing')])];
+  // heading-order is a standard rule: a mandatory one cannot be lowered (test/levels.test.mjs).
+  const results = [page('file:///r/a.html', 1280, [v('heading-order'), v('measure'), v('spacing')])];
   const { summary, failed, results: out } = applyPolicy(results, { config: { rules: { measure: 'warn', spacing: 'off' } }, cwd: '/r' });
-  assert.deepEqual(out[0].errors.map((x) => x.rule), ['contrast']);
+  assert.deepEqual(out[0].errors.map((x) => x.rule), ['heading-order']);
   assert.deepEqual(out[0].warnings.map((x) => x.rule), ['measure']);
   assert.equal(summary.errors, 1);
   assert.equal(summary.warnings, 1);
   assert.equal(failed, true);
-  const clean = applyPolicy(results, { config: { rules: { contrast: 'warn', measure: 'warn', spacing: 'off' } }, cwd: '/r' });
+  const clean = applyPolicy(results, { config: { rules: { 'heading-order': 'warn', measure: 'warn', spacing: 'off' } }, cwd: '/r' });
   assert.equal(clean.failed, false, 'a run of warnings does not fail');
   assert.equal(clean.summary.clean, 1);
 });
@@ -88,15 +89,15 @@ test('a baseline never hides a violation on a page it did not cover', () => {
 });
 
 test('config: a missing implicit file is fine, a bad severity is not', () => {
-  // Given a directory with no af.config.json, the system's defaults apply. (Given an explicit path
+  // Given a directory with no standards.config.json, the system's defaults apply. (Given an explicit path
   // that does not exist, it throws — see the test below.)
   const c = loadConfig('/nonexistent');
   assert.deepEqual(c, { rules: {}, baseline: null, source: null });
-  assert.throws(() => loadConfig(fileURLToPath(new URL('../test/fixtures/af.config.bad.json', import.meta.url))), /expected one of/);
+  assert.throws(() => loadConfig(fileURLToPath(new URL('../test/fixtures/standards.config.bad.json', import.meta.url))), /expected one of/);
 });
 
 test('a page the run did not visit is not reported as fixed', () => {
-  // Otherwise `af lint a.html` says "N fixed, re-run --baseline-write", the user does, and every
+  // Otherwise `standards lint a.html` says "N fixed, re-run --baseline-write", the user does, and every
   // held violation on b.html is forgotten. "Not linted today" is not "fixed".
   const a = { url: 'file:///r/a.html', viewport: 1280, violations: [{ rule: 'measure', text: { sample: 'x' } }] };
   const b = { url: 'file:///r/b.html', viewport: 1280, violations: [{ rule: 'spacing', value: 13 }] };

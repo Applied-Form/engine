@@ -1,9 +1,9 @@
 /**
- * af drift — what a site's design system actually is, and how far the site is from it.
+ * standards drift — what a site's design system actually is, and how far the site is from it.
  *
- *   af drift <page.html|url> [...] [--out report.json] [--declared tokens.json] [--viewports 320,1280]
- *   af drift <page.html|url> [...] --save-survey survey.json     measure, and keep the measurements
- *   af drift --from-survey survey.json [--declared tokens.json]  analyse without a browser
+ *   standards drift <page.html|url> [...] [--out report.json] [--declared tokens.json] [--viewports 320,1280]
+ *   standards drift <page.html|url> [...] --save-survey survey.json     measure, and keep the measurements
+ *   standards drift --from-survey survey.json [--declared tokens.json]  analyse without a browser
  *
  * Takes local files by preference rather than live URLs. A report that re-scrapes cannot be
  * re-run: the site moves, the numbers move, and the client is right to ask which run was true.
@@ -16,6 +16,7 @@
  * going back to a site that has moved underneath it. And the survey can be handed to the client
  * as the evidence, so the numbers are auditable rather than trusted.
  */
+import '../src/lib/env-guard.mjs'; // first: a name conflict exits 2 (src/lib/env-guard.mjs)
 import { writeFileSync, readFileSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -32,8 +33,8 @@ const targets = args.filter((a, i) => !a.startsWith('--') && !(i > 0 && args[i -
 
 const fromSurvey = flag('from-survey');
 if (!targets.length && !fromSurvey) {
-  console.error('usage: af drift <page.html|url> [...] [--out report.json] [--declared tokens.json] [--viewports 320,1280]');
-  console.error('       af drift --from-survey survey.json [--declared tokens.json]');
+  console.error('usage: standards drift <page.html|url> [...] [--out report.json] [--declared tokens.json] [--viewports 320,1280]');
+  console.error('       standards drift --from-survey survey.json [--declared tokens.json]');
   process.exit(2);
 }
 

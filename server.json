@@ -1,23 +1,30 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
-  "name": "io.github.Applied-Form/engine",
-  "title": "Applied Form engine",
+  "name": "io.github.Applied-Form/standards",
+  "title": "Standards by Applied Form",
   "description": "Lint rendered pages against a design system in a real browser, across six widths, with the fix.",
-  "websiteUrl": "https://github.com/Applied-Form/engine",
+  "websiteUrl": "https://github.com/Applied-Form/standards",
   "repository": {
-    "url": "https://github.com/Applied-Form/engine",
+    "url": "https://github.com/Applied-Form/standards",
     "source": "github"
   },
-  "version": "3.3.1",
+  "version": "4.0.0",
   "packages": [
     {
       "registryType": "npm",
       "registryBaseUrl": "https://registry.npmjs.org",
-      "identifier": "@appliedform/engine",
-      "version": "3.3.1",
+      "identifier": "@appliedform/standards",
+      "version": "4.0.0",
       "transport": {
         "type": "stdio"
-      }
+      },
+      "runtimeHint": "npx",
+      "packageArguments": [
+        {
+          "type": "positional",
+          "value": "mcp"
+        }
+      ]
     }
   ]
 }

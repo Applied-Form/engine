@@ -5,7 +5,7 @@
  * Every number this repository has produced about itself came from measuring its own pages with
  * its own linter. The research brief asked for comparisons made by running, not by reading, and
  * this is that: two third-party instruments nobody here can tune, run on the same page as
- * `af lint`, with the three results printed side by side.
+ * `standards lint`, with the three results printed side by side.
  *
  *   axe-core   an accessibility engine, injected into the rendered page.
  *   stylelint  a static linter over the page's own stylesheets, running the config this repository
@@ -25,6 +25,7 @@
  * `test/compare.test.mjs` holds the fixture results so the claims quoted from them cannot rot
  * silently.
  */
+import '../src/lib/env-guard.mjs'; // first: a name conflict exits 2 (src/lib/env-guard.mjs)
 import { readFileSync } from 'node:fs';
 import { pathToFileURL, fileURLToPath } from 'node:url';
 import { resolve, dirname } from 'node:path';
@@ -106,9 +107,9 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
       results.push(r);
       if (!json) {
         console.log(`\n${p}`);
-        console.log(`  af lint    ${r.gate.count} violations, ${Object.keys(r.gate.rules).length} rules: ${list(r.gate.rules)}`);
-        console.log(`  axe-core   ${r.axe.count} violations, ${Object.keys(r.axe.rules).length} rules (${r.axe.serious} serious or critical): ${list(r.axe.rules)}`);
-        console.log(`  stylelint  ${r.stylelint.count} warnings, ${Object.keys(r.stylelint.rules).length} rules, over ${r.stylelint.sources} authored stylesheet(s): ${list(r.stylelint.rules)}`);
+        console.log(`  standards lint  ${r.gate.count} violations, ${Object.keys(r.gate.rules).length} rules: ${list(r.gate.rules)}`);
+        console.log(`  axe-core        ${r.axe.count} violations, ${Object.keys(r.axe.rules).length} rules (${r.axe.serious} serious or critical): ${list(r.axe.rules)}`);
+        console.log(`  stylelint       ${r.stylelint.count} warnings, ${Object.keys(r.stylelint.rules).length} rules, over ${r.stylelint.sources} authored stylesheet(s): ${list(r.stylelint.rules)}`);
       }
     }
   } finally { await browser.close(); }

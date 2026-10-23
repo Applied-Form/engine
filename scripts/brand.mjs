@@ -4,8 +4,9 @@
  *   node scripts/brand.mjs --hue 210 --paper "#F4F7FA" [--saturation 0.5] [--name "North Field"] [--key north] [--wordmark brands/north/wordmark.svg] [--out brands/north.tokens.json]
  *
  * With --out the result is a brand overlay (system colour names plus the brand block), ready for
- * AF_BRAND=<key> npm run build:brand. Without it, the roles and their measurements are printed.
+ * STANDARDS_SYSTEM=<key> npm run build:brand. Without it, the roles and their measurements are printed.
  */
+import '../src/lib/env-guard.mjs'; // first: a name conflict exits 2 (src/lib/env-guard.mjs)
 import { writeFileSync } from 'node:fs';
 import { derivePalette, toOverlay } from '../src/lib/palette.mjs';
 
@@ -13,7 +14,7 @@ const args = process.argv.slice(2);
 const opt = (k, d) => { const i = args.indexOf(`--${k}`); return i >= 0 ? args[i + 1] : d; };
 const hue = Number(opt('hue')), paper = opt('paper'), saturation = Number(opt('saturation', 0.55));
 const key = opt('key', 'brand'), name = opt('name', key), wordmark = opt('wordmark'), fontsDir = opt('fonts-dir');
-if (!Number.isFinite(hue) || !paper) { console.error('usage: node scripts/brand.mjs --hue <0-360> --paper "#RRGGBB" [--saturation 0.55] [--name brand] [--out file]'); process.exit(2); }
+if (!Number.isFinite(hue) || !paper) { console.error('usage: standards brand --hue <0-360> --paper "#RRGGBB" [--saturation 0.55] [--name brand] [--out file]'); process.exit(2); }
 try {
   const p = derivePalette({ hue, paper, saturation });
   for (const [k, v] of Object.entries(p.colors)) console.log(`${k.padEnd(14)} ${v}`);

@@ -4,6 +4,7 @@
  */
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import { systemFromEnv } from './env.mjs';
 
 export const TOKENS_PATH = fileURLToPath(new URL('../../tokens/applied-form.tokens.json', import.meta.url));
 export const BRANDS_DIR = fileURLToPath(new URL('../../brands/', import.meta.url));
@@ -16,17 +17,22 @@ export function mergeTokens(base, overlay) {
   return out;
 }
 
-/** Load the base token file, with a brand overlay (brands/<name>.tokens.json) merged in when one is named. */
-export function loadTokens(brand = process.env.AF_BRAND) {
-  const base = JSON.parse(readFileSync(TOKENS_PATH, 'utf8'));
-  if (!brand) return base;
-  // A brand is a name under brands/, or a path to an overlay file, so a test can state a system
-  // without it having to be one of the shipped brands.
-  const overlay = JSON.parse(readFileSync(brand.endsWith('.json') ? brand : `${BRANDS_DIR}${brand}.tokens.json`, 'utf8'));
-  return mergeTokens(base, overlay);
+/**
+ * A brand's own overlay, as written and not merged over the base: null for the house. A brand is a name under
+ * brands/, or a path to an overlay file, so a test can state a system without it having to be one of the shipped brands.
+ */
+export function loadOverlay(brand = systemFromEnv()) {
+  if (!brand) return null;
+  return JSON.parse(readFileSync(brand.endsWith('.json') ? brand : `${BRANDS_DIR}${brand}.tokens.json`, 'utf8'));
 }
 
-export const brand = process.env.AF_BRAND || null;
+/** Load the base token file, with a brand overlay (brands/<name>.tokens.json) merged in when one is named. */
+export function loadTokens(brand = systemFromEnv()) {
+  const base = JSON.parse(readFileSync(TOKENS_PATH, 'utf8'));
+  return brand ? mergeTokens(base, loadOverlay(brand)) : base;
+}
+
+export const brand = systemFromEnv() || null;
 export const tokens = loadTokens(brand);
 
 const EXT = 'form.applied';
@@ -103,6 +109,24 @@ export const colors = Object.fromEntries(leafEntries(tokens.color).map(([name, t
 export const colorName = (hex) =>
   Object.entries(colors).find(([, v]) => v.toUpperCase() === String(hex).toUpperCase())?.[0] ?? null;
 
+/**
+ * A system that declares a pack is judged in its register `pack`. Without one every page fails
+ * `register` alone, which a pack drops as a house rule, so no rule at all is measured (decision 0027).
+ * `contrast` falls back on a register's background where a page paints none; a register without one
+ * leaves it nothing to measure against. Both are refused as the system is loaded.
+ */
+export function holdRegisters(system, source) {
+  if ((system.$extensions?.[EXT]?.pack ?? null) !== null && !system.register?.pack) {
+    throw new Error(`${source}: declares a pack but states no register.pack, so no rule would judge a page under it (decision 0027)`);
+  }
+  for (const [id, group] of leafEntries(system.register ?? {})) {
+    const node = group?.background;
+    const bg = node && typeof node === 'object' ? resolve(node.$value, system) : node;
+    if (typeof bg !== 'string' || !/^#[0-9a-f]{3,8}$/i.test(bg)) throw new Error(`${source}: register.${id}.background is ${JSON.stringify(bg)}, not a colour; \`contrast\` measures against it where a page paints no ground (decision 0027)`);
+  }
+}
+holdRegisters(tokens, brand ? `the system ${brand}` : 'the token file');
+
 /** Resolved register palettes, e.g. registers.ii.link is the Register II link colour as a hex string. */
 export const registers = Object.fromEntries(
   leafEntries(tokens.register).map(([id, group]) => [
@@ -157,6 +181,41 @@ export const display = {
   weightMax: value('display.weight-max'),
 };
 
+
+/**
+ * The mandatory rules (decision 0027). `mandatoryFloor` is the platform's own list, read from the
+ * base file without any overlay, so a brand or pack cannot move it. `mandatoryDeclared` is the
+ * loaded system's list, which src/lib/rules/registry.mjs holds to the floor.
+ */
+const platform = loadTokens(null);
+export const mandatoryFloor = platform.$extensions?.[EXT]?.levels?.mandatory ?? [];
+export const mandatoryDeclared = ext().levels?.mandatory;
+
+/**
+ * The thresholds the mandatory rules read from the loaded system, and the rule that reads each. A
+ * system may raise one and may not lower it (decision 0027): lowering `floors.body-contrast` would
+ * silence `contrast` without naming it. The floor is the platform's value, read from the base file
+ * without any overlay, as `mandatoryFloor` is. A value that is not a number is refused too, because
+ * a comparison with it is false and would silence the rule as surely as a low one.
+ */
+export const MANDATORY_THRESHOLDS = {
+  'body-contrast': 'contrast',
+  'display-contrast': 'contrast',
+  'large-text-px': 'contrast',
+  'large-bold-text-px': 'contrast',
+  'text-min-px': 'text-too-small',
+};
+
+export function holdThresholds(system, source, base = platform) {
+  for (const [key, rule] of Object.entries(MANDATORY_THRESHOLDS)) {
+    const floor = resolve(get(`floors.${key}`, base).$value, base);
+    const node = get(`floors.${key}`, system);
+    const v = node == null ? node : resolve(node.$value, system);
+    const why = typeof v !== 'number' || !Number.isFinite(v) ? 'not a number' : v < floor ? `below the platform floor of ${floor}` : null;
+    if (why) throw new Error(`${source}: floors.${key} is ${JSON.stringify(v)}, ${why}; \`${rule}\` reads it, and a system may raise it but not set it below ${floor} (decision 0027)`);
+  }
+}
+holdThresholds(tokens, brand ? `the system ${brand}` : 'the token file');
 
 /** The Standards pack this system was imported from, if it was: { system, version, declares, spacing? }. */
 export const pack = ext().pack ?? null;
@@ -226,7 +285,7 @@ export const states = Object.fromEntries(
  *
  * A design system without a deprecation cycle removes a token when somebody decides to, and every
  * consumer finds out by breaking. `$deprecated` on a leaf says a token is going: the value keeps
- * working, the CSS carries a comment, the flat export carries the note, `af rules --deprecated`
+ * working, the CSS carries a comment, the flat export carries the note, `standards rules --deprecated`
  * lists them, and a test fails when a major release ships one that is still there. The replacement
  * is named, because "deprecated" without a successor is an instruction to guess.
  */

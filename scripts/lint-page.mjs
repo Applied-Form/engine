@@ -8,18 +8,25 @@
  * are printed but never fail.
  *
  *   --json                 one JSON document for CI and editors
- *   --config <file>        severity overrides (default: ./af.config.json if present)
- *   --baseline [file]      hold known violations (default: ./af-baseline.json)
+ *   --config <file>        severity overrides (default: ./standards.config.json if present)
+ *   --baseline [file]      hold known violations (default: ./standards-baseline.json)
  *   --baseline-write       record the current violations as the baseline and exit 0
- *   --out <file>           where --baseline-write writes (default: ./af-baseline.json)
+ *   --out <file>           where --baseline-write writes (default: ./standards-baseline.json)
  *   --register <i|ii>      lint a page that declares no register as if it were in this one; a
  *                          page that declares its own keeps it, and the output says which was assumed
  *
- * Set AF_CHROMIUM to a Chromium executable to skip Playwright's own download.
+ * A config or baseline under the old name is read, and written, at its own path, with one line.
+ * An explicit --config or --baseline path gets no fallback.
+ *
+ * Set STANDARDS_CHROMIUM to a Chromium executable to skip Playwright's own download.
  */
+import '../src/lib/env-guard.mjs'; // first: a name conflict exits 2 (src/lib/env-guard.mjs)
 import { pathToFileURL } from 'node:url';
 import { resolve as resolvePath, dirname } from 'node:path';
 import { writeFileSync } from 'node:fs';
+import { BASELINE } from '../src/lib/names.mjs';
+import { resolveFile } from '../src/lib/resolve-file.mjs';
+import { systemFromEnv } from '../src/lib/env.mjs';
 import { lintPages, sampledViewports, VIEWPORTS } from '../src/lib/page-lint.mjs';
 import { loadConfig, loadBaseline, buildBaseline, mergeBaseline, applyPolicy, policyNotes, severityOf, splitArgs, pageKey } from '../src/lib/policy.mjs';
 
@@ -37,8 +44,11 @@ const fail = (e) => { console.error(`error: ${e.message}`); process.exit(2); };
 let config;
 try { config = loadConfig(opt('config', process.cwd())); } catch (e) { fail(e); }
 const writing = flag('baseline-write');
-const baselinePath = writing ? opt('out', config.baseline ?? 'af-baseline.json')
-  : flag('baseline') ? opt('baseline', config.baseline ?? 'af-baseline.json')
+// The default is looked up only when it is used: a path from the command line or the config is
+// taken as it is, with no fallback to the other name.
+const defaultBaseline = () => config.baseline ?? resolveFile('.', BASELINE.name, BASELINE.legacy).path;
+const baselinePath = writing ? (typeof opts.out === 'string' ? opts.out : defaultBaseline())
+  : flag('baseline') ? (typeof opts.baseline === 'string' ? opts.baseline : defaultBaseline())
   : config.baseline;
 // A path the user typed must exist; one that came from a default or the config may not yet.
 const explicitBaseline = !writing && typeof opts.baseline === 'string';
@@ -56,16 +66,16 @@ const sampleCount = opts.sample != null ? Number(opts.sample) : 2;
 const seed = opts.seed != null ? Number(opts.seed) : Date.now();
 const sampled = sampleCount > 0 ? sampledViewports(sampleCount, seed) : [];
 const viewports = [...VIEWPORTS, ...sampled].sort((a, b) => a - b);
-if (sampled.length) console.log(`sampled widths ${sampled.join(', ')}px (--seed ${seed} to reproduce)`);
+if (sampled.length) console.error(`sampled widths ${sampled.join(', ')}px (--seed ${seed} to reproduce)`);
 const register = opt('register');
 if (opts.register === true) fail(new Error('--register needs a value: i or ii'));
 let results;
 try {
-  results = await lintPages(files.map((f) => (/^https?:\/\//.test(f) ? f : pathToFileURL(resolvePath(f)).href)), { viewports, register, unregistered: !process.env.AF_BRAND && register == null ? 'universal' : 'house' });
+  results = await lintPages(files.map((f) => (/^https?:\/\//.test(f) ? f : pathToFileURL(resolvePath(f)).href)), { viewports, register, unregistered: !systemFromEnv() && register == null ? 'universal' : 'house' });
 } catch (e) { if (/unknown register/.test(e.message)) fail(e); throw e; }
 
 if (!json && results.some((r) => r.scope === 'universal')) {
-  console.log('No system loaded: pages without a register are checked against the universal accessibility rules only. Load a system with: af init --pack <pack tokens.json | instrument>');
+  console.log('No system loaded: pages without a register are checked against the universal accessibility rules only. Load a system with: standards init --pack <pack tokens.json | instrument>');
 }
 
 if (writing) {

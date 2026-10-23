@@ -6,6 +6,7 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { lint, advise, registerFor, typeTokensFor, ARTEFACT_REGISTER } from '../src/lib/rules.mjs';
 import { colors as c, registers, colorName } from '../src/lib/tokens.mjs';
 import { RULES } from '../src/lib/rules/registry.mjs';
+import { ENV } from '../src/lib/names.mjs';
 
 const rules = (spec) => lint(spec).map((v) => v.rule);
 
@@ -431,7 +432,7 @@ test('a system that permits radius and shadow is held to its own scale', () => {
   // The proof that the rules are parameters rather than Applied Form's taste. The fixture system
   // declares a radius scale of 4 and 12 and two elevations; under it, those values are correct
   // and anything else is a violation — the same strictness, a different system. It runs in a
-  // child process because a system is chosen at import time, by AF_BRAND.
+  // child process because a system is chosen at import time, by STANDARDS_SYSTEM.
   const script = `
     import { lint } from '${pathToFileURL(root + 'src/lib/rules.mjs').href}';
     const base = { register: 'ii', background: '#FFFFFF' };
@@ -450,7 +451,7 @@ test('a system that permits radius and shadow is held to its own scale', () => {
     }));
   `;
   const out = execFileSync(process.execPath, ['--input-type=module', '-e', script], {
-    cwd: root, env: { ...process.env, AF_BRAND: root + 'test/fixtures/rounded.tokens.json' }, encoding: 'utf8',
+    cwd: root, env: { ...process.env, [ENV.STANDARDS_SYSTEM]: undefined, STANDARDS_SYSTEM: root + 'test/fixtures/rounded.tokens.json' }, encoding: 'utf8',
   });
   const r = JSON.parse(out);
   assert.deepEqual(r.onScale, [], 'a declared radius and a declared elevation are correct under this system');
@@ -460,7 +461,7 @@ test('a system that permits radius and shadow is held to its own scale', () => {
 });
 
 test('a system named by its file path builds under its file name, never under the path', () => {
-  const dist = (brand) => execFileSync(process.execPath, ['--input-type=module', '-e', `import { DIST } from '${pathToFileURL(root + 'src/lib/build-utils.mjs').href}'; console.log(DIST);`], { env: { ...process.env, AF_BRAND: brand }, encoding: 'utf8' }).trim();
+  const dist = (brand) => execFileSync(process.execPath, ['--input-type=module', '-e', `import { DIST } from '${pathToFileURL(root + 'src/lib/build-utils.mjs').href}'; console.log(DIST);`], { env: { ...process.env, [ENV.STANDARDS_SYSTEM]: undefined, STANDARDS_SYSTEM: brand }, encoding: 'utf8' }).trim();
   assert.equal(dist(root + 'test/fixtures/rounded.tokens.json'), 'dist/brands/rounded/');
   assert.equal(dist('../../escape.json'), 'dist/brands/escape/', 'a relative path cannot climb out of dist/');
   assert.equal(dist('north'), 'dist/brands/north/');

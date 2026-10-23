@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * `af drift` over the targets in `eval/drift/targets.json`, one directory per target.
+ * `standards drift` over the targets in `eval/drift/targets.json`, one directory per target.
  *
  *   node eval/drift-batch.mjs all
  *   node eval/drift-batch.mjs govuk carbon
@@ -13,10 +13,12 @@
  * report and the reader has to be able to tell. Needs network; it is what `.github/workflows/drift.yml`
  * runs, and it runs the same way on any machine that can reach the sites.
  */
+import '../src/lib/env-guard.mjs'; // first: a name conflict exits 2 (src/lib/env-guard.mjs)
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { childEnv } from '../src/lib/env.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
@@ -47,7 +49,7 @@ for (const job of jobs) {
   const survey = resolve(dir, 'survey.json'), report = resolve(dir, 'report.json');
   console.log(`\n== ${job.key} · ${job.name} · ${job.pages.length} page(s)`);
   const started = new Date().toISOString();
-  const r = spawnSync(process.execPath, [resolve(ROOT, 'scripts/drift.mjs'), ...job.pages, '--save-survey', survey, '--out', report], { encoding: 'utf8', cwd: ROOT });
+  const r = spawnSync(process.execPath, [resolve(ROOT, 'scripts/drift.mjs'), ...job.pages, '--save-survey', survey, '--out', report], { encoding: 'utf8', cwd: ROOT, env: childEnv() });
   const ok = r.status === 0 && existsSync(survey);
   const status = { key: job.key, name: job.name, pages: job.pages, started, finished: new Date().toISOString(), ok, exit: r.status, stdout: r.stdout.slice(-4000), stderr: r.stderr.slice(-4000) };
   writeFileSync(resolve(dir, 'status.json'), JSON.stringify(status, null, 2) + '\n');

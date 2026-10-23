@@ -5,7 +5,7 @@ covers the repository: by opening a pull request you agree your change is licens
 
 ## How this repository is made
 
-This tree is exported from Applied Form's own repository, where the engine is developed beside the
+This tree is exported from Applied Form's own repository, where Standards is developed beside the
 design system it was built for. A pull request here is reviewed here. When it is accepted, a
 maintainer carries the change into the source repository with you credited as a co-author, and it
 arrives in this repository with the next export. A change merged only here would be overwritten by

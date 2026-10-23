@@ -1,11 +1,11 @@
-Applied Form engine
+Standards by Applied Form
 Copyright 2026 Applied Form Ltd
 
 This product is licensed under the Apache License, Version 2.0 (see LICENSE).
 
 The name "Applied Form", the Applied Form wordmark and the Applied Form mark are trademarks and
 are not licensed under the Apache License. The token file in tokens/ is the Reference system, a
-neutral palette over the engine's structure, written for testing the engine; it is not the
+neutral palette over Standards' structure, written for testing Standards; it is not the
 Applied Form design system, which is licensed separately.
 
 The fonts in fonts/ (Fraunces, Libre Franklin, IBM Plex Mono) are distributed under the SIL Open
@@ -13,11 +13,11 @@ Font License 1.1. Each family's copyright notice and the licence text are in fon
 see fonts/README.md.
 
 The pages in test/fixtures/packs/instrument/ are Instrument's reference renderings from
-appliedform/standards (examples/workflow/reference-catalogue-r3), unmodified, used under the
+Applied-Form/standards-schema (examples/workflow/reference-catalogue-r3), unmodified, used under the
 Creative Commons Attribution 4.0 International Licence: Instrument, a Standards pack, from
 Applied Form. They embed Public Sans and DM Mono, each under the SIL Open Font License 1.1, with
 its licence text carried in the page's own font-license metadata.
 
-packs/instrument.tokens.json is Instrument's token contract from appliedform/standards, unmodified,
+packs/instrument.tokens.json is Instrument's token contract from Applied-Form/standards-schema, unmodified,
 used under the Creative Commons Attribution 4.0 International Licence: Instrument, a Standards pack,
 from Applied Form.

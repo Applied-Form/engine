@@ -1482,6 +1482,213 @@ pipeline-blind or held-out prediction is registered (fourteenth amendment).
 **The run, once approved.** `azure:gpt-5` and `azure:gpt-5-mini`, arm `pipeline` only, the thirty-six
 frozen briefs, two samples each, repairs as `engine10`, about $12 of Azure credit (`engine10`: $11.80).
 
+### Amendment, 2026-10-18 (seventeenth) — `engine12`: an on-dark link colour for Register II, and first drafts kept
+
+**Approved by Jordan on 2026-10-18 and registered before any `engine12` record exists.** It runs on
+`engine12` at the commit that records this approval. From the dispatch of its baseline re-score it is
+frozen like every amendment before it.
+
+**Why.** `engine11` left `link-colour-ii` on 3 GPT-5 pages and 1 mini page (results, `engine11` section).
+Every flagged link there sat on a dark masthead, where Register II's link colour reads about 2.05:1, so
+the models drew pale links and the rule failed them. No declaration could satisfy both `link-colour-ii`
+and `contrast` while the link stayed there: a gap in the system, not in the page (sixteenth amendment).
+The `engine11` read also found that the records could not separate a remedy from the draw, because the
+pipeline arm keeps only the shipped page.
+
+**What is in it** (`engine12`, which is `engine11` with `system/link-on-dark` merged; decision 0025).
+
+1. **A token.** `register.ii.link-on-dark` is added to every system: the colour, with real colour (CIE
+   Lab chroma above 10), nearest the link's hue that clears 4.5:1 and APCA Lc 60 on both ink and
+   espresso. The study system, Meridian (`eval/fixtures/meridian.merged.tokens.json`), takes clay light
+   `#ACD7C0`: 9.18:1 and Lc 72.8 on ink, 5.01:1 and Lc 60.7 on espresso.
+2. **The scorer.** `link-colour-ii` accepts either the link colour or the on-dark colour for a plain link
+   (one that paints no ground of its own) whose measured ground is exactly ink or espresso. Every other
+   link is judged as on `engine11`. The rule can therefore only move a page from fail to pass.
+3. **The fixer, pipeline arm.** It sets the on-dark colour on such a link only when all of these hold:
+   - the link is in neither accepted colour, or it is in the link colour and its text fails `contrast`;
+   - the checker can vouch for the ground;
+   - the link holds visible text that is not the wordmark;
+   - every run of text the link colours reads in the new colour on its own ground.
+
+   Links that paint their own ground keep `engine11`'s remedy.
+4. **First drafts are kept.** `generateConformant` returns the model's first draft, and `eval/run.mjs`
+   writes it to `drafts/` beside `pages/`, so the run's artifact carries it. Nothing scored changes.
+5. **What reaches the prompts.**
+   - The token and its `$description` reach the tokens arm, the four rules arms and both pipeline arms, through the token file.
+   - `--af-link-on-dark` is added to `tokens.css` for the components arm. `components.css` is byte-identical.
+   - Only the pipeline arm's repair message names the on-dark colour.
+
+**The diagnosis, on the runner** (run 39154542018, `engine11`'s pages re-scored with `engine12`'s scorer,
+`eval/link-diag.mjs` replaying each flagged page through `engine11`'s fixer and `engine12`'s).
+
+- **The re-score matches the records in every count the job prints.** 63 of 72 clean on GPT-5 and 60 on
+  mini; tier-2 clean 63 and 61; tier 1 held on 13 and 11 of 13. The job prints no per-page comparison, so
+  the baseline below is what establishes it page by page.
+- **The replay clears the masthead on GPT-5.** All 3 GPT-5 pages are cleared of `link-colour-ii`, and
+  the gate then passes on all 3 (control: 0). The 1 mini page (b09-s0) is not cleared: its links sit on
+  `#2B332F`, a dark band that is not one of the register's grounds: three of its four flagged links sit
+  there, and the fourth is white on a green filled button, which keeps `engine11`'s remedy. No page is
+  worse than the control on any rule.
+- **Projected on `engine11`'s pages:** 66 of 72 clean on GPT-5 (from 63), 60 on mini (unchanged).
+
+**Baseline.** `engine11` re-scored with `engine12`'s scorer, pipeline arm, both models, in one rescore
+dispatch at the approved `engine12` commit before `engine12` generates. **Predicted: the counts match the
+record, as run 39154542018 already reads.** Any difference is a defect, found and fixed before `engine12`
+is read.
+
+**How the bands are set.** The `engine11` read found the ±6 band too narrow. It had rested on one
+observation; the runs' own paired samples put the spread between two 72-page mini runs at about 5 pages,
+so a 95% band needs about ±10. GPT-5's draws have varied less (pages failing a rule outside the
+registered changes: 7 then 6), so its bands are ±8. The expected values allow for regression to the
+mean:
+- **mini** centres on the mean of `engine10`'s projection under `engine11`'s code (47) and `engine11`'s
+  record (60), and this change projects no gain on mini;
+- **GPT-5** centres on that mean (61 and 63) plus the replay's 3 pages.
+
+**Predictions for `engine12`, bounded both ways, pipeline arm only.** 72 fresh pages per model. No
+pipeline-blind or held-out prediction is registered (fourteenth amendment).
+
+| | GPT-5 | GPT-5-mini |
+|---|---|---|
+| 1. `link-colour-ii` pages | 0–5, expected 1 (`engine11`: 3) | 0–4, expected 1 (`engine11`: 1) |
+| 2. Pass rate (pages clean) | 57–72, expected 65 (`engine11`: 63) | 44–64, expected 54 (`engine11`: 60) |
+| 3. Tier-2 clean | 57–72, expected 65 (`engine11`: 63) | 45–65, expected 55 (`engine11`: 61) |
+| 4. Tier 1 held | 11–13 of 13, expected 12 | 10–13 of 13, expected 12 |
+| 5. `contrast` pages | 0–5, expected 2 (`engine11`: 3) | 0–4, expected 1 (`engine11`: 1) |
+| 6. Whole-page repairs | 3–17, expected 7 (`engine11`: 7) | 15–35, expected 25 (`engine11`: 25) |
+| 7. Cost against rules-read | 1.00–1.40×, expected 1.14× (`engine11`: 1.15×) | 1.30–1.70×, expected 1.49× (`engine11`: 1.49×) |
+| 8. Pages with a first draft kept | 72 of 72 | 72 of 72 |
+
+1. **Links.** The replay clears the masthead pages whose links sit on ink. The expected values are the
+   residue: links on a dark band that is not the register's ground, and filled buttons, which no change
+   here reaches.
+2. **Pass rate.** Below a band, the rules that rose are named before the run is read. Above a band, the
+   gain is traced by the draft replay (below) before it is attributed to the change.
+3. **Tier-2 clean** moves with the pass rate. The change acts on tier 2 only.
+4. **Tier 1.** The fix is judged on every rule, so it is kept only where tier 1 is left as it was. As on
+   `engine9` to `engine11`, each tier 1 rule breaks on 0–1 pages per model.
+5. **`contrast`** can fall where a link in the link colour on ink is recoloured. It cannot rise through
+   the fix, because the fix is refused where any run would read worse.
+6. **Whole-page repairs** are not moved by the change: a masthead link was never a reason for one.
+7. **Cost** falls slightly, by the repair rounds the masthead pages no longer need (about 0.01× on GPT-5).
+   The 1.5× bar stands as registered and is reported met or missed per model.
+8. **First drafts.** Every pipeline page has its first draft in the artifact's `drafts/`, named as its
+   page. A missing draft is a defect in the instrument and is reported before the run is read.
+9. **No rule the fixer can move rises by more than 2 pages per model over `engine11`**: `contrast`,
+   text-too-small, body-too-small, `target-size`, `focus-hidden`, `focus-restyled`, `measure`,
+   `print-overflow`. A larger rise is traced before the run is read.
+
+**A registered secondary analysis, the draft replay.** After the run, each first draft is put through
+`engine11`'s fixer and through `engine12`'s on the runner, with no model call. Both outcomes are
+reported per page and pooled: pages clean after the first fix under each, and the pages where the two
+differ. This separates the change from the draw for the first fix, which `engine11`'s records could not.
+It sets no band: it is how the read attributes the pass rate. Its script is written and tested before
+the read, and the read reports which commit ran it.
+
+**Known risks.**
+- **Prompts.** The token's description now reaches every arm that is given the token file. A model may
+  draw masthead links in the on-dark colour unprompted, which the scorer now accepts. That is a real
+  gain for the system, not an artefact of scoring, but it means the pass rate can move by more than the
+  replay's 3 pages.
+- **Labels.** On Meridian the on-dark colour clears `label-apca` on both grounds (Lc 72.8 and 60.7). A
+  label-size link on espresso is the case nearest the floor.
+
+**The run, once approved.** `azure:gpt-5` and `azure:gpt-5-mini`, arm `pipeline` only, the thirty-six
+frozen briefs, two samples each, repairs as `engine11`, about $11 of Azure credit (`engine11`: $11.02).
+
+### Amendment, 2026-10-21 (eighteenth) — 4.0.0 renames the package and the command and adds rule levels; no measured verdict was meant to change
+
+**Registered before any 4.0.0 record exists. No model was run for it and it registers no prediction.**
+The seventeenth amendment (`engine12`, PR #80) is the last before it, so this one takes the next
+number. From the first 4.0.0 run this section is frozen like every amendment before it.
+
+**What 4.0.0 is.** A rename plus rule levels. The package `@appliedform/engine` becomes
+`@appliedform/standards`, the command `af` becomes `standards`, and the tools, the environment variables
+and the config, baseline and pack names move with them (decision 0029). Every rule now has a level,
+mandatory, standard or advisory (decision 0027). Neither change was meant to alter what a rule measures,
+which rules run, or what a page scores. With the default configuration the levels change no verdict
+(0027, "No verdict changes").
+
+The branch carries three more changes, which reached `main` after `fb118f7` and are not part of the
+rename. A brand that states no mark gets no Form on its house page (PR #78, owner decision T4).
+A system that sets a threshold a mandatory rule reads below the house value is refused when it is loaded,
+and so is a system that declares a pack and states no `register.pack` (decision 0027). Each acts on a
+system, brand or pack that a team supplies, and none acts under the default configuration the evidence
+below uses. This amendment registers no claim about any of them: the evidence does not exercise them.
+
+Three more pull requests reached `main` after `fb118f7` and are on the branch. PR #79 makes the build
+scripts' writes atomic and keeps test scratch out of `dist/`. PR #80 (`engine12`) keeps the model's first
+draft in `eval/run.mjs`, returns it from `src/lib/pipeline.mjs` and adds the draft replay. PR #81 makes the
+templates follow T1, T2 and T4. None changes a prompt or a lint verdict: none of the three touches
+`src/lib/rules/`, `eval/arms.mjs` or `src/lib/page-lint.mjs`, and they reach only the build and test
+scripts, the harness's draft path and the template builder.
+
+**The old names still run.** `af`, `af mcp`, `af-mcp`, the `af_*` tools, `AF_BRAND`, `AF_CHROMIUM`,
+`af.config.json` and `af-baseline.json` work until 5.0.0, each with one line on stderr. A `.af/` path
+named in a config is a plain path and keeps working without a line.
+
+**The repair-feedback text changed in one place.** The `fix` text of `recipe-mismatch`
+(`src/lib/rules/registry.mjs:65`) said "af move <name> emits the scaffold" and now says "standards move
+<name> emits the scaffold". A model shown that rule's repair feedback sees the new command name. Every
+other string the harness shows a model is the same as at `fb118f7` (the 3.3.0 release commit): the rule
+table (`id`, `group`, `severity`, `summary`, `why`, `fix`, `wcag` for all 73 rules) and the two prompts
+built from it in `eval/arms.mjs` (`proseGuide()` and `compiledRuleContext()`) were printed from both
+trees and compared line by line, and the one line above is the whole difference.
+
+**The new baseline.** The harness fingerprint, `harnessFingerprint('.')` in `eval/run.mjs`, hashes
+`eval/`, `fonts/`, `package-lock.json`, `package.json`, `scripts/`, `src/` and `tokens/`. The rename
+touches all of them but `fonts/`, which has not changed since `fb118f7`, so every 3.3.x fingerprint is
+superseded. The baseline for 4.0.0 is the value `harnessFingerprint('.')` returns at the commit tagged
+4.0.0, recorded in the first run's record. That value is recorded at the release commit and not here,
+because stages of the rename after this amendment still change files that the fingerprint covers.
+
+**Records are not pooled.** A run file holds records of one fingerprint (the harness refuses a resume
+under any other). 3.3.x records and 4.0.0 records stay in separate run files, and a table that sets one
+against the other says so in its caption. The 3.3.x records are history as written.
+
+**The evidence: one page set, two engines.** The page set was taken with `git show fb118f7:<path>` and
+copied to a scratch directory: `test/fixtures/clean.html`, `violations.html`, `attacks.html` and the nine
+`examples/*.html` pages, with `examples/spreads.css` and the `dist/tokens.css` and `dist/components.css`
+that the 3.3.0 build wrote, so that both engines read the same bytes. Each page was linted with
+`lint --json --sample 0`, default configuration, no system variable set and no config file in the
+directory, by `bin/af.mjs` from a scratch copy of `fb118f7` (a `git archive`, built there) and by
+`bin/standards.mjs` from the 4.0.0 branch. Four widths per page, so 48 renders per engine. The commands,
+both revisions, the raw output of both engines, the empty diff and a per-page summary are kept in
+`eval/equivalence-4.0.0/`, which the open export does not carry.
+
+| Page set | Pages | Violations at 320, 672, 1280 and 1584 | Rules fired |
+|---|---|---|---|
+| `examples/*.html` (nine) | 9 | 0 | none (see the advisories below) |
+| `test/fixtures/clean.html` | 1 | 0 | none |
+| `test/fixtures/attacks.html` | 1 | 57 | 10 |
+| `test/fixtures/violations.html` | 1 | 136 | 31 |
+
+The two engines gave the same exit status on every page (0 on ten, 1 on `attacks.html` and
+`violations.html`), the same per-width verdict, and the same rule ids in the same order. The standard
+output of the two engines was identical byte for byte on all twelve pages, so the diff is empty.
+The totals were derived twice: 193 violations summed from the per-width lists, and 57 + 136 = 193
+errors from the summaries. 35 distinct rules fire in the set.
+
+Advisories are not violations and are not in these counts. One rule fires as an advisory on this set:
+`apca-advisory`, on `examples/components.html` (4), `register-ii-dark.html` (32) and `specimen.html` (4),
+40 in all. Both engines reported the same advisories, so they are part of the byte-for-byte match.
+
+**What this does and does not show.** It shows that, on these pages and this configuration, the lint
+verdict of the rename is unchanged. It does not exercise the other 38 of the 73 rules as violations
+(one of them, `apca-advisory`, fires as an advisory, as above): among the mandatory rules, `contrast`,
+`focus-hidden` and `wordmark-live-text` fire on no page of the set, so for
+them this run shows only that nothing changed on pages that do not trigger them. It does not exercise
+`fix`, `audit`, the MCP server, a config that lowers a rule, or a model: the 4.0.0 pipeline arm has not
+been run. The levels change what a team's policy may lower, which this set does not test (decision 0027
+and `test/levels.test.mjs` do).
+
+**To repeat it.** From a checkout of `fb118f7` run `npm ci && npm run build`. Copy the page set above
+out of that checkout, with `dist/tokens.css` and `dist/components.css`, into one directory. In it run
+`node <fb118f7>/bin/af.mjs lint <page> --json --sample 0` and `node <4.0.0>/bin/standards.mjs lint <page>
+--json --sample 0` for each page, with `AF_BRAND`, `AF_CHROMIUM`, `STANDARDS_SYSTEM` and
+`STANDARDS_CHROMIUM` unset, and compare the two outputs. `eval/equivalence-4.0.0/run.sh` does all of
+this and writes the files kept beside it.
+
 ## Measures
 
 Primary:

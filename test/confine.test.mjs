@@ -71,7 +71,7 @@ test('an MCP draft cannot read the directory the server runs in', { skip }, asyn
   const was = process.cwd();
   process.chdir(secretDir);
   try {
-    const out = await HANDLERS.af_lint({ html: thief, viewports: [1280] });
+    const out = await HANDLERS.standards_lint({ html: thief, viewports: [1280] });
     const text = out.content.map((c) => c.text).join('\n');
     assert.doesNotMatch(text, /heading-order/, text.slice(0, 2000));
   } finally {
@@ -80,13 +80,13 @@ test('an MCP draft cannot read the directory the server runs in', { skip }, asyn
   }
 });
 
-test('an af_fix draft cannot read the directory the server runs in, and only its own source comes back', { skip }, async () => {
-  // af_fix returns the page, so a draft that read a file would hand the file back. It gets af_lint's
+test('a standards_fix draft cannot read the directory the server runs in, and only its own source comes back', { skip }, async () => {
+  // standards_fix returns the page, so a draft that read a file would hand the file back. It gets standards_lint's
   // roots: its own directory and the engine's files, with the server running inside the secret's.
   const was = process.cwd();
   process.chdir(secretDir);
   try {
-    const out = JSON.parse((await HANDLERS.af_fix({ html: thief, viewports: [1280] })).content[0].text);
+    const out = JSON.parse((await HANDLERS.standards_fix({ html: thief, viewports: [1280] })).content[0].text);
     assert.ok(!out.remaining.some((v) => v.rule === 'heading-order'), JSON.stringify(out.remaining));
     // What comes back is the draft's own source and the fix block, never anything the page rendered.
     assert.equal(out.html.replace(/<style data-af-fixes>[\s\S]*?<\/style>\n?/, ''), thief);
@@ -103,9 +103,9 @@ test('control: the same draft fixed with the secret directory allowed reads it, 
 });
 
 test('with realpaths, a link inside a root is followed to where it leads: outside every root it is refused, inside one it is read', { skip }, async () => {
-  // af audit lints pages in place, in directories a person named; one of them may hold a link to
+  // standards audit lints pages in place, in directories a person named; one of them may hold a link to
   // the auditor's files. The browser follows a link, so with realpaths confine checks the file it
-  // leads to. af audit asks for this; af lint and af fix do not (the next test).
+  // leads to. standards audit asks for this; standards lint and standards fix do not (the next test).
   const dir = mkdtempSync(join(tmpdir(), 'af-link-'));
   writeFileSync(join(dir, 'kept.txt'), 'TOP-SECRET');
   symlinkSync(join(secretDir, 'secret.txt'), join(dir, 'out.txt'));
@@ -125,7 +125,7 @@ test('with realpaths, a link inside a root is followed to where it leads: outsid
   assert.ok(!failed.some((f) => f.url.endsWith('/in.txt')), JSON.stringify(failed));
 });
 
-test('without realpaths, as af lint and af fix call it, a page reads a stylesheet linked into its directory from outside every root; with realpaths it is refused', { skip }, async () => {
+test('without realpaths, as standards lint and standards fix call it, a page reads a stylesheet linked into its directory from outside every root; with realpaths it is refused', { skip }, async () => {
   // A person's own site may link a shared stylesheet into the page's directory. Without realpaths
   // confine checks the path as written, so the link is read.
   const outside = mkdtempSync(join(tmpdir(), 'af-shared-'));
@@ -136,16 +136,16 @@ test('without realpaths, as af lint and af fix call it, a page reads a styleshee
 <body data-register="ii"><main><h1>Linked</h1><p class="pale">A pale paragraph, coloured by a stylesheet linked in from elsewhere.</p></main></body></html>`);
   const url = pathToFileURL(join(dir, 'page.html')).href;
   const pale = (r) => r.violations.some((v) => v.rule === 'contrast' && /d0d0d0/i.test(`${v.text?.color} ${v.message}`));
-  // af lint's roots: the working directory and the engine's files, neither of which holds the target.
+  // standards lint's roots: the working directory and the engine's files, neither of which holds the target.
   const failed = [];
   const [asLint] = await lintPages([url], { viewports: [1280], browser, onFailed: (f) => failed.push(f) });
   assert.ok(pale(asLint), `the stylesheet loaded: ${JSON.stringify(asLint.violations.map((v) => v.rule))}`);
   assert.deepEqual(failed, []);
   const { fixPage } = await import('../src/lib/fix/page.mjs');
-  // af fix's roots: the page's directory and af lint's.
+  // standards fix's roots: the page's directory and standards lint's.
   const { initial } = await fixPage(readFileSync(join(dir, 'page.html'), 'utf8'), { browser, viewports: [1280], baseHref: pathToFileURL(`${dir}/`).href, fileRoots: [dir, ...DEFAULT_FILE_ROOTS()] });
-  assert.ok(pale(initial[0]), 'af fix reads it too');
-  // The control: with realpaths, as af audit asks, the same link is refused and heard.
+  assert.ok(pale(initial[0]), 'standards fix reads it too');
+  // The control: with realpaths, as standards audit asks, the same link is refused and heard.
   const refused = [];
   const [asReport] = await lintPages([url], { viewports: [1280], browser, onFailed: (f) => refused.push(f), realpaths: true });
   assert.ok(!pale(asReport), 'with realpaths the stylesheet is refused');

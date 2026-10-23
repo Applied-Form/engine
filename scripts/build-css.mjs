@@ -5,6 +5,7 @@
  * set the register-specific tokens. Apply the attribute at a document
  * boundary, never mid-page.
  */
+import '../src/lib/env-guard.mjs'; // first: a name conflict exits 2 (src/lib/env-guard.mjs)
 import { readdirSync } from 'node:fs';
 import { brandInfo, systemName, systemVersion, colors, registers, chartSeries, chartSeriesOnLight, chartSeriesOnDark, fonts, typeScale, spacingScale, grid, display, floors, motion, rules, opacity, focus, states, radiusTokens, elevationTokens, tokens as rawTokens, deprecations } from '../src/lib/tokens.mjs';
 import { ROOT, outDir , DIST, writeAtomic } from '../src/lib/build-utils.mjs';

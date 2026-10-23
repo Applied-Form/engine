@@ -7,7 +7,8 @@
  *
  *   Severity  — a team may run a rule as `error` (fails the build), `warn` (reported, does not fail)
  *               or `off`. The default for every rule is `error`; lowering one is a local, recorded
- *               choice in af.config.json, not a change to the system.
+ *               choice in standards.config.json, not a change to the system. A mandatory rule cannot be
+ *               lowered (decision 0027).
  *   Baseline  — a snapshot of the violations a codebase already has. Everything in the baseline is
  *               reported as known and does not fail; anything beyond it is new and does. A team
  *               burns the baseline down on its own schedule while being held to the line from today.
@@ -17,6 +18,20 @@
  */
 import { readFileSync, existsSync } from 'node:fs';
 import { relative } from 'node:path';
+import { RULES } from './rules/registry.mjs';
+import { CONFIG } from './names.mjs';
+import { resolveFile } from './resolve-file.mjs';
+
+/**
+ * A mandatory rule cannot be lowered (decision 0027). A policy that runs one as `warn` or `off` is
+ * refused, both where it is read and where it is applied, so a config built in code meets the same floor.
+ */
+const MANDATORY = new Set(RULES.filter((r) => r.level === 'mandatory').map((r) => r.id));
+function refuseDemotion(rules, source) {
+  for (const [id, sev] of Object.entries(rules ?? {})) {
+    if (MANDATORY.has(id) && sev !== 'error') throw new Error(`${source}: rule "${id}" is mandatory and cannot be set to "${sev}"; a mandatory rule always fails the build (decision 0027)`);
+  }
+}
 
 export const SEVERITIES = ['error', 'warn', 'off'];
 export const BASELINE_VERSION = 1;
@@ -58,15 +73,17 @@ export function pageKey(url, viewport, cwd = process.cwd()) {
 }
 
 /**
- * Read af.config.json (or an explicit path).
+ * Read standards.config.json in a directory (the old name is read too, with one line: see
+ * resolveFile), or an explicit path.
  *
  * A missing *implicit* file is not an error: the defaults are the system's. A missing *explicit*
- * path is, because a typo in `--config af.confg.json` would otherwise silently run every rule at
+ * path is, because a typo in `--config standards.confg.json` would otherwise silently run every rule at
  * `error` with no baseline, and the run would pass or fail for the wrong reason without a word.
+ * An explicit path gets no fallback to the other name.
  */
 export function loadConfig(pathOrCwd = process.cwd()) {
   const explicit = pathOrCwd.endsWith('.json');
-  const file = explicit ? pathOrCwd : `${pathOrCwd}/af.config.json`;
+  const file = explicit ? pathOrCwd : resolveFile(pathOrCwd, CONFIG.name, CONFIG.legacy).path;
   if (!existsSync(file)) {
     if (explicit) throw new Error(`config file not found: ${file}`);
     return { rules: {}, baseline: null, source: null };
@@ -75,6 +92,7 @@ export function loadConfig(pathOrCwd = process.cwd()) {
   for (const [id, sev] of Object.entries(raw.rules ?? {})) {
     if (!SEVERITIES.includes(sev)) throw new Error(`${file}: rule "${id}" has severity "${sev}"; expected one of ${SEVERITIES.join(', ')}`);
   }
+  refuseDemotion(raw.rules, file);
   return { rules: raw.rules ?? {}, baseline: raw.baseline ?? null, source: file };
 }
 
@@ -116,6 +134,7 @@ export function buildBaseline(results, { cwd = process.cwd(), stamp = null } = {
  * Counts matter — three identical violations baselined, then a fourth appears, and the fourth is new.
  */
 export function applyPolicy(results, { config = {}, baseline = null, cwd = process.cwd() } = {}) {
+  refuseDemotion(config.rules, config.source ?? 'policy');
   const remaining = new Map();
   for (const [key, fps] of Object.entries(baseline?.entries ?? {})) remaining.set(key, new Map(Object.entries(fps)));
 
@@ -161,7 +180,7 @@ export function applyPolicy(results, { config = {}, baseline = null, cwd = proce
 /**
  * Merge a freshly recorded baseline into an existing one. Pages this run visited take the new
  * record (including an empty one: a page that is now clean loses its entries); pages it did not
- * visit keep theirs. Without this, `af baseline one-page.html` would silently discard every other
+ * visit keep theirs. Without this, `standards baseline one-page.html` would silently discard every other
  * page's known violations, and the next full run would fail on all of them.
  */
 export function mergeBaseline(previous, fresh, visitedKeys) {

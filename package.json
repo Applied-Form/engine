@@ -1,26 +1,26 @@
 {
-  "name": "@appliedform/engine",
-  "version": "3.3.1",
-  "description": "Deprecated: use @appliedform/standards, which replaces this package and gets all further releases. A design-system conformance gate measured in a real browser: DTCG tokens in, every rendered page checked at four fixed and two sampled widths, with drift surveys, an MCP server and an evaluation harness anyone can rerun.",
+  "name": "@appliedform/standards",
+  "version": "4.0.0",
+  "description": "Standards by Applied Form: a design-system conformance gate measured in a real browser. DTCG tokens in, every rendered page checked at four fixed and two sampled widths, with drift surveys, an MCP server and an evaluation harness anyone can rerun.",
   "type": "module",
-  "mcpName": "io.github.Applied-Form/engine",
+  "mcpName": "io.github.Applied-Form/standards",
   "license": "Apache-2.0",
   "author": "Applied Form Ltd",
   "engines": {
     "node": ">=20"
   },
   "bin": {
+    "standards": "bin/standards.mjs",
     "af": "bin/af.mjs",
-    "af-mcp": "scripts/mcp.mjs",
-    "engine": "scripts/mcp.mjs"
+    "af-mcp": "bin/af-mcp.mjs"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Applied-Form/engine.git"
+    "url": "git+https://github.com/Applied-Form/standards.git"
   },
-  "homepage": "https://github.com/Applied-Form/engine#readme",
+  "homepage": "https://github.com/Applied-Form/standards#readme",
   "bugs": {
-    "url": "https://github.com/Applied-Form/engine/issues"
+    "url": "https://github.com/Applied-Form/standards/issues"
   },
   "files": [
     "bin",
@@ -33,7 +33,7 @@
     "dist/components.css",
     "dist/stylelint.config.cjs",
     "docs",
-    "af.config.example.json",
+    "standards.config.example.json",
     "server.json",
     "NOTICE"
   ],
@@ -47,7 +47,7 @@
     "eval:analyse": "node eval/analyse.mjs",
     "eval:judge": "node eval/judge-run.mjs",
     "eval:compare": "node eval/compare.mjs test/fixtures/violations.html test/fixtures/attacks.html test/fixtures/clean.html",
-    "prepack": "node -e \"const e={...process.env};delete e.AF_BRAND;require('child_process').execSync('npm run build',{stdio:'inherit',env:e})\""
+    "prepack": "node -e \"const e={...process.env};delete e.STANDARDS_SYSTEM;delete e.AF_BRAND;require('child_process').execSync('npm run build',{stdio:'inherit',env:e})\""
   },
   "dependencies": {
     "playwright": "^1.56.1"

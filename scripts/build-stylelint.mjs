@@ -16,7 +16,9 @@
  * A consumer installs `stylelint` and `stylelint-declaration-strict-value` themselves; neither is
  * a dependency of this package, which has one.
  */
-import { writeFileSync } from 'node:fs';
+import '../src/lib/env-guard.mjs'; // first: a name conflict exits 2 (src/lib/env-guard.mjs)
+import { fileURLToPath } from 'node:url';
+import { writeAtomic } from '../src/lib/build-utils.mjs';
 import { colors, spacingScale, fonts, radiusScale, absent } from '../src/lib/tokens.mjs';
 
 const OUT = new URL('../dist/', import.meta.url);
@@ -74,5 +76,5 @@ const config = {
 };
 
 const body = `/* ${config.$generated} */\nmodule.exports = ${JSON.stringify(config, null, 2)};\n`;
-writeFileSync(new URL('stylelint.config.cjs', OUT), body);
+writeAtomic(fileURLToPath(new URL('stylelint.config.cjs', OUT)), body);
 console.log(`wrote dist/stylelint.config.cjs (${TOKENED.length} tokened properties, ${Object.values(colors).length} colours)`);

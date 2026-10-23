@@ -14,12 +14,14 @@
  * it is scored on, and the held-out split — the whole defence against circularity — would be gone.
  * `disclosedOnly()` below is that filter, and it is the single most load-bearing line in the file.
  */
+import '../src/lib/env-guard.mjs'; // first: a name conflict exits 2 (src/lib/env-guard.mjs)
 import { readFileSync, writeFileSync, appendFileSync, existsSync, mkdirSync, readdirSync, statSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { pathToFileURL, fileURLToPath } from 'node:url';
 import { spawnSync, execFileSync } from 'node:child_process';
 import { resolve, dirname, join } from 'node:path';
 import { launchBrowser, lintPages } from '../src/lib/page-lint.mjs';
+import { systemFromEnv, childEnv } from '../src/lib/env.mjs';
 import { ARMS, REPAIR_ARMS, PIPELINE_ARMS, pipelineOptions, promptFor, repairPrompt } from './arms.mjs';
 import { generateConformant } from '../src/lib/pipeline.mjs';
 import { generate, resolveModel, available, extractHtml, routeIdentity } from './providers.mjs';
@@ -79,7 +81,8 @@ const cellKey = (b, arm, model, sample) => `${b}|${arm}|${model}|${sample}`;
  * which costs a new run name and never mixes two experiments.
  */
 export const GENERATION = ['eval', 'fonts', 'package-lock.json', 'package.json', 'scripts', 'src', 'tokens'];
-const NOT_THE_EXPERIMENT = [/^eval\/(results|runs|drift)(\/|$)/, /(^|\/)judging(\/|$)/, /(^|\/)pages(\/|$)/, /\.md$/i];
+// eval/panel holds screenshots of a run's pages for the designer panel, drawn after the run ends.
+const NOT_THE_EXPERIMENT = [/^eval\/(results|runs|drift|panel)(\/|$)/, /(^|\/)judging(\/|$)/, /(^|\/)pages(\/|$)/, /\.md$/i];
 
 export function harnessFingerprint(root = '.', paths = GENERATION, { outputs = [] } = {}) {
   // What this run writes, wherever --out put it: a file the first invocation had not yet created
@@ -113,6 +116,13 @@ async function generatePage(brief, arm, model, sample, browser, pageDir) {
     });
     const file = resolve(pageDir, `${brief.id}-${arm}-${fileSafe(model)}-s${sample}-r${r.rounds}.html`);
     writeFileSync(file, r.html);
+    // The model's first draft, before any fix or repair, beside the pages (seventeenth amendment), so
+    // a later read can put the same draft through two fixers and separate a remedy from the draw.
+    if (r.draft != null) {
+      const drafts = resolve(dirname(pageDir), 'drafts');
+      mkdirSync(drafts, { recursive: true });
+      writeFileSync(resolve(drafts, `${brief.id}-${arm}-${fileSafe(model)}-s${sample}.html`), r.draft);
+    }
     return { file, html: r.html, usage: r.usage, rounds: r.rounds, stop: r.stop, fenced: extractHtml(r.text).fenced, failure: classifyFailure({ stop: r.stop, html: r.html }), route, id, fixes: r.fixes, fixStats: r.fixStats, repairKind: r.repairKind, patchStats: r.patchStats, gate: r.gate };
   }
   const messages = [{ role: 'user', content: promptFor(brief, arm, ASSETS) }];
@@ -147,7 +157,7 @@ async function generatePage(brief, arm, model, sample, browser, pageDir) {
 
 /**
  * The gate has to measure the system the model was given. The linter reads its system at import
- * time from AF_BRAND, so a run that did not set it linted every page against Applied Form's own
+ * time from STANDARDS_SYSTEM, so a run that did not set it linted every page against Applied Form's own
  * tokens while the model held Meridian's: the repair loop told a model holding one palette to use
  * another, and the components arm was handed CSS built from the wrong one. The run now re-launches
  * itself under the study system, and builds that system's CSS before any arm reads it.
@@ -155,8 +165,8 @@ async function generatePage(brief, arm, model, sample, browser, pageDir) {
 const STUDY = resolve(ASSETS.tokenFile);
 
 async function main() {
-  if (process.env.AF_BRAND !== STUDY) {
-    const r = spawnSync(process.execPath, [fileURLToPath(import.meta.url), ...argv], { stdio: 'inherit', env: { ...process.env, AF_BRAND: STUDY } });
+  if (systemFromEnv() !== STUDY) {
+    const r = spawnSync(process.execPath, [fileURLToPath(import.meta.url), ...argv], { stdio: 'inherit', env: childEnv({ STANDARDS_SYSTEM: STUDY }) });
     return r.status ?? 1;
   }
   const outFile = opt('out', 'eval/runs/pilot.jsonl');
@@ -201,7 +211,7 @@ async function main() {
   // leave the old cells in the file under a run that claims a different scope. Only concurrency,
   // which changes nothing measured, may differ.
   const scope = { briefs: briefs.map((b) => b.id).sort(), arms: [...arms].sort(), models: [...models].sort(), samples };
-  // The browser that renders, by its own version: AF_CHROMIUM can point past the one the lockfile pins.
+  // The browser that renders, by its own version: STANDARDS_CHROMIUM can point past the one the lockfile pins.
   const browser = await launchBrowser();
   const treatment = { repairs: MAX_REPAIRS, richness: opt('richness', 'full'), harness: harnessFingerprint('.', GENERATION, { outputs: [outFile, pageDir] }), scope, routes: routeIdentity(models), browser: browser.version() };
   const done = new Set();

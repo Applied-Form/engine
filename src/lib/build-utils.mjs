@@ -5,12 +5,13 @@
  */
 import { mkdirSync, writeFileSync, renameSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import { systemFromEnv } from './env.mjs';
 
 /** Absolute path to the repo root, trailing slash included. */
 export const ROOT = fileURLToPath(new URL('../../', import.meta.url));
-/** Output root: dist/ for the base system, dist/brands/<name>/ when AF_BRAND names a brand overlay. */
-export const BRAND = process.env.AF_BRAND || null;
-// AF_BRAND may be a path to an overlay file (tokens.mjs); its output goes under its file name,
+/** Output root: dist/ for the base system, dist/brands/<name>/ when STANDARDS_SYSTEM names a brand overlay. */
+export const BRAND = systemFromEnv() || null;
+// STANDARDS_SYSTEM may be a path to an overlay file (tokens.mjs); its output goes under its file name,
 // never under the path, which could be absolute or climb out of dist/.
 const brandKey = BRAND && BRAND.endsWith('.json') ? BRAND.split(/[\\/]/).pop().replace(/(\.tokens)?\.json$/, '') : BRAND;
 export const DIST = BRAND ? `dist/brands/${brandKey}/` : 'dist/';

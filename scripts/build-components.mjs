@@ -5,6 +5,7 @@
  * bar labels, figure). Everything references the custom properties in
  * dist/tokens.css; load that first.
  */
+import '../src/lib/env-guard.mjs'; // first: a name conflict exits 2 (src/lib/env-guard.mjs)
 import { systemName, systemVersion, grid, floors, layers, bleeds, composition, aspectRatios, print, registers, spacingScale, radiusTokens, elevationTokens } from '../src/lib/tokens.mjs';
 import { outDir, typeShorthand as type , DIST, writeAtomic } from '../src/lib/build-utils.mjs';
 
@@ -105,7 +106,7 @@ L.push('.af-actions { display: flex; flex-wrap: wrap; gap: var(--af-space-02); }
 L.push('');
 L.push('/* Figures: plots and Forms only. Labels live in HTML, not in the scaled SVG. */');
 L.push('.af-grid > .af-figure { grid-column: 1 / -1; }');
-L.push('.af-figure svg { width: 100%; max-width: 800px; height: auto; display: block; }');
+L.push('.af-figure svg:not(.af-sparkline) { width: 100%; max-width: 800px; height: auto; display: block; }');
 L.push(`.af-bar-labels { list-style: none; display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; max-width: 800px; text-align: center; padding-block: var(--af-space-01); font: ${type('data-02')} var(--af-font-data); }`);
 L.push('.af-figure figcaption { margin-top: var(--af-space-01); color: var(--af-muted); }');
 L.push(`.af-line-labels, .af-dot-labels { list-style: none; display: flex; flex-wrap: wrap; gap: var(--af-space-02) var(--af-space-03); padding-block: var(--af-space-01); font: ${type('data-02')} var(--af-font-data); }`);

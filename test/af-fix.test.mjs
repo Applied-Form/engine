@@ -1,5 +1,5 @@
 /**
- * `af fix`: the deterministic fixer behind a command. A page with four faults the fixer knows how to
+ * `standards fix`: the deterministic fixer behind a command. A page with four faults the fixer knows how to
  * cure comes out passing and the command exits 0; a page with a fault it cannot cure exits 1 and names
  * the rule and the element; the input is never written; `--json` is a report a script can read.
  */
@@ -12,9 +12,10 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { spawnSync } from 'node:child_process';
 import { launchBrowser, lintPages } from '../src/lib/page-lint.mjs';
 import { fixReport, selectorsOf, withBase, NOT_CHECKED } from '../src/lib/fix/page.mjs';
+import { ENV } from '../src/lib/names.mjs';
 
 const ROOT = fileURLToPath(new URL('../', import.meta.url));
-const AF = join(ROOT, 'bin/af.mjs');
+const STANDARDS_BIN = join(ROOT, 'bin/standards.mjs');
 const TOKENS_CSS = pathToFileURL(join(ROOT, 'dist/tokens.css')).href;
 
 let browser = null, launchError = null;
@@ -54,8 +55,8 @@ const page = ({ unfixable = false } = {}) => `<!doctype html>
 const FIXABLE_FAULTS = ['link-not-underlined', 'radius-present', 'shadow-present', 'target-size'];
 const WIDTHS = '320,1280';
 
-const env = () => { const e = { ...process.env }; delete e.AF_BRAND; return e; };
-const af = (args, cwd) => spawnSync(process.execPath, [AF, 'fix', ...args], { cwd, encoding: 'utf8', env: env(), timeout: 300000 });
+const env = () => { const e = { ...process.env }; delete e.STANDARDS_SYSTEM; delete e[ENV.STANDARDS_SYSTEM]; return e; };
+const standards = (args, cwd) => spawnSync(process.execPath, [STANDARDS_BIN, 'fix', ...args], { cwd, encoding: 'utf8', env: env(), timeout: 300000 });
 const workspace = (html, name = 'page.html') => {
   // The command resolves paths against its working directory, which the system reports with links
   // followed: on macOS the temporary directory /var/folders/… is /private/var/folders/….
@@ -67,7 +68,7 @@ const workspace = (html, name = 'page.html') => {
 test('a page with four fixable faults comes out passing, beside the input, and exits 0', { skip }, async () => {
   const { dir, file } = workspace(page());
   const before = readFileSync(file);
-  const r = af(['page.html', '--widths', WIDTHS], dir);
+  const r = standards(['page.html', '--widths', WIDTHS], dir);
   assert.equal(r.status, 0, r.stdout + r.stderr);
   assert.deepEqual(readFileSync(file), before, 'the input is untouched');
   const fixed = join(dir, 'page.fixed.html');
@@ -86,7 +87,7 @@ test('a page with four fixable faults comes out passing, beside the input, and e
 test('a page with a fault the fixer cannot cure exits 1 and names the rule and the element', { skip }, () => {
   const { dir, file } = workspace(page({ unfixable: true }));
   const before = readFileSync(file, 'utf8');
-  const r = af(['page.html', '--widths', WIDTHS], dir);
+  const r = standards(['page.html', '--widths', WIDTHS], dir);
   assert.equal(r.status, 1, r.stdout + r.stderr);
   assert.equal(readFileSync(file, 'utf8'), before, 'the input is untouched');
   assert.match(r.stdout, /heading-order {2}html > [^\n]*h4:nth-of-type\(1\) {2}at 320, 1280px/, `the rule and the element are named by its selector:\n${r.stdout}`);
@@ -95,7 +96,7 @@ test('a page with a fault the fixer cannot cure exits 1 and names the rule and t
 
 test('--json is one report: what was fixed, applied, refused and remains, and what was not checked', { skip }, () => {
   const { dir } = workspace(page({ unfixable: true }));
-  const r = af(['page.html', '--widths', WIDTHS, '--json', '--out', 'out/../custom.html'], dir);
+  const r = standards(['page.html', '--widths', WIDTHS, '--json', '--out', 'out/../custom.html'], dir);
   assert.equal(r.status, 1, r.stderr);
   const report = JSON.parse(r.stdout);
   assert.equal(report.passed, false);
@@ -116,24 +117,25 @@ test('--json is one report: what was fixed, applied, refused and remains, and wh
   assert.deepEqual(left.widths, [320, 1280], 'one entry per rule and element, with the widths it failed at');
   assert.ok(left.fix, 'with the fix a person would make');
   assert.equal(report.notChecked.doc, NOT_CHECKED.doc);
+  assert.match(NOT_CHECKED.note, /^A pass covers the rules Standards measures and nothing else\./, 'the note names the product Standards');
 });
 
 test('usage and load errors exit 2 and write nothing', () => {
   const { dir } = workspace(page());
   for (const args of [[], ['missing.html'], ['page.html', '--register', 'iii'], ['page.html', '--widths', 'wide'], ['page.html', '--system', 'no-such-system'], ['page.html', '--out']]) {
-    const r = af(args, dir);
+    const r = standards(args, dir);
     assert.equal(r.status, 2, `${args.join(' ')}: ${r.stdout}${r.stderr}`);
-    assert.match(r.stderr, /af fix/);
+    assert.match(r.stderr, /standards fix/);
   }
   assert.ok(!existsSync(join(dir, 'page.fixed.html')));
 });
 
-test('--system loads a system for the run, as AF_BRAND does for af lint', { skip }, () => {
+test('--system loads a system for the run, as STANDARDS_SYSTEM does for standards lint', { skip }, () => {
   // The rounded fixture permits radius on a scale, so the base system's radius-present cannot fire.
   const { dir } = workspace(page());
-  const base = JSON.parse(af(['page.html', '--widths', '1280', '--json'], dir).stdout);
+  const base = JSON.parse(standards(['page.html', '--widths', '1280', '--json'], dir).stdout);
   assert.ok(base.before.rules['radius-present'], JSON.stringify(base.before));
-  const r = af(['page.html', '--widths', '1280', '--json', '--system', join(ROOT, 'test/fixtures/rounded.tokens.json')], dir);
+  const r = standards(['page.html', '--widths', '1280', '--json', '--system', join(ROOT, 'test/fixtures/rounded.tokens.json')], dir);
   const rounded = JSON.parse(r.stdout);
   assert.equal(rounded.system, join(ROOT, 'test/fixtures/rounded.tokens.json'));
   assert.ok(!rounded.before.rules['radius-present'], JSON.stringify(rounded.before));

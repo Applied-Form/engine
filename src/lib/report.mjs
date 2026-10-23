@@ -1,6 +1,6 @@
 /**
  * Compliance aggregation and reporting. Pure functions, no I/O — see scripts/report.mjs
- * for the CLI that reads `af lint --json` output, aggregates it, and appends history.
+ * for the CLI that reads `standards lint --json` output, aggregates it, and appends history.
  *
  * A "run" is one team/target's lint output: { team, target, pages: [{ url, viewport,
  * register, violations: [{rule, message}], advisories: [...] }] }.

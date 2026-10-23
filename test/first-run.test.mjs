@@ -1,11 +1,11 @@
 /**
  * The first ten minutes: install, load a system, lint a page, see something worth fixing.
  *
- * Readiness baseline B4 (2026-10-13): a newcomer's first `af lint` of an ordinary page reported one
+ * Readiness baseline B4 (2026-10-13): a newcomer's first `standards lint` of an ordinary page reported one
  * violation at every width, "No [data-register] root in the document", a concept they had never met.
  * With no system loaded, a page that declares no register is now judged by the universal rules,
  * which need no system, with one line saying how to load one. A page that declares a register is
- * judged as it always was. `af init --pack` loads a system for every later command.
+ * judged as it always was. `standards init --pack` loads a system for every later command.
  */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -16,9 +16,10 @@ import { join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { lintPages, launchBrowser, DEFAULT_FILE_ROOTS } from '../src/lib/page-lint.mjs';
 import { RULES } from '../src/lib/rules/registry.mjs';
+import { CLIENT_KEY, COMMAND, ENV } from '../src/lib/names.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
-const af = join(root, 'bin/af.mjs');
+const standards = join(root, 'bin/standards.mjs');
 let browser = null, launchError = null;
 try { browser = await launchBrowser(); } catch (e) { launchError = e; if (process.env.CI) throw e; }
 const skip = browser ? false : `no Chromium: ${launchError?.message.split('\n')[0]}`;
@@ -47,38 +48,41 @@ test('a page that declares a register is still judged by every rule', { skip }, 
   assert.notEqual(r.scope, 'universal');
 });
 
-test('af lint with no system says so once, and how to load one', { skip }, () => {
+test('standards lint with no system says so once, and how to load one', { skip }, () => {
   const d = dirWith({ 'page.html': ORDINARY });
-  const env = { ...process.env }; delete env.AF_BRAND;
-  const out = spawnSync(process.execPath, [af, 'lint', 'page.html', '--sample', '0'], { cwd: d, env, encoding: 'utf8' });
+  const env = { ...process.env }; delete env.STANDARDS_SYSTEM; delete env[ENV.STANDARDS_SYSTEM];
+  const out = spawnSync(process.execPath, [standards, 'lint', 'page.html', '--sample', '0'], { cwd: d, env, encoding: 'utf8' });
   const text = out.stdout + out.stderr;
   assert.equal((text.match(/No system loaded/g) ?? []).length, 1, text);
-  assert.match(text, /af init --pack/);
+  assert.match(text, /standards init --pack/);
   assert.match(text, /contrast/);
   assert.doesNotMatch(text, /No \[data-register\] root/);
 });
 
-test('af init --pack instrument loads Instrument for every later af command', { skip }, () => {
+test('standards init --pack instrument loads Instrument for every later standards command', { skip }, () => {
   const d = dirWith({ 'page.html': ORDINARY });
-  const env = { ...process.env }; delete env.AF_BRAND;
-  const init = spawnSync(process.execPath, [af, 'init', '--pack', 'instrument'], { cwd: d, env, encoding: 'utf8' });
+  const env = { ...process.env }; delete env.STANDARDS_SYSTEM; delete env[ENV.STANDARDS_SYSTEM];
+  const init = spawnSync(process.execPath, [standards, 'init', '--pack', 'instrument'], { cwd: d, env, encoding: 'utf8' });
   assert.equal(init.status, 0, init.stderr);
-  assert.ok(existsSync(join(d, '.af/system.json')));
-  assert.equal(JSON.parse(readFileSync(join(d, 'af.config.json'), 'utf8')).system, '.af/system.json');
-  const lint = spawnSync(process.execPath, [af, 'lint', 'page.html', '--sample', '0'], { cwd: d, env, encoding: 'utf8' });
+  assert.ok(existsSync(join(d, '.standards/system.json')));
+  assert.equal(JSON.parse(readFileSync(join(d, 'standards.config.json'), 'utf8')).system, '.standards/system.json');
+  const lint = spawnSync(process.execPath, [standards, 'lint', 'page.html', '--sample', '0'], { cwd: d, env, encoding: 'utf8' });
   const text = lint.stdout + lint.stderr;
   assert.match(text, /register PACK/, text);
   assert.doesNotMatch(text, /No system loaded/);
   assert.match(text, /radius-present/, 'Instrument declares radius 0, so the rounded card is caught');
 });
 
-test('af mcp-config prints a block whose command starts a server that lists af_lint', async () => {
+test('standards mcp-config prints a block whose command starts a server that lists standards_lint', async () => {
   for (const client of ['claude-code', 'cursor']) {
-    const out = spawnSync(process.execPath, [af, 'mcp-config', '--client', client], { encoding: 'utf8' });
+    const out = spawnSync(process.execPath, [standards, 'mcp-config', '--client', client], { encoding: 'utf8' });
     assert.equal(out.status, 0, out.stderr);
     const cfg = JSON.parse(out.stdout);
-    const server = cfg.mcpServers['applied-form'];
+    const server = cfg.mcpServers[CLIENT_KEY];
     assert.ok(server?.command, out.stdout);
+    assert.deepEqual(Object.keys(cfg.mcpServers), [CLIENT_KEY], 'one server, under the key the server introduces itself by');
+    assert.deepEqual([server.command, ...server.args], ['npx', COMMAND, 'mcp'], 'the local install, which npx resolves from node_modules/.bin');
+    assert.ok(!server.args.includes('--legacy-tool-names'), 'the new route lists the new names');
   }
   // Start the printed server from this checkout (the printed npx form resolves the installed package).
   const p = spawn(process.execPath, [join(root, 'scripts/mcp.mjs')], { stdio: ['pipe', 'pipe', 'inherit'] });
@@ -92,7 +96,7 @@ test('af mcp-config prints a block whose command starts a server that lists af_l
   while (!lines.some((l) => l.includes('"id":2')) && Date.now() < deadline) await new Promise((r) => setTimeout(r, 50));
   p.kill();
   const list = JSON.parse(lines.find((l) => l.includes('"id":2')));
-  assert.ok(list.result.tools.some((t) => t.name === 'af_lint'));
+  assert.ok(list.result.tools.some((t) => t.name === 'standards_lint'));
 });
 
 test.after(() => browser?.close());

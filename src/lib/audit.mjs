@@ -1,16 +1,16 @@
 /**
- * The account of a set of pages: what `af audit` writes. One entry per page, built from the lint
+ * The account of a set of pages: what `standards audit` writes. One entry per page, built from the lint
  * results before and (with the fixer) after, then an aggregate across the set. No browser and no
  * I/O beyond reading the scope document: scripts/audit-pages.mjs renders the pages and hands the
  * results here, and audit-html.mjs turns the account into a page.
  *
  * Two units are counted, and they are kept apart on purpose:
  *
- *   a violation  one rule failing on one element at one width, as `af lint` and `af fix` count it
+ *   a violation  one rule failing on one element at one width, as `standards lint` and `standards fix` count it
  *   a finding    one rule failing on one element, at however many widths it failed
  *
  * A finding is what a person fixes, so the report leads with findings. Violations are kept so the
- * numbers can be checked against `af fix --json` for the same page.
+ * numbers can be checked against `standards fix --json` for the same page.
  *
  * A page that did not load is in the account, named, with the reason. It is never counted clean: a
  * page nobody measured has not passed anything.
@@ -271,7 +271,7 @@ export const quote = (s) => (/^[\w./:@,=-]+$/.test(s) ? s : `'${String(s).replac
  * the system as it was typed.
  */
 export function pageCommand({ page = '<page>', roots = [], widths = [], system = null, register = null, fix = false, offline = false }) {
-  return ['npx af audit', page === '<page>' ? page : quote(page), ...roots.flatMap((r) => ['--root', quote(r)]),
+  return ['npx @appliedform/standards@4 audit', page === '<page>' ? page : quote(page), ...roots.flatMap((r) => ['--root', quote(r)]),
     '--widths', widths.join(','), ...(system ? ['--system', quote(system)] : []), ...(register ? ['--register', register] : []),
     ...(fix ? ['--fix'] : []), ...(offline ? ['--offline'] : [])].join(' ');
 }
@@ -285,7 +285,7 @@ export function systemOf(pages, { label = null, arg = null, version = null } = {
   const loaded = pages.filter((p) => p.loaded);
   const universal = loaded.filter((p) => p.scope === 'universal').length;
   const scope = universal && universal === loaded.length ? 'universal' : pack ? 'pack' : 'system';
-  const base = label ?? (scope === 'universal' ? 'the universal rules (no system loaded)' : `the engine's own tokens`);
+  const base = label ?? (scope === 'universal' ? 'the universal rules (no system loaded)' : `Applied Form's own tokens`);
   const also = universal && scope !== 'universal' ? `, and the universal rules for ${universal === 1 ? 'the page that declares' : `the ${universal} pages that declare`} no register` : '';
   return { label: `${base}${also}`, arg, version, scope };
 }
@@ -344,7 +344,7 @@ export function aggregate(pages) {
  * typed); a page that could read a directory named above its own, or read a file in another one
  * named, carries its own `command`. The report lists the --root directories as `rootsShown` gives
  * them, without the auditor's directories. `policy` records that the rule overrides in
- * af.config.json were not applied, and which they were: every rule listed is checked at its default
+ * standards.config.json were not applied, and which they were: every rule listed is checked at its default
  * severity, so the report reads the same whoever runs it.
  */
 export function buildReport({ pages, system, engine, register = null, widths, sampled = [], seed = null, fix = false, offline = false, roots = [], rootsShown = roots, generated, command, policy = { applied: false, overrides: {} } }) {
