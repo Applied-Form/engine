@@ -7,6 +7,9 @@
  */
 import { serve, handle, TOOLS, SERVER } from '../src/lib/mcp.mjs';
 
+// This is the last @appliedform/engine release. The notice goes to stderr, which the MCP protocol does not use.
+console.error('@appliedform/engine is deprecated and gets no further releases: uninstall it, then install @appliedform/standards.');
+
 if (process.argv.includes('--selftest')) {
   const calls = [
     { jsonrpc: '2.0', id: 1, method: 'initialize', params: {} },

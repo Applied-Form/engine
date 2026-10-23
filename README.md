@@ -1,3 +1,15 @@
+> **This package is deprecated and gets no further releases. Use `@appliedform/standards`.**
+> Uninstall this one first, then install the new one:
+>
+> ```sh
+> npm uninstall @appliedform/engine
+> npm install @appliedform/standards
+> ```
+>
+> The new package's command is `standards`. Both packages ship the `af` and `af-mcp` bins, so a global
+> install of one over the other fails with EEXIST, and a project that has both cannot tell which `af`
+> runs. That is why the uninstall comes first.
+
 # Applied Form engine
 
 A design-system conformance gate measured in a real browser. Give it a DTCG token file and a page;
