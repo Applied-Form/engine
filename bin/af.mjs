@@ -30,6 +30,9 @@ import { resolve as resolvePath } from 'node:path';
 
 const ROOT = fileURLToPath(new URL('../', import.meta.url));
 const [cmd, ...rest] = process.argv.slice(2);
+// This is the last @appliedform/engine release. The notice goes to stderr, which --json output and the MCP
+// protocol do not use; `af mcp` leaves it to the server it starts, so that command prints it once.
+if (cmd !== 'mcp') console.error('@appliedform/engine is deprecated and gets no further releases: uninstall it, then install @appliedform/standards.');
 // The system `af init` named in af.config.json is the one every command here judges against, unless
 // AF_BRAND already says otherwise.
 if (!process.env.AF_BRAND && existsSync('af.config.json')) {

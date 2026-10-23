@@ -2,7 +2,7 @@
   "$description": "Reference: the neutral system the open engine is tested against. Colour derived by `af brand --hue 200 --paper #F6F6F4 --saturation 0.2`; positive-light and critical-light are the overlay's positive and critical mixed toward white until they clear 4.6:1 on its espresso, where the base pair sits at 4.5:1; structure, rules and the three OFL voices come from the base file. It exists so the engine can be published without publishing Applied Form's own palette, and it is not a design anyone should ship. The mark's shape parameters are replaced, because Applied Form's identify the brand; its size and placement limits are rules and stay. The two literal steps of the sequential chart scale are the midpoints of its own sand, clay and terra deep.",
   "$extensions": {
     "form.applied": {
-      "version": "3.3.0",
+      "version": "3.3.1",
       "aspectRatios": [
         "1:1",
         "2:1",
