@@ -27,7 +27,7 @@ import { derivePalette } from './palette.mjs';
 import { fromPack } from './pack.mjs';
 import { CLIENT_KEY, TOOL_MAP, deprecated } from './names.mjs';
 
-export const SERVER = { name: CLIENT_KEY, version: '4.0.0' };
+export const SERVER = { name: CLIENT_KEY, version: '4.0.1' };
 
 export const TOOLS = [
   {
