@@ -972,20 +972,64 @@ test('a page inside the engine reads the engine’s published files and no other
   }
 });
 
-test('a refused request a page makes after its load event is still heard and listed', { skip }, () => {
-  // The page asks for a file outside every root 300ms after it has loaded, as a script fetching data
-  // late does (by XMLHttpRequest: Chromium's headless shell, which CI runs, rejects a fetch() of a
-  // file URL inside the page without making a request, so there would be nothing to hear). Closed at once after it is measured, the page would cancel the request and the
-  // refusal would go unheard; standards audit keeps it open until its network is quiet.
+test('a refused request a page makes after its load event is still heard and listed', { skip }, async () => {
+  // The page asks for a file outside every root only after it has loaded and after a local server has
+  // answered it, as a script fetching data late does (by XMLHttpRequest: Chromium's headless shell,
+  // which CI runs, rejects a fetch() of a file URL inside the page without making a request, so there
+  // would be nothing to hear). Closed at once after it is measured, the page would cancel the request
+  // and the refusal would go unheard; standards audit keeps it open until its network is quiet.
+  //
+  // Nothing here waits a fixed time for the page. The server holds /hold for LATE ms, so the page's
+  // request comes after the audit has measured it; the audit waits for that request because it is in
+  // flight. When it is answered the page makes the refused request and, in the same turn, /tail, which
+  // the server holds until the page has seen the refusal (/done). So the network is quiet only for the
+  // gap between Playwright reporting /hold finished and the page's callback sending /tail and the
+  // refused request, which is far smaller than the old 300 ms timer race but not zero. If measuring
+  // takes longer than LATE (1500 ms), the request can finish before the audit starts waiting, and the
+  // test then passes without exercising the keep-open path, as the old timer test could.
+  const LATE = 1500;
   const dir = workspace();
   writeFileSync(join(dir, 'secret.txt'), LEAK);
   mkdirSync(join(dir, 'client'));
-  writeFileSync(join(dir, 'client', 'page.html'), `<!doctype html><html lang="en" data-register="ii"><head><meta charset="utf-8"><title>t</title></head>
-<body><main><h1>Title</h1></main><script>addEventListener('load', () => setTimeout(() => { const x = new XMLHttpRequest(); x.open('GET', '../secret.txt'); x.send(); }, 300));</script></body></html>`);
-  const r = standards(['client', '--widths', '320', '--json'], dir);
-  const [p] = JSON.parse(r.stdout).pages;
-  assert.deepEqual(p.failed, [{ resource: 'secret.txt', type: 'xhr', why: REFUSED.file }], r.stderr);
-  assert.ok(!r.stdout.includes(LEAK));
+  const hits = [], tails = [], timers = new Set();
+  const server = createServer((req, res) => {
+    hits.push(req.url);
+    const headers = { 'access-control-allow-origin': '*', 'content-type': 'text/plain' };
+    if (req.url === '/hold') {
+      const t = setTimeout(() => { timers.delete(t); res.writeHead(200, headers).end('ok'); }, LATE);
+      timers.add(t);
+      res.on('close', () => { clearTimeout(t); timers.delete(t); });
+    } else if (req.url === '/tail') {
+      tails.push(res);
+      res.writeHead(200, headers);
+      res.on('close', () => { const i = tails.indexOf(res); if (i >= 0) tails.splice(i, 1); });
+    } else {
+      if (req.url === '/done') for (const t of tails.splice(0)) t.end('ok');
+      res.writeHead(200, headers).end('ok');
+    }
+  });
+  await new Promise((ok) => server.listen(0, '127.0.0.1', ok));
+  try {
+    const origin = `http://127.0.0.1:${server.address().port}`;
+    writeFileSync(join(dir, 'client', 'page.html'), `<!doctype html><html lang="en" data-register="ii"><head><meta charset="utf-8"><title>t</title></head>
+<body><main><h1>Title</h1></main><script>
+const get = (path, then) => { const x = new XMLHttpRequest(); x.open('GET', '${origin}' + path); if (then) x.onloadend = then; x.send(); };
+addEventListener('load', () => get('/hold', () => {
+  get('/tail');
+  const x = new XMLHttpRequest(); x.open('GET', '../secret.txt'); x.onloadend = () => get('/done'); x.send();
+}));
+</script></body></html>`);
+    const r = await standardsAsync(['client', '--widths', '320', '--json'], dir);
+    const [p] = JSON.parse(r.stdout).pages;
+    assert.deepEqual(p.failed, [{ resource: 'secret.txt', type: 'xhr', why: REFUSED.file }], r.stderr);
+    assert.ok(!r.stdout.includes(LEAK));
+    assert.ok(hits.includes('/done'), `the page saw the refusal: ${hits.join(' ')}`);
+  } finally {
+    for (const t of timers) clearTimeout(t);
+    for (const t of tails) t.destroy();
+    server.closeAllConnections();
+    await new Promise((ok) => server.close(ok));
+  }
 });
 
 test('a page from a URL reads no local file, with the fixer as without it', { skip }, async () => {
